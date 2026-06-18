@@ -1,0 +1,55 @@
+## Context
+
+La gestion de cargos fue introducida con una vinculacion directa al usuario de identidad (`CargoId` en user administrado). En paralelo, el dominio ya consolidó `FichaSocio` como entidad de perfil funcional ligada a `UserId`. Mantener el cargo en identidad fragmenta responsabilidades y duplica decisiones entre administracion de usuarios y perfil de socio.
+
+## Goals / Non-Goals
+
+**Goals:**
+- Mover la asignacion de cargo al agregado `FichaSocio`.
+- Mantener una unica referencia de cargo por ficha de socio.
+- Eliminar `CargoId` de contratos de gestion de usuarios administrados.
+- Preservar seguridad y reglas existentes (propietario/admin) en operaciones de ficha.
+
+**Non-Goals:**
+- No se redefine el CRUD de catalogo de cargos.
+- No se introduce historico de cargos por socio.
+- No se cambia el modelo de autenticacion/autorizacion JWT.
+
+## Decisions
+
+1. Fuente de verdad del cargo en `FichaSocio`.
+Rationale: el cargo es parte del perfil funcional del socio, no de identidad tecnica.
+Alternativa: mantener cargo en `User` y replicarlo en ficha. Se descarta por inconsistencia y sincronizacion compleja.
+
+2. Relacion opcional 1..1 desde ficha hacia cargo (`CargoId` nullable con FK).
+Rationale: permite socios sin cargo y un solo cargo activo por ficha.
+Alternativa: relacion N..N. Se descarta por no cumplir regla "una ficha, un cargo".
+
+3. API de usuarios administrados sin `CargoId`.
+Rationale: desacopla gestion de cuentas de datos de socio.
+Alternativa: mantener parametro en users API y propagar a ficha internamente. Se descarta por contrato ambiguo y acoplamiento cruzado.
+
+4. Migracion en dos pasos: esquema + backfill opcional.
+Rationale: reducir riesgo en despliegue y permitir rollback controlado.
+Alternativa: migracion monolitica con logica compleja. Se descarta por mayor riesgo operacional.
+
+## Risks / Trade-offs
+
+- [Datos existentes con CargoId en usuarios] -> Mitigacion: script/migracion de traspaso a `FichaSocio` por `UserId` y reporte de filas no mapeables.
+- [Clientes API enviando CargoId en users endpoints] -> Mitigacion: versionar contrato o devolver error claro de campo no soportado.
+- [Fichas sin cargo tras migracion] -> Mitigacion: definir si cargo es opcional y dashboard de completitud post-despliegue.
+
+## Migration Plan
+
+1. Añadir `CargoId` en tabla `FichasSocio` con FK a `Cargos`.
+2. Eliminar `CargoId` de entidad/contratos de gestion de usuarios.
+3. Implementar ajuste de handlers y validadores de ficha para resolver `CargoId`.
+4. Ejecutar migracion de datos desde usuario a ficha cuando aplique.
+5. Ejecutar pruebas unitarias/integracion y desplegar.
+6. Rollback: revertir migracion y restaurar contratos previos si se requiere.
+
+## Open Questions
+
+- Confirmar si `CargoId` en ficha es obligatorio u opcional para socios activos.
+- Confirmar estrategia final de migracion para usuarios con cargo pero sin ficha creada.
+- Confirmar si la API debe exponer descripcion del cargo junto a `FichaSocio` o solo `CargoId`.

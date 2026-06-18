@@ -1,0 +1,61 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+<section class="food-alerts-detail">
+    <header class="food-alerts-detail__header">
+        <nav class="food-alerts-list__breadcrumb" aria-label="@L["food_alerts_detail_breadcrumb_label"]">
+            <a class="food-alerts-list__breadcrumb-link" href="@BackHref">@BackText</a>
+            <span class="food-alerts-list__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="food-alerts-list__breadcrumb-current" aria-current="page">@L["food_alerts_detail_title"]</span>
+        </nav>
+    </header>
+
+    @if (IsLoading)
+    {
+        <div class="alert food-alerts-detail__status" role="status">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["food_alerts_detail_loading"]</span>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div class="alert alert-error food-alerts-detail__status" role="alert">
+            <span>@L[ErrorMessageKey]</span>
+        </div>
+    }
+    else if (Alert is not null)
+    {
+        <article class="food-alerts-detail__card card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                @if (!string.IsNullOrWhiteSpace(CategoryTitle))
+                {
+                    <span class="badge badge-outline food-alerts-detail__category-badge">@CategoryTitle</span>
+                }
+
+                <h1>@Alert.Title</h1>
+
+                @if (Alert.PublishedAt is not null)
+                {
+                    <p class="food-alerts-detail__date">@FormatDate(Alert.PublishedAt.Value)</p>
+                }
+
+                <div class="food-alerts-detail__content">
+                    @foreach (var paragraph in DescriptionParagraphs)
+                    {
+                        <p>@paragraph</p>
+                    }
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Alert.SourceUrl))
+                {
+                    <a class="btn btn-outline food-alerts-detail__source-link"
+                       href="@Alert.SourceUrl"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                        @L["food_alerts_detail_source"]
+                    </a>
+                }
+            </div>
+        </article>
+    }
+</section>

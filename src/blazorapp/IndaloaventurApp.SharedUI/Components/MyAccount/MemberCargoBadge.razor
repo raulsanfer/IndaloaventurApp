@@ -1,0 +1,17 @@
+﻿@using Microsoft.Extensions.Localization
+@using IndaloaventurApp.SharedUI.Resources
+
+@if (IsVisible)
+{
+    <section class="mi-cuenta-cargo-card">
+        <span class="mi-cuenta-cargo-card__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+                <path d="M18 2H6V4H7V7C7 9.76 8.79 12.1 11.28 12.82C9.31 13.47 8 15.32 8 17.5V19H6V21H18V19H16V17.5C16 15.32 14.69 13.47 12.72 12.82C15.21 12.1 17 9.76 17 7V4H18V2ZM14 17.5V19H10V17.5C10 15.84 11.34 14.5 13 14.5C14.66 14.5 16 15.84 16 17.5H14ZM15 7C15 9.21 13.21 11 11 11C8.79 11 7 9.21 7 7V4H15V7Z"></path>
+            </svg>
+        </span>
+        <div>
+            <p class="mi-cuenta-cargo-card__title">@L["mi_cuenta_cargo_title"]</p>
+            <p class="mi-cuenta-cargo-card__value">@CargoText</p>
+        </div>
+    </section>
+}

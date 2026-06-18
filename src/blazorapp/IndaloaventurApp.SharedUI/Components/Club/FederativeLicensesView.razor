@@ -1,0 +1,228 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+<section class="mi-club-licenses">
+    <header class="mi-club-licenses__header">
+        <nav class="mi-club-licenses__breadcrumb" aria-label="@L["mi_club_federative_licenses_breadcrumb_label"]">
+            <a class="mi-club-licenses__breadcrumb-link" href="/mi-club">@L["mi_club_back"]</a>
+            <span class="mi-club-licenses__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="mi-club-licenses__breadcrumb-current" aria-current="page">@L["mi_club_eyebrow"]</span>
+        </nav>
+
+        <div class="mi-club-licenses__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="mi-club-licenses__hero-top">
+                    <div class="mi-club-licenses__hero-copy">                        
+                        <h1>@L["mi_club_federative_licenses_title"]</h1>
+                        <p>@L["mi_club_federative_licenses_summary"]</p>
+                    </div>
+
+                    <button type="button"
+                            class="btn btn-primary mi-club-licenses__request-btn"
+                            disabled="@IsNonOperational"
+                            @onclick="OpenRequestModal">
+                        @L["mi_club_federative_licenses_request"]
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    @if (IsNonOperational)
+    {
+        <div class="alert mi-club-licenses__status mi-club-licenses__status--info">
+            <span>@L["mi_club_federative_licenses_not_available"]</span>
+        </div>
+    }
+    else if (IsLoading)
+    {
+        <div class="alert mi-club-licenses__status">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["mi_club_federative_licenses_loading"]</span>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div class="alert alert-error mi-club-licenses__status" role="alert">
+            <span>@L[ErrorMessageKey]</span>
+        </div>
+    }
+    else if (SeasonGroups.Count == 0)
+    {
+        <div class="alert mi-club-licenses__status">
+            <span>@L["mi_club_federative_licenses_empty"]</span>
+        </div>
+    }
+    else
+    {
+        <div class="mi-club-licenses__season-stack" role="list" aria-label="@L["mi_club_federative_licenses_title"]">
+            @foreach (var seasonGroup in SeasonGroups)
+            {
+                <details class="collapse mi-club-licenses__season-collapse" role="listitem">
+                    <summary class="collapse-title mi-club-licenses__season-summary">
+                        <span class="mi-club-licenses__season-label">@GetSeasonLabel(seasonGroup.Temporada)</span>
+                    </summary>
+
+                    <div class="collapse-content mi-club-licenses__season-panel">
+                        <ul class="mi-club-licenses__season-list">
+                            @foreach (var request in seasonGroup.Solicitudes)
+                            {
+                                <li class="mi-club-licenses__item">
+                                    <div class="mi-club-licenses__item-header">
+                                        <div class="mi-club-licenses__item-license">
+                                            <span class="mi-club-licenses__item-license-label">@L["mi_club_federative_licenses_header_license"]</span>
+                                            <p class="mi-club-licenses__item-title">@request.Licencia</p>
+                                            <small class="mi-club-licenses__item-season">@GetRequestSeasonLabel(request)</small>
+                                        </div>
+
+                                        <span class="badge badge-outline mi-club-licenses__item-status">
+                                            <i class="bi bi-clock-history" aria-hidden="true"></i>
+                                            @request.Estado
+                                        </span>
+                                    </div>
+
+                                    <div class="mi-club-licenses__item-main">
+                                        <dl class="mi-club-licenses__item-meta">
+                                            <div class="mi-club-licenses__item-meta-group">
+                                                <dt>@L["mi_club_federative_licenses_label_category"]</dt>
+                                                <dd>@request.Categoria</dd>
+                                            </div>
+                                            <div class="mi-club-licenses__item-meta-group">
+                                                <dt>@L["mi_club_federative_licenses_label_scope"]</dt>
+                                                <dd>@request.AmbitoTerritorial</dd>
+                                            </div>
+                                        </dl>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </details>
+            }
+        </div>
+    }
+</section>
+
+@if (IsRequestModalOpen)
+{
+    <div class="modal modal-open" role="dialog" aria-modal="true" aria-labelledby="federative-license-modal-title">
+        <div class="modal-box mi-club-licenses__modal">
+            <div class="mi-club-licenses__modal-header">
+                <div>
+                    <p class="mi-club-licenses__modal-eyebrow">@L["mi_club_eyebrow"]</p>
+                    <h2 id="federative-license-modal-title">@L["mi_club_federative_licenses_request_title"]</h2>
+                </div>
+
+                <button type="button"
+                        class="btn btn-sm btn-ghost"
+                        disabled="@IsSubmittingRequest"
+                        aria-label="@L["mi_club_federative_licenses_request_cancel"]"
+                        @onclick="CloseRequestModal">
+                    ✕
+                </button>
+            </div>
+
+            <div class="mi-club-licenses__modal-body">
+                <label class="form-control mi-club-licenses__field">
+                    <span class="label">
+                        <span class="label-text">@L["mi_club_federative_licenses_request_modality"]</span>
+                    </span>
+                    <select class="select select-bordered w-full"
+                            value="@SelectedModalityValue"
+                            disabled="@IsSubmittingRequest"
+                            @onchange="OnModalityChangedAsync">
+                        @foreach (var option in ModalityOptions)
+                        {
+                            <option value="@option.Value">@option.Label</option>
+                        }
+                    </select>
+                </label>
+
+                <label class="form-control mi-club-licenses__field">
+                    <span class="label">
+                        <span class="label-text">@L["mi_club_federative_licenses_request_season"]</span>
+                    </span>
+                    <select class="select select-bordered w-full"
+                            value="@SelectedTemporada"
+                            disabled="@IsSubmittingRequest"
+                            @onchange="OnSeasonChangedAsync">
+                        <option value="">@L["mi_club_federative_licenses_request_select_season"]</option>
+                        @foreach (var option in SeasonOptions)
+                        {
+                            <option value="@option.Value">@option.Label</option>
+                        }
+                    </select>
+                </label>
+
+                <label class="form-control mi-club-licenses__field">
+                    <span class="label">
+                        <span class="label-text">@L["mi_club_federative_licenses_request_license"]</span>
+                    </span>
+                    <select class="select select-bordered w-full"
+                            value="@SelectedLicencia"
+                            disabled="@(IsSubmittingRequest || IsRatesLoading || SelectedTemporada is null || HasRateCatalogEmptyState || LicenseOptions.Count == 0)"
+                            @onchange="OnLicenseChanged">
+                        <option value="">@L["mi_club_federative_licenses_request_select_license"]</option>
+                        @foreach (var option in LicenseOptions)
+                        {
+                            <option value="@option.Value">@option.Label</option>
+                        }
+                    </select>
+                </label>
+
+                <label class="form-control mi-club-licenses__field">
+                    <span class="label">
+                        <span class="label-text">@L["mi_club_federative_licenses_request_category"]</span>
+                    </span>
+                    <select class="select select-bordered w-full"
+                            value="@SelectedCategoria"
+                            disabled="@(IsSubmittingRequest || IsRatesLoading || string.IsNullOrWhiteSpace(SelectedLicencia) || HasRateCatalogEmptyState || CategoryOptions.Count == 0)"
+                            @onchange="OnCategoryChanged">
+                        <option value="">@L["mi_club_federative_licenses_request_select_category"]</option>
+                        @foreach (var option in CategoryOptions)
+                        {
+                            <option value="@option.Value">@option.Label</option>
+                        }
+                    </select>
+                </label>
+
+                @if (IsRatesLoading)
+                {
+                    <div class="alert mi-club-licenses__modal-status">
+                        <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                        <span>@L["mi_club_federative_licenses_request_rates_loading"]</span>
+                    </div>
+                }
+                else if (!string.IsNullOrWhiteSpace(RequestMessageKey) || !string.IsNullOrWhiteSpace(RequestMessageText))
+                {
+                    <div class="alert @(IsRequestMessageError ? "alert-error" : "mi-club-licenses__status--info") mi-club-licenses__modal-status" role="alert">
+                        <span>@ResolveRequestMessage()</span>
+                    </div>
+                }
+
+                @if (SelectedRate is not null)
+                {
+                    <div class="mi-club-licenses__price-card">
+                        <span class="mi-club-licenses__price-label">@L["mi_club_federative_licenses_request_price"]</span>
+                        <strong class="mi-club-licenses__price-value">@FormatPrice(SelectedRate.PrecioClub)</strong>
+                    </div>
+                }
+            </div>
+
+            <div class="modal-action mi-club-licenses__modal-actions">
+                <button type="button"
+                        class="btn btn-ghost"
+                        disabled="@IsSubmittingRequest"
+                        @onclick="CloseRequestModal">
+                    @L["mi_club_federative_licenses_request_cancel"]
+                </button>
+                <button type="button"
+                        class="btn btn-primary"
+                        disabled="@(!CanConfirmRequest)"
+                        @onclick="SubmitRequestAsync">
+                    @(IsSubmittingRequest ? L["mi_club_federative_licenses_request_confirm_loading"] : L["mi_club_federative_licenses_request_confirm"])
+                </button>
+            </div>
+        </div>
+    </div>
+}

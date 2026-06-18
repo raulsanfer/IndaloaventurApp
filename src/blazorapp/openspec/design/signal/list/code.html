@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline-variant": "#ddc1ae",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#e3e1ec",
+                    "on-secondary-fixed": "#1c1b1b",
+                    "inverse-on-surface": "#f1effa",
+                    "inverse-surface": "#2f3038",
+                    "on-error-container": "#93000a",
+                    "secondary": "#5f5e5e",
+                    "on-secondary": "#ffffff",
+                    "primary": "#904d00",
+                    "on-tertiary-fixed": "#1a1c1d",
+                    "on-background": "#1a1b22",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#e2e2e3",
+                    "outline": "#897362",
+                    "inverse-primary": "#ffb77d",
+                    "surface-container-high": "#e8e7f1",
+                    "on-secondary-fixed-variant": "#474746",
+                    "background": "#fbf8ff",
+                    "primary-fixed-dim": "#ffb77d",
+                    "on-secondary-container": "#636262",
+                    "surface-bright": "#fbf8ff",
+                    "primary-container": "#ff8c00",
+                    "tertiary-container": "#a9aaab",
+                    "tertiary": "#5d5e60",
+                    "surface-dim": "#dad9e3",
+                    "on-tertiary-fixed-variant": "#454748",
+                    "surface-container-highest": "#e3e1ec",
+                    "on-primary-fixed-variant": "#6e3900",
+                    "on-primary-fixed": "#2f1500",
+                    "surface": "#fbf8ff",
+                    "on-surface": "#1a1b22",
+                    "surface-container": "#eeedf7",
+                    "on-tertiary-container": "#3d3f40",
+                    "secondary-fixed-dim": "#c8c6c5",
+                    "secondary-fixed": "#e5e2e1",
+                    "surface-tint": "#904d00",
+                    "secondary-container": "#e2dfde",
+                    "on-primary-container": "#623200",
+                    "surface-container-low": "#f4f2fd",
+                    "primary-fixed": "#ffdcc3",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-surface-variant": "#564334"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "40px",
+                    "md": "24px",
+                    "xl": "64px",
+                    "base": "8px",
+                    "margin-desktop": "48px",
+                    "xs": "4px",
+                    "sm": "12px",
+                    "gutter": "24px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Outfit"],
+                    "label-sm": ["Outfit"],
+                    "label-lg": ["Outfit"],
+                    "headline-lg-mobile": ["Outfit"],
+                    "body-md": ["Outfit"],
+                    "headline-md": ["Outfit"],
+                    "headline-lg": ["Outfit"],
+                    "headline-xl": ["Outfit"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500"}],
+                    "label-lg": ["14px", {"lineHeight": "20px", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-xl": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-mobile h-16 bg-surface shadow-sm">
+<div class="flex items-center gap-4">
+<button class="transition-transform duration-200 active:scale-95 text-on-surface-variant hover:bg-surface-variant/50 p-2 rounded-full">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Incidencias</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="transition-transform duration-200 active:scale-95 text-on-surface-variant hover:bg-surface-variant/50 p-2 rounded-full">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-20 px-margin-mobile max-w-2xl mx-auto">
+<!-- Search Bar -->
+<div class="mt-4 mb-6">
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="block w-full pl-12 pr-4 py-4 bg-surface-container-lowest border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-body-md text-on-surface placeholder:text-outline/60 shadow-sm group-hover:shadow-md" placeholder="Buscar por ruta o zona..." type="text"/>
+</div>
+</div>
+<!-- Filter Chips -->
+<section class="mb-8">
+<div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+<button class="flex-shrink-0 px-5 py-2 bg-primary-container text-on-primary-container rounded-full font-label-lg transition-all active:scale-95 shadow-sm">
+                    Todos
+                </button>
+<button class="flex-shrink-0 px-5 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-lg transition-all hover:bg-surface-variant active:scale-95">
+                    Senderos
+                </button>
+<button class="flex-shrink-0 px-5 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-lg transition-all hover:bg-surface-variant active:scale-95">
+                    Clima
+                </button>
+<button class="flex-shrink-0 px-5 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-lg transition-all hover:bg-surface-variant active:scale-95">
+                    Refugios
+                </button>
+<button class="flex-shrink-0 px-5 py-2 bg-surface-container-high text-on-surface-variant rounded-full font-label-lg transition-all hover:bg-surface-variant active:scale-95">
+                    Fauna
+                </button>
+</div>
+</section>
+<!-- Incidencias List -->
+<section class="space-y-4">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex transition-all hover:shadow-md hover:border-primary/20">
+<div class="w-32 h-auto flex-shrink-0 overflow-hidden">
+<img alt="Desprendimiento en Senda de los Pinos" class="w-full h-full object-cover" data-alt="A detailed wide shot of a rugged mountain trail blocked by several large grey boulders and loose debris. The lighting is bright and clear, indicating a sunny morning in a high-altitude environment. The surrounding scenery consists of jagged peaks and sparse pine trees under a brilliant blue sky. The overall aesthetic is one of natural power and high-energy adventure, maintaining a clean and crisp photographic style with vibrant natural colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAmnBHxrEPf83uQkK8hnqYjiuKBlp71BZHDCj489_5ihVa2sTbKkZnS1KSmDiwiRyWMKbcZhbXT-Q_i0JydcIdISqqBbIQuK0tTeeLmZYJ_FMpq5sDHjDTZh9j-yK3I6wJ8lOQWHUmkSR76AtT43P6ecXEx7HvLfE8II4YjqXCtOIMYTM-HJTT4WLgk4jG5RjwNbrR-Mirza4K1pd3MusjKNktZpHHGiHXzwdJKg4MdZ83Amc9OS7sfUCqck8nPP5hFVaXRrJXWjvw"/>
+</div>
+<div class="p-4 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<span class="px-2 py-0.5 bg-error-container text-on-error-container rounded-md text-[10px] font-bold uppercase tracking-wider">Senderos</span>
+<span class="text-outline text-label-sm">Hoy, 09:15</span>
+</div>
+<h3 class="font-label-lg text-on-surface mb-1">Desprendimiento en Senda de los Pinos</h3>
+<p class="text-on-surface-variant text-label-sm line-clamp-2">Paso bloqueado por rocas de gran tamaño tras las lluvias. Se recomienda desvío por la variante B.</p>
+</div>
+<div class="mt-3 flex items-center text-primary">
+<span class="material-symbols-outlined text-[18px] mr-1">location_on</span>
+<span class="text-label-sm font-semibold">Km 4.2 - Sector Norte</span>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex transition-all hover:shadow-md hover:border-primary/20">
+<div class="w-32 h-auto flex-shrink-0 overflow-hidden">
+<img alt="Refugio del Viento cerrado" class="w-full h-full object-cover" data-alt="A high-altitude mountain refuge cabin made of rustic wood and stone, situated on a snowy ridge. Dark, dramatic storm clouds are gathering in the background, creating an atmospheric and slightly ominous mood. The lighting is cold and diffused, highlighting the texture of the snow and the rough surfaces of the building. The image captures the essence of extreme mountain conditions with a high-contrast, modern photographic style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYJ7kuytUuN_uqSKKNYKcy-qSyqVuK4p9DKwtQqlHHfkcw1fh8ohV9lsv6OyhbU2QL54yp8-Io8hpo2mJC8BsNuiS9HAOmX0TdHc1jTSkvr_yOAFyRpR5jNDgAQQ1LhaFI95SwvYBI1rQ96ZBYlMoF5MSdvQjI5vWQngtn83uqrZUVe_c0uVj_9hAlTv4oHUwxgUB4Zywzbl8YDcHK4SaDpd_O3aLMHaNxwWIvraHbBhpCLh7ghC8gyQ6Bom5TRwlZP2qEpNR2MFY"/>
+</div>
+<div class="p-4 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<span class="px-2 py-0.5 bg-primary-fixed text-on-primary-fixed rounded-md text-[10px] font-bold uppercase tracking-wider">Refugios</span>
+<span class="text-outline text-label-sm">Ayer</span>
+</div>
+<h3 class="font-label-lg text-on-surface mb-1">Cierre temporal Refugio del Viento</h3>
+<p class="text-on-surface-variant text-label-sm line-clamp-2">Labores de mantenimiento en el sistema eléctrico. Reapertura prevista para el viernes.</p>
+</div>
+<div class="mt-3 flex items-center text-primary">
+<span class="material-symbols-outlined text-[18px] mr-1">warning</span>
+<span class="text-label-sm font-semibold">Cierre Temporal</span>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex transition-all hover:shadow-md hover:border-primary/20">
+<div class="w-32 h-auto flex-shrink-0 overflow-hidden">
+<img alt="Avistamiento de fauna" class="w-full h-full object-cover" data-alt="A majestic wild mountain goat standing proudly on a rocky outcrop against a backdrop of distant, hazy mountain ranges. The scene is bathed in the warm, golden light of late afternoon, creating a serene and awe-inspiring atmosphere. The focus is sharp on the animal, with a soft blur on the expansive landscape behind it. The color palette is composed of natural earthy tones, golden yellows, and soft blues, reflecting a high-quality wildlife photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWp_VluqcDiH_U0V10ZdRWepyfBOcp_icjIdlOyT_yPa2V9TUFY0-M62Y8tI_YGqi_DTrpIjoBD1RnAilLBZ5qGtZieLCFaDmlnsj0YrMprmuOznRphcviAXfMq3s082KTTxgQqyrhn1YJk1E9SF4AH_7D7NDNsxjeIJd8gm2F06-rTzmutAuOuqcgRNQmLJhQ6_DePymMd6bRgOmTUZUlbquUqxL3okrTQEjXsc-6ypxtMiGt7azMzOvlf8lP8Ry_pGQXaq6eEdo"/>
+</div>
+<div class="p-4 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded-md text-[10px] font-bold uppercase tracking-wider">Fauna</span>
+<span class="text-outline text-label-sm">2 días</span>
+</div>
+<h3 class="font-label-lg text-on-surface mb-1">Presencia de Íbices en zona de escalada</h3>
+<p class="text-on-surface-variant text-label-sm line-clamp-2">Gran grupo de íbices activos en las paredes sur. Se ruega no molestar ni alimentar a los animales.</p>
+</div>
+<div class="mt-3 flex items-center text-primary">
+<span class="material-symbols-outlined text-[18px] mr-1">pets</span>
+<span class="text-label-sm font-semibold">Sector Las Agujas</span>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm border border-outline-variant/30 flex transition-all hover:shadow-md hover:border-primary/20">
+<div class="w-32 h-auto flex-shrink-0 overflow-hidden">
+<img alt="Nivel de agua alto en río" class="w-full h-full object-cover" data-alt="A fast-flowing mountain river with churning white water and dark, slick rocks along its banks. The lighting is moody and overcast, emphasizing the cold and powerful nature of the water. Deep greens and cool blues dominate the palette, with a sense of movement and energy. The scene is framed by dense, dark forest foliage, creating a feeling of wild, untamed nature in a crisp, modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoc15SiwsHRFprynuYHhFtO-BPsX4Fwwe3SqJ5NnOhg8No8v_iNB-WDArlYHuS31ZizfHHSTA5rjclAewWRcByCFiytgDmNiWwXEDQrhDBXGkk8XyORgPYqiAYa3J9E1e2OfblGKqOw7D3JCJ1cO0a97x_eyLZVVL2_IEzROGE94YdwCcL3KG2c0UJUQOKyuHZbyrFhu4ipTEq-g4Qu6PWd0DKax-j3PY3aWguOBdwZcPv019mo1Q7RFxJ6ViBq59Dyg_N1421XTU"/>
+</div>
+<div class="p-4 flex flex-col justify-between">
+<div>
+<div class="flex justify-between items-start mb-1">
+<span class="px-2 py-0.5 bg-outline-variant text-on-surface-variant rounded-md text-[10px] font-bold uppercase tracking-wider">Clima</span>
+<span class="text-outline text-label-sm">3 días</span>
+</div>
+<h3 class="font-label-lg text-on-surface mb-1">Aumento caudal Río Almenara</h3>
+<p class="text-on-surface-variant text-label-sm line-clamp-2">Vadeos peligrosos por deshielo acelerado. No intentar cruzar sin equipo adecuado.</p>
+</div>
+<div class="mt-3 flex items-center text-primary">
+<span class="material-symbols-outlined text-[18px] mr-1">water_drop</span>
+<span class="text-label-sm font-semibold">Nivel Alto</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB for new incident (Contextual Addition for Management) -->
+<button class="fixed right-6 bottom-24 w-14 h-14 bg-primary-container text-on-primary-container rounded-2xl shadow-lg flex items-center justify-center transition-transform active:scale-90 hover:scale-105 z-40">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface-container shadow-[0_-2px_8px_rgba(26,27,34,0.08)] rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 hover:text-primary" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-lg text-label-lg">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-5 py-1 transition-all duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">groups</span>
+<span class="font-label-lg text-label-lg">Mi Club</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-5 py-1 transition-all duration-300 hover:text-primary" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-lg text-label-lg">Mi Cuenta</span>
+</a>
+</nav>
+<script>
+        // Simple micro-interaction for chips
+        const chips = document.querySelectorAll('section button');
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                chips.forEach(c => {
+                    c.classList.remove('bg-primary-container', 'text-on-primary-container');
+                    c.classList.add('bg-surface-container-high', 'text-on-surface-variant');
+                });
+                chip.classList.add('bg-primary-container', 'text-on-primary-container');
+                chip.classList.remove('bg-surface-container-high', 'text-on-surface-variant');
+            });
+        });
+
+        // Search highlight interaction
+        const searchInput = document.querySelector('input');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.02]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.02]');
+        });
+    </script>
+</body></html>

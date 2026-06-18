@@ -1,0 +1,34 @@
+## MODIFIED Requirements
+
+### Requirement: Admin can create contact records
+The system MUST allow an authenticated user with role `Admin` to create a new phonebook contact record.
+
+#### Scenario: Admin creates contact successfully
+- **WHEN** an authenticated `Admin` submits valid values for `Nombre` and `Telefono1`
+- **THEN** the system SHALL create a `FichaContacto` with a unique `Guid`, assign `FechaAlta` automatically, and persist optional values for `Telefono2`, `Email`, `Direccion` and `Observaciones`
+
+#### Scenario: Contact creation rejected by domain validation
+- **WHEN** an authenticated `Admin` submits an invalid `Nombre`, invalid phone data, invalid `Email`, or invalid `Direccion`
+- **THEN** the system SHALL reject the request and SHALL not persist the `FichaContacto`
+
+### Requirement: Authenticated users can consult phonebook contacts
+The system MUST allow any authenticated user, regardless of role, to consult phonebook contacts.
+
+#### Scenario: Authenticated user lists contacts
+- **WHEN** an authenticated user requests the contact list
+- **THEN** the system SHALL return the persisted `FichaContacto` records with `Id`, `FechaAlta`, `Nombre`, `Telefono1`, `Telefono2`, `Email`, `Direccion`, and `Observaciones`
+
+#### Scenario: Authenticated user gets contact detail
+- **WHEN** an authenticated user requests a contact by existing `Guid`
+- **THEN** the system SHALL return the matching `FichaContacto` detail including `Email` and `Direccion`
+
+### Requirement: Admin can update existing contact records
+The system MUST allow an authenticated user with role `Admin` to edit an existing phonebook contact record.
+
+#### Scenario: Admin updates contact successfully
+- **WHEN** an authenticated `Admin` submits valid update data for an existing `FichaContacto`
+- **THEN** the system SHALL persist updated values for `Nombre`, `Telefono1`, optional `Telefono2`, optional `Email`, optional `Direccion`, and optional `Observaciones` while preserving the original `Id` and `FechaAlta`
+
+#### Scenario: Admin update fails for missing contact
+- **WHEN** an authenticated `Admin` attempts to edit a non-existing `FichaContacto`
+- **THEN** the system SHALL return a not found outcome and SHALL not create a new record implicitly

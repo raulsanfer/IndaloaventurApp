@@ -1,0 +1,9 @@
+@page "/configuracion/usuarios/{UserId:guid}/ficha"
+@using IndaloaventurApp.SharedUI.Components.Settings
+@using IndaloaventurApp.SharedUI.Components.Shell
+
+<PageTitle>Ficha de Socio</PageTitle>
+
+<AuthenticatedShell ActiveHref="/mi-cuenta">
+    <AdminMemberProfileView UserId="@UserId" />
+</AuthenticatedShell>

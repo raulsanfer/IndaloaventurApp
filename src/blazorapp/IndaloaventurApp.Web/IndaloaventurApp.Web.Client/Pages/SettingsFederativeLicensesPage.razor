@@ -1,0 +1,9 @@
+@page "/configuracion/licencias-federativas"
+@using IndaloaventurApp.SharedUI.Components.Settings
+@using IndaloaventurApp.SharedUI.Components.Shell
+
+<PageTitle>Licencias Federativas</PageTitle>
+
+<AuthenticatedShell ActiveHref="/mi-cuenta">
+    <AdminFederativeLicenseManagementView InitialUserId="@UserId" />
+</AuthenticatedShell>

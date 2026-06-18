@@ -1,0 +1,40 @@
+@using IndaloaventurApp.SharedUI.Resources
+
+<section class="settings-page">
+    <nav class="settings-page__breadcrumb" aria-label="breadcrumb">
+        <a class="settings-page__breadcrumb-link" href="/mi-cuenta">@L["shell_nav_my_account"]</a>
+        <span class="settings-page__breadcrumb-separator" aria-hidden="true">/</span>
+        <span class="settings-page__breadcrumb-current" aria-current="page">@L["settings_title"]</span>
+    </nav>
+
+    @if (IsAdmin)
+    {
+        <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm settings-page__fieldset" aria-label="@L["settings_admin_title"]">
+            <legend class="fieldset-legend text-base">@L["settings_admin_title"]</legend>
+
+            <div class="card-body">
+                <div class="settings-page__admin-options">
+                <a class="btn btn-ghost settings-page__admin-option" href="@CargoManagementHref">
+                    <span class="settings-page__admin-option-label">@L["settings_admin_cargos_title"]</span>
+                    <span aria-hidden="true">&gt;</span>
+                </a>
+
+                <a class="btn btn-ghost settings-page__admin-option" href="@UsersManagementHref">
+                    <span class="settings-page__admin-option-label">@L["settings_admin_users_title"]</span>
+                    <span aria-hidden="true">&gt;</span>
+                </a>
+
+                <a class="btn btn-ghost settings-page__admin-option" href="@FederativeLicensesManagementHref">
+                    <span class="settings-page__admin-option-label">@L["settings_admin_federative_licenses_title"]</span>
+                    <span aria-hidden="true">&gt;</span>
+                </a>
+
+                <a class="btn btn-ghost settings-page__admin-option" href="@SignalsManagementHref">
+                    <span class="settings-page__admin-option-label">@L["settings_admin_signals_title"]</span>
+                    <span aria-hidden="true">&gt;</span>
+                </a>
+                </div>
+            </div>
+        </fieldset>
+    }
+</section>

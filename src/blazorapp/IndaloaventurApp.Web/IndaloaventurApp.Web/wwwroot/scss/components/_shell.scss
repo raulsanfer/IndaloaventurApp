@@ -1,0 +1,122 @@
+﻿.authenticated-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.authenticated-shell__content {
+  padding: var(--space-md) var(--space-md) calc(84px + var(--space-md));
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  backdrop-filter: blur(8px);
+  background: rgba(248, 249, 250, 0.9);
+  border-bottom: 1px solid var(--color-outline);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.app-header__welcome {
+  margin: 0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.app-header__status {
+  font-size: 0.8rem;
+  color: var(--color-secondary);
+  background: #d9f6e8;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+
+.app-header__actions button {
+  border: 1px solid var(--color-outline);
+  background: white;
+  border-radius: 999px;
+  width: 36px;
+  height: 36px;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: var(--space-md);
+  right: var(--space-md);
+  bottom: var(--space-md);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-outline);
+  background: white;
+  box-shadow: 0 16px 26px rgba(63, 102, 83, 0.2);
+}
+
+.bottom-nav a {
+  min-height: 64px;
+  border-radius: 10px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 4px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  text-align: center;
+}
+
+.bottom-nav__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.bottom-nav__icon i {
+  font-size: 1.45rem;
+}
+
+.bottom-nav a small {
+  font-size: 0.82rem;
+  line-height: 1;
+}
+
+.bottom-nav a.is-active {
+  color: white;
+  background: var(--color-primary);
+}
+
+@media (min-width: 900px) {
+  .bottom-nav {
+    position: sticky;
+    left: auto;
+    right: auto;
+    bottom: var(--space-md);
+    width: min(700px, 100%);
+    margin: 0 auto var(--space-md);
+  }
+
+  .authenticated-shell__content {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+  }
+}

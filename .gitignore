@@ -1,0 +1,82 @@
+# ----------------------------
+# Build outputs (.NET)
+# ----------------------------
+**/bin/
+**/obj/
+**/out/
+**/publish/
+**/artifacts/
+
+# ----------------------------
+# Test, coverage, logs
+# ----------------------------
+**/TestResults/
+**/*.trx
+**/*.coverage
+**/*.coveragexml
+**/coverage/
+**/coverage-report/
+**/BenchmarkDotNet.Artifacts/
+**/*.log
+
+# ----------------------------
+# User/IDE files (Visual Studio, Rider, VSCode)
+# ----------------------------
+*.user
+*.pubxml
+*.pubxml.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+.idea/
+.vscode/
+*.DotSettings.user
+
+# ----------------------------
+# Package/cache folders
+# ----------------------------
+packages/
+**/node_modules/
+
+# ----------------------------
+# OS/system temp files
+# ----------------------------
+.DS_Store
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ----------------------------
+# Local secrets and env files
+# ----------------------------
+.env
+.env.*
+*.pfx
+*.snk
+*.pem
+*.key
+*.crt
+secrets.json
+appsetting_api.json
+**/appsettings.Development.json
+**/appsettings.Local.json
+**/appsettings.*.local.json
+
+# ----------------------------
+# Database dumps and local backups
+# ----------------------------
+*.bak
+*.dacpac
+*.sqlproj.user
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
+
+# ----------------------------
+# Local tooling
+# ----------------------------
+.codex/

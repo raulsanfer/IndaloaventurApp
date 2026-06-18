@@ -1,0 +1,107 @@
+@using Microsoft.Extensions.Localization
+@using IndaloaventurApp.SharedUI.Resources
+
+@if (IsLoading)
+{
+    <section class="mi-cuenta-page">
+        <p class="mi-cuenta-loading">@L["mi_cuenta_loading"]</p>
+    </section>
+}
+else
+{
+    <section class="mi-cuenta-page">
+        @if (Profile is not null)
+        {
+            <header class="mi-cuenta-header">
+                <div class="mi-cuenta-avatar-wrap">
+                    <div class="mi-cuenta-avatar">@Initials</div>
+                    <span class="mi-cuenta-avatar-status" aria-hidden="true"></span>
+                </div>
+                <h1>@Profile.FullName</h1>
+                @* @if (Profile.IsMember)
+                {
+                    <p class="mi-cuenta-membership">@Profile.MembershipLabel</p>
+                } *@
+            </header>
+
+            @if (Profile.IsMember)
+            {
+                <MemberCargoBadge CargoId="@Profile.CargoId" CargoLabel="@Profile.CargoLabel" />
+            }
+        }
+
+        @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+        {
+            <p class="mi-cuenta-error">@ErrorMessage</p>
+        }
+
+        @if (Profile?.IsMember == true)
+        {
+            <section class="mi-cuenta-links">
+                <h2>@L["mi_cuenta_data_section"]</h2>
+                <a href="/mi-cuenta/ficha-socio" class="mi-cuenta-link-item">
+                    <span class="mi-cuenta-link-item__content">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M17 3H7C5.9 3 5 3.9 5 5V19C5 20.1 5.9 21 7 21H17C18.1 21 19 20.1 19 19V5C19 3.9 18.1 3 17 3ZM17 19H7V8H17V19ZM9 5H15V7H9V5ZM11 10H13V12H11V10ZM9 14H15V16H9V14Z"></path>
+                        </svg>
+                        <span>@L["mi_cuenta_link_member_file"]</span>
+                    </span>
+                    <span class="mi-cuenta-link-item__chevron" aria-hidden="true">&gt;</span>
+                </a>
+            </section>
+        }
+        else if (ShowJoinMemberLink)
+        {
+            <section class="mi-cuenta-links">
+                <h2>@L["mi_cuenta_data_section"]</h2>
+                <a href="https://indaloaventura.com/hazte-socio/"
+                   class="mi-cuenta-link-item mi-cuenta-link-item--external"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <span class="mi-cuenta-link-item__content">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 5C9.79 5 8 6.79 8 9S9.79 13 12 13 16 11.21 16 9 14.21 5 12 5ZM12 11C10.9 11 10 10.1 10 9S10.9 7 12 7 14 7.9 14 9 13.1 11 12 11ZM12 14C9.33 14 4 15.34 4 18V20H20V18C20 15.34 14.67 14 12 14ZM6 18C6.22 17.28 8.31 16 12 16S17.78 17.28 18 18H6ZM20 6V9H22V6H20ZM20 10V13H22V10H20ZM17 9H20V7H17V9Z"></path>
+                        </svg>
+                        <span>@L["mi_cuenta_link_join_member"]</span>
+                    </span>
+                    <span class="mi-cuenta-link-item__meta">
+                        <span class="mi-cuenta-link-item__tag">@L["mi_cuenta_external_link"]</span>
+                        <span class="mi-cuenta-link-item__chevron" aria-hidden="true">&gt;</span>
+                    </span>
+                </a>
+            </section>
+        }
+
+        <section class="mi-cuenta-links">
+            <h2>@L["mi_cuenta_support_section"]</h2>
+            <a href="/configuracion" class="mi-cuenta-link-item">
+                <span class="mi-cuenta-link-item__content">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M19.14 12.94C19.19 12.63 19.23 12.32 19.23 12C19.23 11.68 19.19 11.36 19.13 11.06L21.19 9.44C21.37 9.3 21.42 9.05 21.3 8.84L19.35 5.16C19.23 4.95 18.98 4.87 18.76 4.95L16.33 5.93C15.83 5.55 15.29 5.24 14.69 5L14.33 2.42C14.3 2.18 14.09 2 13.84 2H10.16C9.91 2 9.7 2.18 9.67 2.42L9.31 5C8.71 5.24 8.17 5.55 7.67 5.93L5.24 4.95C5.02 4.87 4.77 4.95 4.65 5.16L2.7 8.84C2.58 9.05 2.63 9.3 2.81 9.44L4.87 11.06C4.81 11.36 4.77 11.69 4.77 12C4.77 12.31 4.81 12.63 4.86 12.94L2.81 14.56C2.63 14.7 2.58 14.95 2.7 15.16L4.65 18.84C4.77 19.05 5.02 19.13 5.24 19.05L7.67 18.07C8.17 18.45 8.71 18.76 9.31 19L9.67 21.58C9.7 21.82 9.91 22 10.16 22H13.84C14.09 22 14.3 21.82 14.33 21.58L14.69 19C15.29 18.76 15.83 18.45 16.33 18.07L18.76 19.05C18.98 19.13 19.23 19.05 19.35 18.84L21.3 15.16C21.42 14.95 21.37 14.7 21.19 14.56L19.14 12.94ZM12 15.5C10.07 15.5 8.5 13.93 8.5 12C8.5 10.07 10.07 8.5 12 8.5C13.93 8.5 15.5 10.07 15.5 12C15.5 13.93 13.93 15.5 12 15.5Z"></path>
+                    </svg>
+                    <span>@L["mi_cuenta_link_settings"]</span>
+                </span>
+                <span class="mi-cuenta-link-item__chevron" aria-hidden="true">&gt;</span>
+            </a>
+            <a href="#" class="mi-cuenta-link-item is-disabled" aria-disabled="true">
+                <span class="mi-cuenta-link-item__content">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M11 18H13V16H11V18ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12 6C9.79 6 8 7.79 8 10H10C10 8.9 10.9 8 12 8C13.1 8 14 8.9 14 10C14 12 11 11.75 11 15H13C13 12.75 16 12.5 16 10C16 7.79 14.21 6 12 6Z"></path>
+                    </svg>
+                    <span>@L["mi_cuenta_link_help"]</span>
+                </span>
+                <span class="mi-cuenta-link-item__chevron" aria-hidden="true">&gt;</span>
+            </a>
+        </section>
+        <section style="margin-top:15px">
+            <button type="button" class="mi-cuenta-link-item signout" @onclick="OnSignOutClicked">
+                <span class="mi-cuenta-link-item__content">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M10.09 15.59L11.5 17L16.5 12L11.5 7L10.09 8.41L12.67 11H3V13H12.67L10.09 15.59ZM19 3H9C7.9 3 7 3.9 7 5V9H9V5H19V19H9V15H7V19C7 20.1 7.9 21 9 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z"></path>
+                    </svg>
+                    <span>@L["mi_cuenta_link_signout"]</span>
+                </span>
+            </button>
+        </section>
+    </section>
+}

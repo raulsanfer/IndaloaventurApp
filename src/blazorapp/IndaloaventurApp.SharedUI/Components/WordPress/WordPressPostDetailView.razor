@@ -1,0 +1,42 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+@if (IsLoading)
+{
+    <section class="wordpress-post">
+        <p class="wordpress-post__status">@L["wordpress_post_loading"]</p>
+    </section>
+}
+else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+{
+    <section class="wordpress-post">
+        <p class="wordpress-post__status wordpress-post__status--error">@ErrorMessage</p>
+    </section>
+}
+else if (Post is not null)
+{
+    <article class="wordpress-post">
+        <a class="wordpress-post__back" href="/home">
+            <i class="bi bi-arrow-left"></i>
+            <span>@L["wordpress_post_back"]</span>
+        </a>
+
+        <header class="wordpress-post__header">
+            <p class="wordpress-post__eyebrow">@L["wordpress_post_eyebrow"]</p>
+            <h1>@Post.Title</h1>
+            <p class="wordpress-post__date">@FormatDate(Post.PublishedAtUtc)</p>
+        </header>
+
+        @if (!string.IsNullOrWhiteSpace(Post.FeaturedImageUrl))
+        {
+            <img src="@Post.FeaturedImageUrl" alt="@Post.Title" class="wordpress-post__hero" />
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Post.Summary))
+        {
+            <p class="wordpress-post__summary">@Post.Summary</p>
+        }
+
+        <div class="wordpress-post__content">@ContentMarkup</div>
+    </article>
+}

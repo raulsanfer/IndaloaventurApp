@@ -1,0 +1,24 @@
+﻿@using Microsoft.Extensions.Localization
+@using IndaloaventurApp.SharedUI.Resources
+
+<section class="home-dashboard">
+    <header>
+        <p class="home-dashboard__greeting">@L["home_greeting"]</p>
+        <h1>@L["home_title"]</h1>
+        <p class="home-dashboard__summary">@L["home_summary"]</p>
+    </header>
+
+    <HomeNewsSection />
+
+    <div class="home-dashboard__cards">
+        <a class="home-dashboard__card-link home-dashboard__card-link--food-alerts" href="/alertas-alimentarias">
+            <article class="home-dashboard__card home-dashboard__card--food-alerts">
+                <span class="home-dashboard__card-icon" aria-hidden="true">
+                    <i class="bi bi-basket2"></i>
+                </span>
+                <h2>@L["food_alerts_home_title"]</h2>
+            </article>
+        </a>
+    </div>
+   
+</section>

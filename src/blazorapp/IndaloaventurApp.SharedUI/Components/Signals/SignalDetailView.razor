@@ -1,0 +1,332 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.Extensions.Localization
+
+<section class="signal-detail">
+    <header class="signal-detail__header">
+        <nav class="signal-home__breadcrumb" aria-label="@L["signal_detail_breadcrumb_label"]">
+            <a class="signal-home__breadcrumb-link" href="/signals">@L["signal_detail_back"]</a>
+            <span class="signal-home__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="signal-home__breadcrumb-current" aria-current="page">@L["signal_detail_title"]</span>
+        </nav>
+    </header>
+
+    @if (IsLoading)
+    {
+        <div class="signal-detail__status-shell">
+            <div class="alert alert-info signal-detail__status" role="status">
+                <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                <span>@L["signal_detail_loading"]</span>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div class="signal-detail__status-shell">
+            <div class="alert alert-error signal-detail__status" role="alert">
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                <span>@L[ErrorMessageKey]</span>
+            </div>
+        </div>
+    }
+    else if (Signal is null)
+    {
+        <div class="signal-detail__status-shell">
+            <div class="alert alert-warning signal-detail__status" role="status">
+                <i class="bi bi-signpost-split" aria-hidden="true"></i>
+                <span>@L["signal_detail_not_found"]</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="signal-detail__hero-meta">
+            <span class="badge badge-outline badge-lg signal-detail__category-badge">
+                @if (!string.IsNullOrWhiteSpace(Signal.CategoryIconName))
+                {
+                    <i class="bi @Signal.CategoryIconName" aria-hidden="true"></i>
+                }
+                @Signal.CategoryName
+            </span>
+
+            <span class="badge badge-lg @(Signal.IsActive ? "badge-success" : "badge-neutral")">
+                @GetStatusText(Signal)
+            </span>
+        </div>
+
+        <section class="signal-detail__hero card border border-base-200 bg-base-100 shadow-sm">
+                <div class="card-body">
+                    <div class="signal-detail__hero-head">
+                        <div class="signal-detail__hero-copy">
+                            <h1>@Signal.Title</h1>
+                            <p class="signal-detail__summary">
+                                <i class="bi bi-clock-history" aria-hidden="true"></i>
+                                <span>@GetHeaderSummary()</span>
+                            </p>
+                        </div>
+
+                        @if (CanEditSignal)
+                        {
+                            <button type="button"
+                                    class="btn btn-outline signal-detail__edit-trigger"
+                                    disabled="@IsSaving"
+                                    @onclick="BeginEdit">
+                                @L["signal_detail_edit_action"]
+                            </button>
+                        }
+                    </div>
+
+                <div class="signal-detail__overview-grid">
+                    <article class="card border border-base-200 bg-base-200/40 shadow-sm signal-detail__overview-card">
+                        <div class="card-body">
+                            <span class="signal-detail__overview-icon">
+                                <i class="bi bi-calendar-event" aria-hidden="true"></i>
+                            </span>
+                            <span class="signal-detail__label">@L["signal_detail_field_created"]</span>
+                            <p class="signal-detail__overview-value signal-detail__overview-value--timestamp">@FormatTimestamp(Signal.CreatedAt)</p>
+                        </div>
+                    </article>
+
+                    <article class="card border border-base-200 bg-base-200/40 shadow-sm signal-detail__overview-card">
+                        <div class="card-body">
+                            <span class="signal-detail__overview-icon">
+                                <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                            </span>
+                            <span class="signal-detail__label">@L["signal_detail_field_updated"]</span>
+                            <p class="signal-detail__overview-value signal-detail__overview-value--timestamp">@FormatTimestamp(Signal.UpdatedAt)</p>
+                        </div>
+                    </article>
+
+                    <article class="card border border-base-200 bg-base-200/40 shadow-sm signal-detail__overview-card">
+                        <div class="card-body">
+                            <span class="signal-detail__overview-icon">
+                                <i class="bi bi-diagram-3" aria-hidden="true"></i>
+                            </span>
+                            <span class="signal-detail__label">@L["signal_detail_field_category"]</span>
+                            <p class="signal-detail__overview-value">@Signal.CategoryName</p>
+                        </div>
+                    </article>
+
+                    <article class="card border border-base-200 bg-base-200/40 shadow-sm signal-detail__overview-card">
+                        <div class="card-body">
+                            <span class="signal-detail__overview-icon">
+                                <i class="bi bi-clipboard-check" aria-hidden="true"></i>
+                            </span>
+                            <span class="signal-detail__label">@L["signal_detail_field_status"]</span>
+                            <p class="signal-detail__overview-value">@GetStatusText(Signal)</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <div class="signal-detail__tabs-shell">
+            <div role="tablist" class="tabs tabs-bordered signal-detail__tabs">
+                <button type="button"
+                        role="tab"
+                        class="tab @(ActiveTab == SignalDetailTab.Data ? "tab-active" : null)"
+                        aria-selected="@(ActiveTab == SignalDetailTab.Data)"
+                        @onclick="() => SelectTab(SignalDetailTab.Data)">
+                    @L["signal_detail_tab_data"]
+                </button>
+                <button type="button"
+                        role="tab"
+                        class="tab @(ActiveTab == SignalDetailTab.Map ? "tab-active" : null)"
+                        aria-selected="@(ActiveTab == SignalDetailTab.Map)"
+                        @onclick="() => SelectTab(SignalDetailTab.Map)">
+                    @L["signal_detail_tab_map"]
+                </button>
+            </div>
+        </div>
+
+        @if (ActiveTab == SignalDetailTab.Data)
+        {
+            <section class="signal-detail__panel">
+                @if (!string.IsNullOrWhiteSpace(StatusMessageKey))
+                {
+                    <div class="alert alert-success signal-detail__status signal-detail__status--success" role="status">
+                        <span>@L[StatusMessageKey]</span>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(SaveErrorMessageKey))
+                {
+                    <div class="alert alert-error signal-detail__status signal-detail__status--error" role="alert">
+                        <span>@L[SaveErrorMessageKey]</span>
+                    </div>
+                }
+
+                <article class="card border border-base-200 bg-base-100 shadow-sm signal-detail__content-card">
+                    @if (IsEditing && CanEditSignal)
+                    {
+                        <div class="card-body signal-detail__edit-shell">
+                            <div class="signal-detail__section-head">
+                                <div>
+                                    <h2>@L["signal_detail_edit_title"]</h2>
+                                    <p class="signal-detail__muted">@L["signal_detail_edit_summary"]</p>
+                                </div>
+
+                                <span class="badge badge-outline">@L["signal_detail_edit_badge"]</span>
+                            </div>
+
+                            <EditForm Model="Editor" OnSubmit="@(_ => SaveAsync())" class="signal-detail__edit-form">
+                                <label class="form-control signal-detail__edit-field" for="signal-edit-title">
+                                    <span class="label">
+                                        <span class="label-text">@L["signal_create_title_label"]</span>
+                                    </span>
+                                    <InputText id="signal-edit-title"
+                                               class="input input-bordered"
+                                               @bind-Value="Editor.Title"
+                                               placeholder="@L["signal_create_title_placeholder"]" />
+                                </label>
+
+                                <label class="form-control signal-detail__edit-field" for="signal-edit-description">
+                                    <span class="label">
+                                        <span class="label-text">@L["signal_create_description_label"]</span>
+                                    </span>
+                                    <InputTextArea id="signal-edit-description"
+                                                   class="textarea textarea-bordered signal-detail__edit-textarea"
+                                                   @bind-Value="Editor.Description"
+                                                   placeholder="@L["signal_create_description_placeholder"]" />
+                                </label>
+
+                                <label class="form-control signal-detail__edit-field" for="signal-edit-status">
+                                    <span class="label">
+                                        <span class="label-text">@L["signal_detail_field_status"]</span>
+                                    </span>
+                                    <InputSelect id="signal-edit-status"
+                                                 class="select select-bordered"
+                                                 @bind-Value="Editor.IsActive">
+                                        <option value="true">@L["signal_detail_status_active"]</option>
+                                        <option value="false">@L["signal_detail_status_archived"]</option>
+                                    </InputSelect>
+                                </label>
+
+                                <div class="signal-detail__edit-actions">
+                                    <button type="submit" class="btn btn-primary" disabled="@IsSaving">
+                                        @L["signal_detail_edit_save"]
+                                    </button>
+                                    <button type="button" class="btn btn-ghost" disabled="@IsSaving" @onclick="CancelEdit">
+                                        @L["signal_detail_edit_cancel"]
+                                    </button>
+                                </div>
+                            </EditForm>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-body signal-detail__description">
+                            <p>@Signal.Description</p>
+                        </div>
+                    }
+                </article>
+            </section>
+        }
+        else
+        {
+            <section class="signal-detail__panel">
+                @if (HasCoordinates)
+                {
+                    <article class="card border border-base-200 bg-base-100 shadow-sm signal-detail__content-card">
+                        <div class="card-body signal-detail__map-card">
+                            <div class="signal-detail__section-head">
+                                <h2>@L["signal_detail_tab_map"]</h2>
+                                <span class="badge badge-outline">@CoordinateText</span>
+                            </div>
+
+                            <div class="signal-detail__map-stage">
+                                <iframe class="signal-detail__map-frame"
+                                        title="@L["signal_detail_map_frame_title"]"
+                                        src="@MapEmbedUrl"
+                                        loading="lazy"
+                                        referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+                                <div class="signal-detail__location-card">
+                                    <div class="signal-detail__location-copy">
+                                        <span class="signal-detail__location-icon">
+                                            <i class="bi bi-geo-alt" aria-hidden="true"></i>
+                                        </span>
+                                        <div>
+                                            <p class="signal-detail__location-title">@Signal.Title</p>
+                                            <p class="signal-detail__location-subtitle">@CoordinateText</p>
+                                        </div>
+                                    </div>
+                                    <a class="btn btn-warning"
+                                       href="@MapExternalUrl"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        @L["signal_detail_map_open"]
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                }
+                else
+                {
+                    <div class="card border border-base-200 bg-base-100 shadow-sm signal-detail__content-card">
+                        <div class="card-body">
+                            <div class="alert alert-warning signal-detail__status" role="status">
+                                <i class="bi bi-geo" aria-hidden="true"></i>
+                                <span>@L["signal_detail_location_empty"]</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </section>
+        }
+
+        <section class="signal-detail__panel">
+            <article class="card border border-base-200 bg-base-100 shadow-sm signal-detail__content-card">
+                <div class="card-body signal-detail__comments">
+                    <div class="signal-detail__section-head">
+                        <h2>@L["signal_detail_tab_comments"]</h2>
+                        <span class="signal-detail__tags-caption">@GetCommentsCaption()</span>
+                    </div>
+
+                    @if (Comments.Count == 0)
+                    {
+                        <p class="signal-detail__muted">@L["signal_detail_comments_empty"]</p>
+                    }
+                    else
+                    {
+                        <div class="signal-detail__comment-list">
+                            @foreach (var comment in Comments)
+                            {
+                                <article class="signal-detail__comment">
+                                    <p class="signal-detail__comment-text">@comment.Text</p>
+                                    <p class="signal-detail__comment-date">@FormatTimestamp(comment.CommentedAt)</p>
+                                </article>
+                            }
+                        </div>
+                    }
+                </div>
+            </article>
+        </section>
+
+        <section class="signal-detail__panel">
+            <article class="card border border-base-200 bg-base-100 shadow-sm signal-detail__content-card">
+                <div class="card-body signal-detail__tags">
+                    <div class="signal-detail__section-head">
+                        <h2>@L["signal_detail_field_tags"]</h2>
+                        <span class="signal-detail__tags-caption">@GetTagsCaption()</span>
+                    </div>
+
+                    @if (Tags.Count == 0)
+                    {
+                        <p class="signal-detail__muted">@L["signal_detail_tags_empty"]</p>
+                    }
+                    else
+                    {
+                        <div class="signal-detail__tag-list">
+                            @foreach (var tag in Tags)
+                            {
+                                <span class="badge badge-outline badge-lg">@tag</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </article>
+        </section>
+    }
+</section>

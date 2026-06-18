@@ -1,0 +1,185 @@
+@using IndaloaventurApp.SharedUI.Resources
+
+<section class="settings-federative-licenses">
+    <header class="settings-federative-licenses__header">
+        <nav class="settings-federative-licenses__breadcrumb" aria-label="@L["settings_federative_licenses_breadcrumb_label"]">
+            <a class="settings-federative-licenses__breadcrumb-link" href="/mi-cuenta">@L["shell_nav_my_account"]</a>
+            <span class="settings-federative-licenses__breadcrumb-separator" aria-hidden="true">/</span>
+            <a class="settings-federative-licenses__breadcrumb-link" href="/configuracion">@L["settings_title"]</a>
+            <span class="settings-federative-licenses__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="settings-federative-licenses__breadcrumb-current" aria-current="page">@L["settings_admin_federative_licenses_title"]</span>
+        </nav>
+
+        <div class="settings-federative-licenses__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="settings-federative-licenses__hero-topline">
+                    <p class="settings-federative-licenses__eyebrow">@L["settings_admin_title"]</p>
+                    <span class="badge badge-outline settings-federative-licenses__hero-badge">@L["settings_admin_federative_licenses_title"]</span>
+                </div>
+                <h1>@L["settings_admin_federative_licenses_title"]</h1>
+                <p>@L["settings_federative_licenses_summary"]</p>
+            </div>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessageKey))
+    {
+        <div role="status" class="alert alert-success settings-federative-licenses__status">
+            <span>@L[StatusMessageKey]</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div role="alert" class="alert alert-error settings-federative-licenses__status">
+            <span>@L[ErrorMessageKey]</span>
+        </div>
+    }
+
+    <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm settings-federative-licenses__fieldset" aria-label="@L["settings_federative_licenses_filters_title"]">
+        <legend class="fieldset-legend settings-federative-licenses__legend">@L["settings_federative_licenses_filters_title"]</legend>
+
+        <div class="card-body">
+            <div class="settings-federative-licenses__section-header">
+                <div>
+                    <h2>@L["settings_federative_licenses_filters_title"]</h2>
+                    <p>@L["settings_federative_licenses_filters_summary"]</p>
+                </div>
+            </div>
+
+            <form class="settings-federative-licenses__form" @onsubmit="HandleFiltersSubmitAsync" @onsubmit:preventDefault="true">
+                <div class="settings-federative-licenses__grid">
+                    <label class="form-control settings-federative-licenses__field" for="federative-license-user-filter">
+                        <span class="label">
+                            <span class="label-text">@L["settings_federative_licenses_filter_user"]</span>
+                        </span>
+                        <input id="federative-license-user-filter"
+                               class="input input-bordered"
+                               type="text"
+                               value="@UserIdFilterText"
+                               placeholder="@L["settings_federative_licenses_filter_user_placeholder"]"
+                               @oninput="HandleUserIdFilterChanged" />
+                    </label>
+
+                    <label class="form-control settings-federative-licenses__field" for="federative-license-season-filter">
+                        <span class="label">
+                            <span class="label-text">@L["settings_federative_licenses_filter_season"]</span>
+                        </span>
+                        <input id="federative-license-season-filter"
+                               class="input input-bordered"
+                               type="number"
+                               inputmode="numeric"
+                               value="@SeasonFilterText"
+                               placeholder="@L["settings_federative_licenses_filter_season_placeholder"]"
+                               @oninput="HandleSeasonFilterChanged" />
+                    </label>
+
+                    <label class="form-control settings-federative-licenses__field" for="federative-license-status-filter">
+                        <span class="label">
+                            <span class="label-text">@L["settings_federative_licenses_filter_status"]</span>
+                        </span>
+                        <select id="federative-license-status-filter"
+                                class="select select-bordered"
+                                value="@StatusFilter"
+                                @onchange="HandleStatusFilterChanged">
+                            <option value="">@L["settings_federative_licenses_filter_status_all"]</option>
+                            @foreach (var status in AllowedStatuses)
+                            {
+                                <option value="@status">@status</option>
+                            }
+                        </select>
+                    </label>
+                </div>
+
+                <div class="settings-federative-licenses__actions">
+                    <button type="submit" class="btn btn-primary settings-federative-licenses__primary-button" disabled="@IsLoading">
+                        @L["settings_federative_licenses_apply_filters"]
+                    </button>
+                    <button type="button" class="btn btn-ghost" disabled="@IsLoading" @onclick="ClearFiltersAsync">
+                        @L["settings_federative_licenses_clear_filters"]
+                    </button>
+                </div>
+            </form>
+        </div>
+    </fieldset>
+
+    <section class="card border border-base-200 bg-base-100 shadow-sm settings-federative-licenses__results" aria-labelledby="settings-federative-licenses-results-title">
+        <div class="card-body">
+            <div class="settings-federative-licenses__section-header">
+                <div>
+                    <p class="settings-federative-licenses__section-kicker">@L["settings_admin_title"]</p>
+                    <h2 id="settings-federative-licenses-results-title">@L["settings_federative_licenses_results_title"]</h2>
+                    <p>@L["settings_federative_licenses_results_summary"]</p>
+                </div>
+                <span class="badge badge-neutral badge-outline">@Requests.Count</span>
+            </div>
+
+            @if (IsLoading)
+            {
+                <div class="alert settings-federative-licenses__feedback">
+                    <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                    <span>@L["settings_federative_licenses_loading"]</span>
+                </div>
+            }
+            else if (Requests.Count == 0)
+            {
+                <div class="alert settings-federative-licenses__feedback settings-federative-licenses__feedback--empty">
+                    <span>@L["settings_federative_licenses_empty"]</span>
+                </div>
+            }
+            else
+            {
+                <ul class="list settings-federative-licenses__list" aria-live="polite">
+                    @foreach (var request in Requests)
+                    {
+                        <li class="list-row settings-federative-licenses__list-item">
+                            <div class="settings-federative-licenses__list-copy">
+                                <div class="settings-federative-licenses__headline">
+                                    <strong>@request.UserEmail</strong>
+                                    @if (IsOwnRequest(request))
+                                    {
+                                        <span class="badge badge-outline">@L["settings_federative_licenses_owner_self"]</span>
+                                    }
+                                    <span class="badge badge-ghost">@string.Format(L["settings_federative_licenses_season_format"], request.Temporada)</span>
+                                </div>
+
+                                <div class="settings-federative-licenses__license-line">
+                                    <strong>@request.Licencia</strong>
+                                    <span>@request.Categoria</span>
+                                    <span>@request.AmbitoTerritorial</span>
+                                </div>
+
+                                <small>@string.Format(L["settings_federative_licenses_created_at"], FormatTimestamp(request.FechaCreacionUtc))</small>
+                                <small>@string.Format(L["settings_federative_licenses_user_id_format"], request.UserId)</small>
+                            </div>
+
+                            <div class="settings-federative-licenses__item-actions">
+                                <label class="form-control settings-federative-licenses__status-editor">
+                                    <span class="label">
+                                        <span class="label-text">@L["settings_federative_licenses_edit_status"]</span>
+                                    </span>
+                                    <select class="select select-bordered select-sm"
+                                            value="@GetDraftStatus(request)"
+                                            disabled="@(UpdatingRequestId == request.Id)"
+                                            @onchange="args => HandleDraftStatusChanged(request.Id, args)">
+                                        @foreach (var status in AllowedStatuses)
+                                        {
+                                            <option value="@status">@status</option>
+                                        }
+                                    </select>
+                                </label>
+
+                                <button type="button"
+                                        class="btn btn-sm btn-outline"
+                                        disabled="@(!CanSaveStatus(request))"
+                                        @onclick="() => SaveStatusAsync(request)">
+                                    @L["settings_federative_licenses_save_status"]
+                                </button>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </section>
+</section>

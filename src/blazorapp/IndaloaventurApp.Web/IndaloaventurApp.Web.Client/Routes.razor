@@ -1,0 +1,11 @@
+<SessionInitializationGate>
+    <Router AppAssembly="typeof(Program).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="routeData" />
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <p>Página no encontrada.</p>
+        </NotFound>
+    </Router>
+</SessionInitializationGate>

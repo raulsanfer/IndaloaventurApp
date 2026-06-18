@@ -1,0 +1,28 @@
+@using IndaloaventurApp.SharedUI.Models.FoodAlerts
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+<section class="food-alerts-home">
+    <header class="food-alerts-home__header">
+        <div class="food-alerts-home__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <h1>@L["food_alerts_home_title"]</h1>
+                <p class="food-alerts-home__summary">@L["food_alerts_home_summary"]</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="food-alerts-home__list" role="list" aria-label="@L["food_alerts_home_list_label"]">
+        @foreach (var category in Categories)
+        {
+            <article class="card food-alerts-home__card bg-base-100 shadow-sm" role="listitem">
+                <a class="food-alerts-home__card-link" href="@GetCategoryHref(category.Code)">
+                    <div class="card-body">
+                        <h2 class="food-alerts-home__card-title">@L[category.TitleResourceKey]</h2>
+                        <p class="food-alerts-home__card-subtitle">@L[category.SubtitleResourceKey]</p>
+                    </div>
+                </a>
+            </article>
+        }
+    </div>
+</section>

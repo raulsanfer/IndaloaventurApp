@@ -1,0 +1,9 @@
+﻿@page "/mi-cuenta"
+@using IndaloaventurApp.SharedUI.Components.MyAccount
+@using IndaloaventurApp.SharedUI.Components.Shell
+
+<PageTitle>Mi Cuenta</PageTitle>
+
+<AuthenticatedShell ActiveHref="/mi-cuenta">
+    <MyAccountView OnSignOut="SignOutAsync" />
+</AuthenticatedShell>

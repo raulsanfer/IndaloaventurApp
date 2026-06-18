@@ -1,0 +1,6 @@
+using IndaloAventurApi.Application.Abstractions.Cqrs;
+using IndaloAventurApi.Application.Abstractions.LicenciasFederativas;
+
+namespace IndaloAventurApi.Application.Features.LicenciasFederativas.GetMisSolicitudesLicenciaFederativa;
+
+public sealed record GetMisSolicitudesLicenciaFederativaQuery(Guid AuthenticatedUserId) : IQuery<IReadOnlyCollection<SolicitudLicenciaFederativaDto>>;

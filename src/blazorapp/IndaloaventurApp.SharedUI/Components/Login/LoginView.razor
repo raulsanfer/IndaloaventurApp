@@ -1,0 +1,82 @@
+﻿@using Microsoft.Extensions.Localization
+@using IndaloaventurApp.SharedUI.Abstractions.Auth
+@using IndaloaventurApp.SharedUI.Models.Auth
+@using IndaloaventurApp.SharedUI.Resources
+
+<section class="login-page">
+    <div class="login-hero">
+        <div class="login-hero__overlay"></div>
+        <div class="login-hero__brand">
+            <img class="login-hero__logo" src="_content/IndaloaventurApp.SharedUI/assets/images/logo.png" alt="@L["app_name"]" />
+            @* <h1>@L["app_name"]</h1>
+            <p>@L["login_subtitle"]</p> *@
+        </div>
+    </div>
+
+    <div class="login-panel">
+        <h2>@L["login_title"]</h2>
+
+        @if (!string.IsNullOrWhiteSpace(StatusMessageKey))
+        {
+            <p class="login-form__notice" role="status">@L[StatusMessageKey]</p>
+        }
+
+        <EditForm Model="Form" OnValidSubmit="SubmitAsync" class="login-form">
+            <DataAnnotationsValidator />
+
+            <label for="emailOrUser">@L["login_user_label"]</label>
+            <InputText id="emailOrUser" type="text" @bind-Value="Form.EmailOrUserName" placeholder="@L["login_user_placeholder"]" />
+            <ValidationMessage For="() => Form.EmailOrUserName" />
+
+            <label for="password">@L["login_password_label"]</label>
+            <InputText id="password" type="password" @bind-Value="Form.Password" placeholder="@L["login_password_placeholder"]" />
+            <ValidationMessage For="() => Form.Password" />
+
+            <div class="login-form__options">
+                <label class="remember-me">
+                    <InputCheckbox @bind-Value="Form.RememberMe" />
+                    <span>@L["login_remember_me"]</span>
+                </label>
+                <a href="/forgot-password">@L["login_forgot_password"]</a>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+            {
+                <p class="login-form__error">@L[ErrorMessageKey]</p>
+            }
+
+            <button type="submit" disabled="@IsSubmitting">@L["login_submit"]</button>
+        </EditForm>
+
+        <div class="login-social">
+            <span>@L["login_social_divider"]</span>
+            <div class="login-social__actions">
+                <div class="login-social__google-slot">
+                    @if (CanRenderGoogleButton)
+                    {
+                        <div id="@GoogleButtonElementId" class="login-social__google-button"></div>
+                    }
+                    else
+                    {
+                        <button type="button" class="is-disabled" disabled title="@L["login_social_google_unavailable"]">@L["login_google"]</button>
+                    }
+                </div>
+                @* <button type="button" class="is-disabled" disabled title="@L["login_social_provider_coming_soon"]">@L["login_facebook"]</button> *@
+            </div>
+
+            @if (IsSocialSubmitting)
+            {
+                <p class="login-social__status">@L["login_social_loading"]</p>
+            }
+        </div>
+
+        <footer class="login-footer">
+            <p>@L["login_join_message"] <a href="https://indaloaventura.com/hazte-socio/">@L["login_join_link"]</a></p>
+            @* <div>
+                <a href="#">@L["footer_terms"]</a>
+                <a href="#">@L["footer_privacy"]</a>
+                <a href="#">@L["footer_support"]</a>
+            </div> *@
+        </footer>
+    </div>
+</section>

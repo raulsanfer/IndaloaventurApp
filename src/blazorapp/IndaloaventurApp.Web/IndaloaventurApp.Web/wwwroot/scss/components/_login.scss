@@ -1,0 +1,231 @@
+﻿.login-page {
+  display: grid;
+  min-height: 100vh;
+  grid-template-columns: 1fr;
+  position: relative;
+  overflow: hidden;
+  background: url("/_content/IndaloaventurApp.SharedUI/assets/images/screen_mountain_bg.jpg") center center / cover no-repeat;
+}
+
+.login-hero {
+  min-height: 280px;
+  display: grid;
+  place-items: center;
+}
+
+.login-hero__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.15) 100%);
+  pointer-events: none;
+}
+
+.login-hero__brand {
+  position: relative;
+  z-index: 1;
+  color: white;
+  padding: var(--space-xl) var(--space-md);
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.login-hero__logo {
+  width: min(240px, 62vw);
+  height: auto;
+  display: block;
+  margin-bottom: var(--space-md);
+}
+
+.login-panel {
+  position: relative;
+  z-index: 1;
+  margin: -24px var(--space-md) var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: 0 14px 34px rgba(63, 102, 83, 0.15);
+}
+
+.login-panel h2 {
+  margin: 0 0 var(--space-sm);
+}
+
+.login-panel__eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-secondary);
+}
+
+.login-panel__intro {
+  margin: 0 0 var(--space-md);
+  color: var(--color-text-muted);
+}
+
+.login-form {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+  width: 100%;
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  background: var(--color-surface-soft);
+}
+
+.login-form input:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.login-form__options {
+  margin-top: var(--space-xs);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.login-form__error {
+  color: #ba1a1a;
+  margin: 0;
+}
+
+.login-form__notice {
+  margin: 0;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(87, 169, 130, 0.12);
+  color: #1f5a3f;
+}
+
+.login-form__notice--warning {
+  background: rgba(194, 123, 0, 0.12);
+  color: #8a5200;
+}
+
+.login-form__readonly {
+  opacity: 0.8;
+}
+
+.login-form button {
+  margin-top: var(--space-xs);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 13px;
+  font-weight: 600;
+  color: white;
+  background: var(--color-primary);
+}
+
+.login-form button:disabled {
+  opacity: 0.7;
+}
+
+.login-social {
+  margin-top: var(--space-lg);
+  text-align: center;
+}
+
+.login-social span {
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.login-social__actions {
+  margin-top: var(--space-sm);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-sm);
+}
+
+.login-social__google-slot {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.login-social__google-button {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-social__google-button > div {
+  width: 100%;
+}
+
+.login-social__actions button {
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  background: transparent;
+}
+
+.login-social__actions .is-disabled {
+  color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.6);
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.login-social__status {
+  margin: var(--space-sm) 0 0;
+  font-size: 0.85rem;
+  color: var(--color-secondary);
+}
+
+.login-footer {
+  margin-top: var(--space-md);
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.login-footer p {
+  margin: 0;
+}
+
+.login-footer div {
+  margin-top: var(--space-sm);
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-size: 0.8rem;
+}
+
+.login-panel__secondary-actions {
+  margin-top: var(--space-md);
+  text-align: center;
+}
+
+@media (min-width: 900px) {
+  .login-page {
+    grid-template-columns: 56% 44%;
+  }
+
+  .login-hero {
+    min-height: 100vh;
+  }
+
+  .login-panel {
+    margin: var(--space-xl) var(--space-xl) var(--space-xl) 0;
+    align-self: center;
+    max-width: 520px;
+  }
+}

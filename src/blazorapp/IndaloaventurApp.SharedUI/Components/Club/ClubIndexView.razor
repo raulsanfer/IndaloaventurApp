@@ -1,0 +1,37 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+<section class="mi-club-page">
+    <header class="mi-club-page__header">
+        <p class="mi-club-page__eyebrow">@L["mi_club_eyebrow"]</p>
+        <h1>@L["mi_club_title"]</h1>
+        <p class="mi-club-page__summary">@L["mi_club_summary"]</p>
+    </header>
+
+    <div class="mi-club-page__options">
+        <a class="mi-club-option-card" href="/mi-club/telefonos-interes">
+            <span class="mi-club-option-card__icon" aria-hidden="true">
+                <i class="bi bi-telephone-forward-fill"></i>
+            </span>
+            <span class="mi-club-option-card__body">
+                <span class="mi-club-option-card__title">@L["mi_club_phonebook_title"]</span>
+                <span class="mi-club-option-card__description">@L["mi_club_phonebook_description"]</span>
+            </span>
+            <span class="mi-club-option-card__chevron" aria-hidden="true">&gt;</span>
+        </a>
+
+        @if (CanAccessFederativeLicenses)
+        {
+            <a class="mi-club-option-card" href="/mi-club/licencias-federativas">
+                <span class="mi-club-option-card__icon" aria-hidden="true">
+                    <i class="bi bi-person-vcard-fill"></i>
+                </span>
+                <span class="mi-club-option-card__body">
+                    <span class="mi-club-option-card__title">@L["mi_club_federative_licenses_title"]</span>
+                    <span class="mi-club-option-card__description">@L["mi_club_federative_licenses_description"]</span>
+                </span>
+                <span class="mi-club-option-card__chevron" aria-hidden="true">&gt;</span>
+            </a>
+        }
+    </div>
+</section>

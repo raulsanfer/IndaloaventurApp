@@ -1,0 +1,209 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.AspNetCore.Components.Forms
+
+<section class="member-file-page">
+    <header class="member-file-page__header">
+        <nav class="member-file-page__breadcrumb" aria-label="@L["member_file_breadcrumb_label"]">
+            <a class="member-file-page__breadcrumb-link" href="/mi-cuenta">@L["shell_nav_my_account"]</a>
+            <span class="member-file-page__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="member-file-page__breadcrumb-current" aria-current="page">@L["member_file_title"]</span>
+        </nav>
+
+        <div class="member-file-page__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="member-file-page__hero-copy">
+                    <h1>@L["member_file_title"]</h1>
+                    <p>@L["member_file_summary"]</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessageKey))
+    {
+        <div class="alert alert-success member-file-page__status" role="status">
+            <span>@L[StatusMessageKey]</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div class="alert alert-error member-file-page__status" role="alert">
+            <span>@L[ErrorMessageKey]</span>
+        </div>
+    }
+
+    @if (IsNonMember)
+    {
+        <div class="alert member-file-page__status member-file-page__status--info">
+            <span>@L["member_file_not_available"]</span>
+        </div>
+    }
+    else if (IsLoading)
+    {
+        <div class="alert member-file-page__status">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["member_file_loading"]</span>
+        </div>
+    }
+    else if (Form is not null)
+    {
+        <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm member-file-page__fieldset" aria-label="@L["member_file_title"]">
+            <legend class="fieldset-legend member-file-page__legend">@L["member_file_title"]</legend>
+
+            <div class="card-body">
+                <div class="member-file-page__section-head">
+                    <div>
+                        <h2>@L["member_file_personal_section"]</h2>
+                        <p>@L["member_file_personal_summary"]</p>
+                    </div>
+                    <span class="badge badge-outline member-file-page__badge">@L["member_file_secure_badge"]</span>
+                </div>
+
+                <EditForm EditContext="EditContext" OnValidSubmit="HandleValidSubmitAsync" class="member-file-page__form">
+                    <DataAnnotationsValidator />
+
+                    <div class="member-file-page__grid">
+                        <div class="form-control">
+                            <label class="label" for="member-cargo-id">
+                                <span class="label-text">@L["member_file_cargo_id"]</span>
+                            </label>
+
+                            @if (IsAdmin)
+                            {
+                                <InputSelect id="member-cargo-id" class="select select-bordered w-full" @bind-Value="Form.CargoId" disabled="@(!CargoFieldState.HasOptions)">
+                                    <option value="">@CargoFieldState.DisplayName</option>
+                                    @foreach (var option in CargoFieldState.Options)
+                                    {
+                                        <option value="@option.Value">@option.Label</option>
+                                    }
+                                </InputSelect>
+                                <ValidationMessage For="() => Form.CargoId" />
+                            }
+                            else
+                            {
+                                <input id="member-cargo-id" type="text" class="input input-bordered w-full" value="@CargoFieldState.DisplayName" readonly disabled />
+                            }
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="member-dni">
+                                <span class="label-text">@L["member_file_dni"]</span>
+                            </label>
+                            <InputText id="member-dni" class="input input-bordered w-full" @bind-Value="Form.Dni" />
+                            <ValidationMessage For="() => Form.Dni" />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="member-nombre">
+                                <span class="label-text">@L["member_file_nombre"]</span>
+                            </label>
+                            <InputText id="member-nombre" class="input input-bordered w-full" @bind-Value="Form.Nombre" />
+                            <ValidationMessage For="() => Form.Nombre" />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="member-apellidos">
+                                <span class="label-text">@L["member_file_apellidos"]</span>
+                            </label>
+                            <InputText id="member-apellidos" class="input input-bordered w-full" @bind-Value="Form.Apellidos" />
+                            <ValidationMessage For="() => Form.Apellidos" />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="member-email">
+                                <span class="label-text">@L["member_file_email"]</span>
+                            </label>
+                            <InputText id="member-email" class="input input-bordered w-full" @bind-Value="Form.Email" />
+                            <ValidationMessage For="() => Form.Email" />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="member-phone">
+                                <span class="label-text">@L["member_file_phone"]</span>
+                            </label>
+                            <InputText id="member-phone" class="input input-bordered w-full" @bind-Value="Form.Tlf" />
+                            <ValidationMessage For="() => Form.Tlf" />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="member-birthdate">
+                                <span class="label-text">@L["member_file_birthdate"]</span>
+                            </label>
+                            <InputDate id="member-birthdate" class="input input-bordered w-full" @bind-Value="Form.FechaNacimiento" />
+                            <ValidationMessage For="() => Form.FechaNacimiento" />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="member-postcode">
+                                <span class="label-text">@L["member_file_postcode"]</span>
+                            </label>
+                            <InputText id="member-postcode" class="input input-bordered w-full" @bind-Value="Form.CodigoPostal" />
+                            <ValidationMessage For="() => Form.CodigoPostal" />
+                        </div>
+
+                        <div class="form-control member-file-page__grid-span-2">
+                            <label class="label" for="member-address">
+                                <span class="label-text">@L["member_file_address"]</span>
+                            </label>
+                            <InputText id="member-address" class="input input-bordered w-full" @bind-Value="Form.Direccion" />
+                            <ValidationMessage For="() => Form.Direccion" />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="member-city">
+                                <span class="label-text">@L["member_file_city"]</span>
+                            </label>
+                            <InputText id="member-city" class="input input-bordered w-full" @bind-Value="Form.Poblacion" />
+                            <ValidationMessage For="() => Form.Poblacion" />
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="member-province">
+                                <span class="label-text">@L["member_file_province"]</span>
+                            </label>
+                            <InputText id="member-province" class="input input-bordered w-full" @bind-Value="Form.Provincia" />
+                            <ValidationMessage For="() => Form.Provincia" />
+                        </div>
+
+                        <div class="form-control member-file-page__grid-span-2">
+                            <label class="label" for="member-allergies">
+                                <span class="label-text">@L["member_file_allergies"]</span>
+                            </label>
+                            <InputTextArea id="member-allergies" class="textarea textarea-bordered min-h-28 w-full" @bind-Value="Form.Alergias" />
+                            <ValidationMessage For="() => Form.Alergias" />
+                        </div>
+                    </div>
+
+                    <section class="member-file-page__consents" aria-labelledby="member-consents-title">
+                        <div>
+                            <h3 id="member-consents-title">@L["member_file_consents_section"]</h3>
+                            <p>@L["member_file_consents_summary"]</p>
+                        </div>
+
+                        <label class="label cursor-pointer member-file-page__checkbox-row" for="member-privacy">
+                            <span class="label-text">@L["member_file_privacy"]</span>
+                            <InputCheckbox id="member-privacy" class="checkbox checkbox-primary" @bind-Value="Form.AceptaPoliticaPrivacidad" />
+                        </label>
+
+                        <label class="label cursor-pointer member-file-page__checkbox-row" for="member-images">
+                            <span class="label-text">@L["member_file_images"]</span>
+                            <InputCheckbox id="member-images" class="checkbox checkbox-primary" @bind-Value="Form.AceptaUsoImagenes" />
+                        </label>
+
+                        <label class="label cursor-pointer member-file-page__checkbox-row" for="member-billing">
+                            <span class="label-text">@L["member_file_billing"]</span>
+                            <InputCheckbox id="member-billing" class="checkbox checkbox-primary" @bind-Value="Form.AceptaCobroCuenta" />
+                        </label>
+                    </section>
+
+                    <div class="member-file-page__actions">
+                        <button type="submit" class="btn btn-primary member-file-page__save" disabled="@IsSubmitting">
+                            @L["member_file_save"]
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+        </fieldset>
+    }
+</section>

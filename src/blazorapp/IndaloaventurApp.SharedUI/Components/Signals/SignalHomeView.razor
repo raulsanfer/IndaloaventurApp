@@ -1,0 +1,119 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+<section class="signal-home">
+    <header class="signal-home__header">
+        <nav class="signal-home__breadcrumb" aria-label="@L["signal_home_breadcrumb_label"]">
+            <a class="signal-home__breadcrumb-link" href="/home">@L["signal_home_back"]</a>
+            <span class="signal-home__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="signal-home__breadcrumb-current" aria-current="page">@L["home_card_signals_title"]</span>
+        </nav>
+
+        <div class="signal-home__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                @* <p class="signal-home__eyebrow">@L["signal_home_eyebrow"]</p> *@
+                <h1>@L["signal_home_title"]</h1>
+                <p class="signal-home__summary">@L["signal_home_summary"]</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="signal-home__search-shell">
+        <label class="input input-bordered signal-home__search" for="signal-search-input">
+            <i class="bi bi-search" aria-hidden="true"></i>
+            <input id="signal-search-input"
+                   type="text"
+                   value="@SearchText"
+                   placeholder="@L["signal_home_search_placeholder"]"
+                   aria-label="@L["signal_home_search_label"]"
+                   @oninput="OnSearchInputAsync" />
+        </label>
+    </div>
+
+    <section class="signal-home__categories" aria-label="@L["signal_home_categories_label"]">
+        <button type="button"
+                class="btn btn-sm signal-home__category-pill @(SelectedCategoryId is null ? "btn-warning" : "btn-ghost")"
+                @onclick="() => SelectCategoryAsync(null)">
+            @L["signal_home_all_categories"]
+        </button>
+
+        @foreach (var category in Categories)
+        {
+            <button type="button"
+                    class="btn btn-sm signal-home__category-pill @(SelectedCategoryId == category.Id ? "btn-warning" : "btn-ghost")"
+                    @onclick="() => SelectCategoryAsync(category.Id)">
+                @if (!string.IsNullOrWhiteSpace(category.IconName))
+                {
+                    <i class="bi @category.IconName" aria-hidden="true"></i>
+                }
+                <span>@category.Name</span>
+            </button>
+        }
+    </section>
+
+    @if (IsLoading)
+    {
+        <div class="alert signal-home__status">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["signal_home_loading"]</span>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div class="alert alert-error signal-home__status" role="alert">
+            <span>@L[ErrorMessageKey]</span>
+        </div>
+    }
+    else if (Signals.Count == 0)
+    {
+        <div class="alert signal-home__status">
+            <span>@L["signal_home_empty"]</span>
+        </div>
+    }
+    else
+    {
+        <div class="signal-home__list" role="list" aria-label="@L["signal_home_list_label"]">
+            @foreach (var signal in Signals)
+            {
+                <article class="card signal-home__card bg-base-100 shadow-sm" role="listitem">
+                    <a class="signal-home__card-link" href="/signals/@signal.Id">
+                        <div class="signal-home__card-media">
+                            @if (!string.IsNullOrWhiteSpace(signal.ImageUrl))
+                            {
+                                <img class="signal-home__card-image"
+                                     src="@signal.ImageUrl"
+                                     alt="@string.Format(L["signal_home_image_alt"], signal.Title)" />
+                            }
+                            else
+                            {
+                                <div class="signal-home__card-image signal-home__card-image--placeholder" aria-hidden="true">
+                                    <i class="bi bi-exclamation-diamond-fill"></i>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="card-body signal-home__card-body">
+                            <div class="signal-home__card-topline">
+                                <span class="badge badge-outline signal-home__category-badge">@signal.CategoryName</span>
+                                <time class="signal-home__date" datetime="@signal.Timestamp.ToString("O")">@FormatTimestamp(signal.Timestamp)</time>
+                            </div>
+
+                            <h2 class="card-title signal-home__card-title">@signal.Title</h2>
+
+                            <div class="signal-home__card-meta">
+                                <i class="bi @GetMetaIcon(signal)" aria-hidden="true"></i>
+                                <span>@GetMetaText(signal)</span>
+                            </div>
+                        </div>
+                    </a>
+                </article>
+            }
+        </div>
+    }
+
+    <a class="btn btn-circle btn-primary signal-home__fab"
+       href="/signals/nueva"
+       aria-label="@L["signal_create_fab_label"]">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+    </a>
+</section>

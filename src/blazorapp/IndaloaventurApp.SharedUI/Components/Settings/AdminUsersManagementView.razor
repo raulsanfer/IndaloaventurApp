@@ -1,0 +1,152 @@
+@using IndaloaventurApp.SharedUI.Resources
+
+<section class="settings-users">
+    <header class="settings-users__header">
+        <nav class="settings-users__breadcrumb" aria-label="@L["settings_users_breadcrumb_label"]">
+            <a class="settings-users__breadcrumb-link" href="/mi-cuenta">@L["shell_nav_my_account"]</a>
+            <span class="settings-users__breadcrumb-separator" aria-hidden="true">/</span>
+            <a class="settings-users__breadcrumb-link" href="/configuracion">@L["settings_title"]</a>
+            <span class="settings-users__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="settings-users__breadcrumb-current" aria-current="page">@L["settings_admin_users_title"]</span>
+        </nav>
+
+        <div class="settings-users__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="settings-users__hero-topline">
+                    <p class="settings-users__eyebrow">@L["settings_admin_title"]</p>
+                    <span class="badge badge-outline settings-users__hero-badge">@L["settings_admin_users_title"]</span>
+                </div>
+                <h1>@L["settings_users_title"]</h1>
+                <p>@L["settings_users_summary"]</p>
+            </div>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessageKey))
+    {
+        <div class="alert alert-success settings-users__status" role="status">
+            <span>@L[StatusMessageKey]</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div class="alert alert-error settings-users__status" role="alert">
+            <span>@L[ErrorMessageKey]</span>
+        </div>
+    }
+
+    <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm settings-users__fieldset" aria-label="@L["settings_users_search_title"]">
+        <legend class="fieldset-legend settings-users__legend">@L["settings_users_search_title"]</legend>
+
+        <div class="card-body">
+            <div class="settings-users__section-header">
+                <div>
+                    <h2>@L["settings_users_search_title"]</h2>
+                    <p>@L["settings_users_search_summary"]</p>
+                </div>
+            </div>
+
+            <form class="settings-users__form" @onsubmit="HandleSearchSubmitAsync" @onsubmit:preventDefault="true">
+                <label class="form-control settings-users__field" for="settings-users-email">
+                    <span class="label">
+                        <span class="label-text settings-users__label-text">@L["settings_users_search_label"]</span>
+                    </span>
+                    <div class="join settings-users__join">
+                        <input
+                            id="settings-users-email"
+                            class="input input-bordered join-item settings-users__input"
+                            type="email"
+                            value="@SearchEmail"
+                            placeholder="@L["settings_users_search_placeholder"]"
+                            @oninput="HandleSearchEmailInput" />
+                        <button type="submit" class="btn btn-primary join-item settings-users__primary-button" disabled="@IsSearching">
+                            @L["settings_users_search"]
+                        </button>
+                    </div>
+                </label>
+            </form>
+        </div>
+    </fieldset>
+
+    <section class="settings-users__results card border border-base-200 bg-base-100 shadow-sm" aria-labelledby="settings-users-results-title">
+        <div class="card-body">
+            <div class="settings-users__section-header">
+                <div>
+                    <p class="settings-users__section-kicker">@L["settings_admin_title"]</p>
+                    <h2 id="settings-users-results-title">@L["settings_users_results_title"]</h2>
+                    <p>@L["settings_users_results_summary"]</p>
+                </div>
+            </div>
+
+            @if (IsSearching)
+            {
+                <div class="alert settings-users__feedback">
+                    <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                    <span>@(IsFilterApplied ? L["settings_users_loading_filtered"] : L["settings_users_loading_all"])</span>
+                </div>
+            }
+            else if (!HasLoaded)
+            {
+                <div class="alert settings-users__feedback settings-users__feedback--empty">
+                    <span>@L["settings_users_idle"]</span>
+                </div>
+            }
+            else if (Results.Count == 0)
+            {
+                <div class="alert settings-users__feedback settings-users__feedback--empty">
+                    <span>@(IsFilterApplied ? L["settings_users_empty_filtered"] : L["settings_users_empty_all"])</span>
+                </div>
+            }
+            else
+            {
+                <ul class="list settings-users__list" aria-live="polite">
+                    @foreach (var user in Results)
+                    {
+                        <li class="list-row settings-users__list-item">
+                            <div class="settings-users__list-copy">
+                                <div class="settings-users__headline">
+                                    <strong>@user.Email</strong>
+                                    <span class="badge @(user.IsMember ? "badge-success" : "badge-ghost")">
+                                        @(user.IsMember ? L["settings_users_member_badge"] : L["settings_users_non_member_badge"])
+                                    </span>
+                                    <span class="badge @GetOperationalBadgeClass(user)">
+                                        @GetOperationalBadgeText(user)
+                                    </span>
+                                </div>
+
+                                @if (user.Roles.Count > 0)
+                                {
+                                    <small>@L["settings_users_roles_label"]: @string.Join(", ", user.Roles)</small>
+                                }
+                            </div>
+
+                            <div class="settings-users__actions">
+                                <a class="btn btn-ghost" href="@BuildFederativeLicensesHref(user.UserId)">
+                                    @L["settings_users_manage_federative_licenses"]
+                                </a>
+
+                                @if (user.IsMember)
+                                {
+                                    <a class="btn btn-outline" href="@BuildMemberFileHref(user.UserId)">
+                                        @L["settings_users_edit_member_file"]
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary settings-users__primary-button"
+                                        disabled="@(CreatingUserId == user.UserId)"
+                                        @onclick="() => HandleCreateMemberFileAsync(user)">
+                                        @L["settings_users_create_member_file"]
+                                    </button>
+                                }
+                            </div>
+                        </li>
+                    }
+                </ul>
+            }
+        </div>
+    </section>
+</section>

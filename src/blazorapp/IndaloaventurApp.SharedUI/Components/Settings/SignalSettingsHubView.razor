@@ -1,0 +1,37 @@
+@using IndaloaventurApp.SharedUI.Resources
+
+<section class="settings-signals">
+    <header class="settings-signals__header">
+        <nav class="settings-signals__breadcrumb" aria-label="@L["settings_signals_breadcrumb_label"]">
+            <a class="settings-signals__breadcrumb-link" href="/mi-cuenta">@L["shell_nav_my_account"]</a>
+            <span class="settings-signals__breadcrumb-separator" aria-hidden="true">/</span>
+            <a class="settings-signals__breadcrumb-link" href="/configuracion">@L["settings_title"]</a>
+            <span class="settings-signals__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="settings-signals__breadcrumb-current" aria-current="page">@L["settings_admin_signals_title"]</span>
+        </nav>
+
+        <div class="settings-signals__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="settings-signals__hero-topline">
+                    <p class="settings-signals__eyebrow">@L["settings_admin_title"]</p>
+                    <span class="badge badge-outline settings-signals__hero-badge">@L["settings_admin_signals_title"]</span>
+                </div>
+                <h1>@L["settings_signals_title"]</h1>
+                <p>@L["settings_signals_summary"]</p>
+            </div>
+        </div>
+    </header>
+
+    <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm settings-signals__fieldset" aria-label="@L["settings_admin_signals_title"]">
+        <legend class="fieldset-legend text-base">@L["settings_admin_signals_title"]</legend>
+
+        <div class="card-body">
+            <div class="settings-signals__admin-options">
+                <a class="btn btn-ghost settings-signals__admin-option" href="/configuracion/signals/categorias">
+                    <span class="settings-signals__admin-option-label">@L["settings_admin_signal_categories_title"]</span>
+                    <span aria-hidden="true">&gt;</span>
+                </a>
+            </div>
+        </div>
+    </fieldset>
+</section>

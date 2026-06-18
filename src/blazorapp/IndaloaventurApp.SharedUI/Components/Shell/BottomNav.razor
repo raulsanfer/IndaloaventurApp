@@ -1,0 +1,14 @@
+﻿@using Microsoft.Extensions.Localization
+@using IndaloaventurApp.SharedUI.Resources
+
+<nav class="bottom-nav" aria-label="Primary">
+    @foreach (var item in Items)
+    {
+        <a href="@item.Href" class="@(item.Href == ActiveHref ? "is-active" : string.Empty)">
+            <span class="bottom-nav__icon" aria-hidden="true">
+                <i class="@item.IconClass"></i>
+            </span>
+            <small>@item.Label</small>
+        </a>
+    }
+</nav>

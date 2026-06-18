@@ -1,0 +1,9 @@
+@page "/noticias/{Slug}"
+@using IndaloaventurApp.SharedUI.Components.Shell
+@using IndaloaventurApp.SharedUI.Components.WordPress
+
+<PageTitle>Noticia</PageTitle>
+
+<AuthenticatedShell ActiveHref="/home">
+    <WordPressPostDetailView Slug="@Slug" />
+</AuthenticatedShell>

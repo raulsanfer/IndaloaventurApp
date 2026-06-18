@@ -1,0 +1,51 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+<section class="home-news" aria-labelledby="home-news-title">
+    <div class="home-news__header">
+        <div>
+            <p class="home-news__eyebrow">@L["home_news_eyebrow"]</p>
+            <h2 id="home-news-title">@L["home_news_title"]</h2>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <p class="home-news__status">@L["home_news_loading"]</p>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <p class="home-news__status home-news__status--error">@ErrorMessage</p>
+    }
+    else if (Posts.Count == 0)
+    {
+        <p class="home-news__status">@L["home_news_empty"]</p>
+    }
+    else
+    {
+        <div class="home-news__rail" role="list" aria-label="@L["home_news_title"]">
+            @foreach (var post in Posts)
+            {
+                <a class="home-news__card" href="@GetPostHref(post)" role="listitem">
+                    @if (!string.IsNullOrWhiteSpace(post.FeaturedImageUrl))
+                    {
+                        <img src="@post.FeaturedImageUrl"
+                             alt="@post.Title"
+                             loading="lazy"
+                             class="home-news__image" />
+                    }
+                    else
+                    {
+                        <div class="home-news__image home-news__image--placeholder" aria-hidden="true">
+                            <span>@L["home_news_placeholder"]</span>
+                        </div>
+                    }
+
+                    <div class="home-news__body">
+                        <p class="home-news__card-title">@post.Title</p>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+</section>

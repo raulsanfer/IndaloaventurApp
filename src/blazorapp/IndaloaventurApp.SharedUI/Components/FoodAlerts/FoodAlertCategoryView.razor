@@ -1,0 +1,64 @@
+@using IndaloaventurApp.SharedUI.Models.FoodAlerts
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+<section class="food-alerts-list">
+    <header class="food-alerts-list__header">
+        <nav class="food-alerts-list__breadcrumb" aria-label="@L["food_alerts_breadcrumb_label"]">
+            <a class="food-alerts-list__breadcrumb-link" href="/alertas-alimentarias">@L["food_alerts_back_home"]</a>
+            <span class="food-alerts-list__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="food-alerts-list__breadcrumb-current" aria-current="page">@CategoryTitle</span>
+        </nav>
+
+        <div class="food-alerts-list__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <h1>@CategoryTitle</h1>
+                <p class="food-alerts-list__summary">@CategorySubtitle</p>
+            </div>
+        </div>
+    </header>
+
+    @if (IsLoading)
+    {
+        <div class="alert food-alerts-list__status" role="status">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["food_alerts_loading"]</span>
+        </div>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div class="alert alert-error food-alerts-list__status" role="alert">
+            <span>@L[ErrorMessageKey]</span>
+        </div>
+    }
+    else if (Alerts.Count == 0)
+    {
+        <div class="alert food-alerts-list__status" role="status">
+            <span>@L["food_alerts_empty"]</span>
+        </div>
+    }
+    else
+    {
+        <div class="food-alerts-list__items" role="list" aria-label="@L["food_alerts_list_label"]">
+            @foreach (var alert in Alerts)
+            {
+                <article class="card food-alerts-list__card bg-base-100 shadow-sm" role="listitem">
+                    <a class="food-alerts-list__card-link" href="@GetAlertHref(alert)">
+                        <div class="card-body">
+                            <div class="food-alerts-list__card-topline">
+                                @if (alert.PublishedAt is not null)
+                                {
+                                    <time class="food-alerts-list__date" datetime="@alert.PublishedAt.Value.ToString("O")">
+                                        @FormatDate(alert.PublishedAt.Value)
+                                    </time>
+                                }
+                            </div>
+                            <h2 class="food-alerts-list__card-title">@alert.Title</h2>
+                            <p class="food-alerts-list__card-summary">@alert.Summary</p>
+                        </div>
+                    </a>
+                </article>
+            }
+        </div>
+    }
+</section>

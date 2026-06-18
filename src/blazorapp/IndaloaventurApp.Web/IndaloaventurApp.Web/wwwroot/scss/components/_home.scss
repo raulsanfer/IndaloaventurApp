@@ -1,0 +1,89 @@
+﻿.home-dashboard {
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.home-dashboard__greeting {
+  margin: 0;
+  text-transform: uppercase;
+  color: var(--color-primary-dark);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+}
+
+.home-dashboard h1 {
+  margin: var(--space-xs) 0;
+  font-size: clamp(1.8rem, 4.8vw, 2.9rem);
+  line-height: 1.1;
+}
+
+.home-dashboard__summary {
+  margin: 0;
+  color: var(--color-text-muted);
+  max-width: 60ch;
+}
+
+.home-dashboard__cards {
+  display: grid;
+  gap: var(--space-md);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.home-dashboard__cards article {
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-lg);
+  background: linear-gradient(170deg, #ffffff 0%, #fff5f1 100%);
+  padding: var(--space-md);
+  box-shadow: 0 10px 20px rgba(171, 53, 0, 0.08);
+}
+
+.home-dashboard__cards h2 {
+  margin-top: 0;
+  margin-bottom: var(--space-xs);
+  color: var(--color-primary-dark);
+}
+
+.home-dashboard__cards p {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.home-dashboard__card-link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.home-dashboard__card-link article {
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.home-dashboard__card-link:hover article,
+.home-dashboard__card-link:focus-visible article {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 24px rgba(171, 53, 0, 0.14);
+}
+
+.home-dashboard__card--food-alerts {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.home-dashboard__card-icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #fff1e6;
+  color: var(--color-primary-dark);
+  font-size: 1.25rem;
+  flex: 0 0 auto;
+}
+
+.home-dashboard__card--food-alerts h2 {
+  margin: 0;
+}

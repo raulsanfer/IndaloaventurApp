@@ -1,0 +1,9 @@
+@page "/configuracion"
+@using IndaloaventurApp.SharedUI.Components.Settings
+@using IndaloaventurApp.SharedUI.Components.Shell
+
+<PageTitle>Configuración</PageTitle>
+
+<AuthenticatedShell ActiveHref="/mi-cuenta">
+    <SettingsView IsAdmin="@IsAdmin" />
+</AuthenticatedShell>

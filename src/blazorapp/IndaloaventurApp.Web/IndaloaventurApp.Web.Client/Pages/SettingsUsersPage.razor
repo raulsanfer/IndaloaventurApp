@@ -1,0 +1,9 @@
+@page "/configuracion/usuarios"
+@using IndaloaventurApp.SharedUI.Components.Settings
+@using IndaloaventurApp.SharedUI.Components.Shell
+
+<PageTitle>Usuarios</PageTitle>
+
+<AuthenticatedShell ActiveHref="/mi-cuenta">
+    <AdminUsersManagementView />
+</AuthenticatedShell>

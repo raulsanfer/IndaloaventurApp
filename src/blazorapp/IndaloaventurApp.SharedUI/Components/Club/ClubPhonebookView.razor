@@ -1,0 +1,90 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+<section class="mi-club-phonebook">
+    <header class="mi-club-phonebook__header">
+        <nav class="mi-club-phonebook__breadcrumb" aria-label="@L["mi_club_phonebook_breadcrumb_label"]">
+            <a class="mi-club-phonebook__breadcrumb-link" href="/mi-club">@L["mi_club_back"]</a>
+            <span class="mi-club-phonebook__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="mi-club-phonebook__breadcrumb-current" aria-current="page">@L["mi_club_eyebrow"]</span>
+        </nav>
+        <h1>@L["mi_club_phonebook_title"]</h1>
+    </header>
+
+    @if (IsLoading)
+    {
+        <p class="mi-club-phonebook__status">@L["mi_club_phonebook_loading"]</p>
+    }
+    else if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <p class="mi-club-phonebook__status mi-club-phonebook__status--error">@ErrorMessage</p>
+    }
+    else if (Contacts.Count == 0)
+    {
+        <p class="mi-club-phonebook__status">@L["mi_club_phonebook_empty"]</p>
+    }
+    else
+    {
+        <div class="mi-club-phonebook__list" role="list" aria-label="@L["mi_club_phonebook_title"]">
+            @foreach (var contact in Contacts)
+            {
+                <article class="card card-sm mi-club-phonebook__card mi-club-phonebook__card--pilot" role="listitem">
+                    <div class="card-body mi-club-phonebook__card-body">
+                        <header class="mi-club-phonebook__card-header">
+                            <div class="mi-club-phonebook__identity">
+                                <h2 class="card-title mi-club-phonebook__card-title">@contact.DisplayName</h2>
+                            </div>
+                        </header>
+
+                        <div class="mi-club-phonebook__contact-stack">
+                            @if (!string.IsNullOrWhiteSpace(contact.Telefono1))
+                            {
+                                <a href="@($"tel:{SanitizePhone(contact.Telefono1)}")" class="mi-club-phonebook__contact-row">
+                                    <span class="mi-club-phonebook__contact-label">@L["mi_club_phonebook_phone_primary"]</span>
+                                    <span class="mi-club-phonebook__contact-value">@contact.Telefono1</span>
+                                </a>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(contact.Telefono2))
+                            {
+                                <a href="@($"tel:{SanitizePhone(contact.Telefono2)}")" class="mi-club-phonebook__contact-row">
+                                    <span class="mi-club-phonebook__contact-label">@L["mi_club_phonebook_phone_secondary"]</span>
+                                    <span class="mi-club-phonebook__contact-value">@contact.Telefono2</span>
+                                </a>
+                            }
+
+                            @if (!string.IsNullOrWhiteSpace(contact.Email))
+                            {
+                                <a href="@($"mailto:{contact.Email}")" class="mi-club-phonebook__contact-row">
+                                    <span class="mi-club-phonebook__contact-label">@L["mi_club_phonebook_email"]</span>
+                                    <span class="mi-club-phonebook__contact-value">@contact.Email</span>
+                                </a>
+                            }
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(contact.Direccion) || !string.IsNullOrWhiteSpace(contact.Observaciones))
+                        {
+                            <div class="mi-club-phonebook__supporting">
+                                @if (!string.IsNullOrWhiteSpace(contact.Direccion))
+                                {
+                                    <div class="mi-club-phonebook__supporting-row">
+                                        <span class="mi-club-phonebook__detail-label">@L["mi_club_phonebook_address"]</span>
+                                        <span class="mi-club-phonebook__detail-value">@contact.Direccion</span>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(contact.Observaciones))
+                                {
+                                    <div class="mi-club-phonebook__supporting-row">
+                                        <span class="mi-club-phonebook__detail-label">@L["mi_club_phonebook_notes"]</span>
+                                        <span class="mi-club-phonebook__detail-value">@contact.Observaciones</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    }
+</section>

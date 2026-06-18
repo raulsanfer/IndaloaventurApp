@@ -1,0 +1,10 @@
+@namespace IndaloaventurApp.Web.Client
+
+@if (SessionService.IsInitialized)
+{
+    @ChildContent
+}
+else
+{
+    <div class="session-initialization-gate" aria-live="polite"></div>
+}

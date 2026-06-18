@@ -1,0 +1,9 @@
+@page "/signals/{SignalId:guid}"
+@using IndaloaventurApp.SharedUI.Components.Shell
+@using IndaloaventurApp.SharedUI.Components.Signals
+
+<PageTitle>Detalle Signal</PageTitle>
+
+<AuthenticatedShell ActiveHref="/signals">
+    <SignalDetailView SignalId="@SignalId" />
+</AuthenticatedShell>

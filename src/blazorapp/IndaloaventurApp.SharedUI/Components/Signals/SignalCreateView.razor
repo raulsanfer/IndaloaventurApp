@@ -1,0 +1,437 @@
+@using IndaloaventurApp.SharedUI.Models.Signals
+@using IndaloaventurApp.SharedUI.Resources
+@using Microsoft.Extensions.Localization
+
+<section class="signal-create">
+    <header class="signal-create__header">
+        <nav class="signal-home__breadcrumb" aria-label="@L["signal_create_breadcrumb_label"]">
+            <a class="signal-home__breadcrumb-link" href="/signals">@L["signal_create_back"]</a>
+            <span class="signal-home__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="signal-home__breadcrumb-current" aria-current="page">@L["signal_create_title"]</span>
+        </nav>
+
+        <div class="signal-create__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <p class="signal-create__eyebrow">@L["signal_create_eyebrow"]</p>
+                <h1>@L["signal_create_title"]</h1>
+                <p class="signal-create__summary">@L["signal_create_summary"]</p>
+            </div>
+        </div>
+    </header>
+
+    <div class="signal-create__steps-shell">
+        <ul class="steps steps-horizontal signal-create__steps">
+            @foreach (var step in OrderedSteps)
+            {
+                <li class="step @(GetStepClass(step))">@GetStepLabel(step)</li>
+            }
+        </ul>
+    </div>
+
+    @if (IsCompleted)
+    {
+        <section class="card signal-create__panel border border-success bg-base-100 shadow-sm">
+            <div class="card-body signal-create__success">
+                <span class="signal-create__success-icon" aria-hidden="true">
+                    <i class="bi bi-check2-circle"></i>
+                </span>
+                <div>
+                    <h2>@L["signal_create_success_title"]</h2>
+                    <p>@L["signal_create_success_message"]</p>
+                </div>
+                <div class="signal-create__actions">
+                    <a class="btn btn-primary" href="/signals">@L["signal_create_success_back"]</a>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="card signal-create__panel border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                @if (CurrentStep == SignalCreateStep.Type)
+                {
+                    <div class="signal-create__section-head">
+                        <div>
+                            <h2>@L["signal_create_type_title"]</h2>
+                            <p>@L["signal_create_type_summary"]</p>
+                        </div>
+                    </div>
+
+                    @if (IsLoadingCategories)
+                    {
+                        <div class="alert signal-create__status">
+                            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                            <span>@L["signal_create_type_loading"]</span>
+                        </div>
+                    }
+                    else if (!string.IsNullOrWhiteSpace(CategoryErrorMessageKey))
+                    {
+                        <div class="alert alert-error signal-create__status" role="alert">
+                            <span>@L[CategoryErrorMessageKey]</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="signal-create__type-list" role="list" aria-label="@L["signal_create_type_list_label"]">
+                            @foreach (var category in Categories)
+                            {
+                                <button type="button"
+                                        class="btn signal-create__type-option @(Draft.TypeId == category.Id ? "btn-primary" : "btn-outline")"
+                                        @onclick="() => SelectType(category)">
+                                    <span class="signal-create__type-icon" aria-hidden="true">
+                                        @if (!string.IsNullOrWhiteSpace(category.IconName))
+                                        {
+                                            <i class="bi @category.IconName"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-exclamation-diamond-fill"></i>
+                                        }
+                                    </span>
+                                    <span>@category.Name</span>
+                                </button>
+                            }
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(TypeErrorMessageKey))
+                    {
+                        <div class="alert alert-warning signal-create__status" role="alert">
+                            <span>@L[TypeErrorMessageKey]</span>
+                        </div>
+                    }
+                }
+                else if (CurrentStep == SignalCreateStep.Details)
+                {
+                    <div class="signal-create__section-head">
+                        <div>
+                            <h2>@L["signal_create_details_title"]</h2>
+                            <p>@L["signal_create_details_summary"]</p>
+                        </div>
+                        @if (SelectedCategory is not null)
+                        {
+                            <span class="badge badge-outline signal-create__selected-type">
+                                @if (!string.IsNullOrWhiteSpace(SelectedCategory.IconName))
+                                {
+                                    <i class="bi @SelectedCategory.IconName" aria-hidden="true"></i>
+                                }
+                                @SelectedCategory.Name
+                            </span>
+                        }
+                    </div>
+
+                    <div class="signal-create__form-grid">
+                        <div class="signal-create__field card bg-base-100 border border-base-200">
+                            <div class="card-body">
+                                <div class="signal-create__field-head">
+                                    <label class="label" for="signal-title">@L["signal_create_title_label"]</label>
+                                    <span class="badge badge-warning">@L["signal_create_required_badge"]</span>
+                                </div>
+                                <input id="signal-title"
+                                       class="input input-bordered"
+                                       type="text"
+                                       placeholder="@L["signal_create_title_placeholder"]"
+                                       @bind="Draft.Title" />
+                            </div>
+                        </div>
+
+                        <div class="signal-create__field card bg-base-100 border border-base-200">
+                            <div class="card-body">
+                                <div class="signal-create__field-head">
+                                    <label class="label" for="signal-description">@L["signal_create_description_label"]</label>
+                                    <span class="badge badge-warning">@L["signal_create_required_badge"]</span>
+                                </div>
+                                <textarea id="signal-description"
+                                          class="textarea textarea-bordered signal-create__textarea"
+                                          placeholder="@L["signal_create_description_placeholder"]"
+                                          @bind="Draft.Description"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="signal-create__field card bg-base-100 border border-base-200">
+                            <div class="card-body">
+                                <div class="signal-create__field-head">
+                                    <label class="label" for="signal-tags">@L["signal_create_tags_label"]</label>
+                                    <span class="badge badge-warning">@L["signal_create_required_badge"]</span>
+                                </div>
+                                <input id="signal-tags"
+                                       class="input input-bordered"
+                                       type="text"
+                                       placeholder="@L["signal_create_tags_placeholder"]"
+                                       @bind="Draft.Tags" />
+                                <p class="signal-create__hint">@L["signal_create_tags_hint"]</p>
+                            </div>
+                        </div>
+
+                        <div class="signal-create__field card bg-base-100 border border-base-200">
+                            <div class="card-body signal-create__location-card">
+                                <div class="signal-create__field-head">
+                                    <label class="label">@L["signal_create_location_label"]</label>
+                                    <span class="badge badge-ghost">@L["signal_create_optional_badge"]</span>
+                                </div>
+
+                                <div class="signal-create__location-actions">
+                                    <button type="button"
+                                            class="btn btn-outline"
+                                            disabled="@IsLocating"
+                                            @onclick="RequestCurrentLocationAsync">
+                                        @if (IsLocating)
+                                        {
+                                            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                                        }
+                                        <i class="bi bi-geo-alt-fill" aria-hidden="true"></i>
+                                        <span>@L["signal_create_location_use_current"]</span>
+                                    </button>
+
+                                    @if (HasLocation)
+                                    {
+                                        <button type="button"
+                                                class="btn btn-ghost"
+                                                @onclick="ClearLocation">
+                                            @L["signal_create_location_clear"]
+                                        </button>
+                                    }
+                                </div>
+
+                                @if (HasLocation)
+                                {
+                                    <div class="alert signal-create__location-result">
+                                        <i class="bi bi-compass-fill" aria-hidden="true"></i>
+                                        <span>@LocationText</span>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(LocationStatusMessageKey))
+                                {
+                                    <div class="alert alert-warning signal-create__status" role="alert">
+                                        <span>@L[LocationStatusMessageKey]</span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(DetailsErrorMessageKey))
+                    {
+                        <div class="alert alert-error signal-create__status" role="alert">
+                            <span>@L[DetailsErrorMessageKey]</span>
+                        </div>
+                    }
+                }
+                else if (CurrentStep == SignalCreateStep.Photos)
+                {
+                    <div class="signal-create__section-head">
+                        <div>
+                            <h2>@L["signal_create_photos_title"]</h2>
+                            <p>@L["signal_create_photos_summary"]</p>
+                        </div>
+                        @if (IsProcessingPhoto)
+                        {
+                            <span class="badge badge-warning badge-outline signal-create__photo-status">
+                                <span class="loading loading-spinner loading-xs" aria-hidden="true"></span>
+                                @L["signal_create_photo_processing"]
+                            </span>
+                        }
+                    </div>
+
+                    <div class="signal-create__photo-grid">
+                        @foreach (var slot in PhotoSlots)
+                        {
+                            <article class="card signal-create__photo-card border border-base-200 bg-base-100">
+                                <div class="card-body">
+                                    <div class="signal-create__photo-preview">
+                                        @if (GetPhoto(slot) is { } photo)
+                                        {
+                                            <img src="@photo.PreviewUrl" alt="@string.Format(L["signal_create_photo_alt"], GetPhotoLabel(slot))" />
+                                        }
+                                        else
+                                        {
+                                            <div class="signal-create__photo-placeholder" aria-hidden="true">
+                                                <i class="bi bi-camera-fill"></i>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="signal-create__photo-meta">
+                                        <div class="signal-create__field-head">
+                                            <h3>@GetPhotoLabel(slot)</h3>
+                                            <span class="badge @(IsPhotoRequired(slot) ? "badge-warning" : "badge-ghost")">
+                                                @(IsPhotoRequired(slot) ? L["signal_create_required_badge"] : L["signal_create_optional_badge"])
+                                            </span>
+                                        </div>
+                                        <p>@GetPhotoCaption(slot)</p>
+                                    </div>
+
+                                    <div class="signal-create__photo-actions">
+                                        <button type="button"
+                                                class="btn btn-primary"
+                                                disabled="@IsProcessingPhoto"
+                                                @onclick="() => OpenPhotoPickerAsync(slot, PhotoInputMode.Camera)">
+                                            <i class="bi bi-camera-fill" aria-hidden="true"></i>
+                                            <span>@GetPhotoCameraButtonLabel(slot)</span>
+                                        </button>
+
+                                        <button type="button"
+                                                class="btn btn-outline"
+                                                disabled="@IsProcessingPhoto"
+                                                @onclick="() => OpenPhotoPickerAsync(slot, PhotoInputMode.Gallery)">
+                                            <i class="bi bi-images" aria-hidden="true"></i>
+                                            <span>@GetPhotoGalleryButtonLabel(slot)</span>
+                                        </button>
+                                    </div>
+
+                                    <InputFile id="@GetPhotoInputId(slot, PhotoInputMode.Camera)"
+                                               class="signal-create__file-input"
+                                               accept="image/*"
+                                               capture="environment"
+                                               OnChange="@(args => OnPhotoSelectedAsync(slot, PhotoInputMode.Camera, args))" />
+                                    <InputFile id="@GetPhotoInputId(slot, PhotoInputMode.Gallery)"
+                                               class="signal-create__file-input"
+                                               accept="image/*"
+                                               OnChange="@(args => OnPhotoSelectedAsync(slot, PhotoInputMode.Gallery, args))" />
+                                </div>
+                            </article>
+                        }
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(PhotoErrorMessageKey))
+                    {
+                        <div class="alert alert-error signal-create__status" role="alert">
+                            <span>@L[PhotoErrorMessageKey]</span>
+                        </div>
+                    }
+                }
+                else if (CurrentStep == SignalCreateStep.Review)
+                {
+                    <div class="signal-create__section-head">
+                        <div>
+                            <h2>@L["signal_create_review_title"]</h2>
+                            <p>@L["signal_create_review_summary"]</p>
+                        </div>
+                    </div>
+
+                    <div class="signal-create__review-grid">
+                        <article class="card signal-create__review-card border border-base-200 bg-base-100">
+                            <div class="card-body">
+                                <span class="signal-create__review-label">@L["signal_create_type_label"]</span>
+                                <div class="signal-create__review-value">
+                                    @if (SelectedCategory is not null)
+                                    {
+                                        @if (!string.IsNullOrWhiteSpace(SelectedCategory.IconName))
+                                        {
+                                            <i class="bi @SelectedCategory.IconName" aria-hidden="true"></i>
+                                        }
+                                        <span>@SelectedCategory.Name</span>
+                                    }
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="card signal-create__review-card border border-base-200 bg-base-100">
+                            <div class="card-body">
+                                <span class="signal-create__review-label">@L["signal_create_title_label"]</span>
+                                <p class="signal-create__review-text">@Draft.Title</p>
+                            </div>
+                        </article>
+
+                        <article class="card signal-create__review-card border border-base-200 bg-base-100">
+                            <div class="card-body">
+                                <span class="signal-create__review-label">@L["signal_create_description_label"]</span>
+                                <p class="signal-create__review-text">@Draft.Description</p>
+                            </div>
+                        </article>
+
+                        <article class="card signal-create__review-card border border-base-200 bg-base-100">
+                            <div class="card-body">
+                                <span class="signal-create__review-label">@L["signal_create_tags_label"]</span>
+                                <div class="signal-create__tag-list">
+                                    @foreach (var tag in ParsedTags)
+                                    {
+                                        <span class="badge badge-warning badge-outline">@tag</span>
+                                    }
+                                </div>
+                            </div>
+                        </article>
+
+                        <article class="card signal-create__review-card border border-base-200 bg-base-100">
+                            <div class="card-body">
+                                <span class="signal-create__review-label">@L["signal_create_location_label"]</span>
+                                <p class="signal-create__review-text">
+                                    @(HasLocation ? LocationText : L["signal_create_location_empty"])
+                                </p>
+                            </div>
+                        </article>
+
+                        <article class="card signal-create__review-card border border-base-200 bg-base-100 signal-create__review-card--photos">
+                            <div class="card-body">
+                                <span class="signal-create__review-label">@L["signal_create_photos_label"]</span>
+                                <div class="signal-create__review-photos">
+                                    @foreach (var slot in PhotoSlots)
+                                    {
+                                        if (GetPhoto(slot) is { } photo)
+                                        {
+                                            <article class="signal-create__review-photo">
+                                                <div class="signal-create__review-photo-head">
+                                                    <span class="signal-create__review-label">@GetPhotoLabel(slot)</span>
+                                                    @if (slot == 2)
+                                                    {
+                                                        <button type="button"
+                                                                class="btn btn-ghost btn-sm signal-create__review-photo-remove"
+                                                                aria-label="@L["signal_create_photo_2_remove"]"
+                                                                title="@L["signal_create_photo_2_remove"]"
+                                                                @onclick="RemovePhoto2">
+                                                            <i class="bi bi-x-lg" aria-hidden="true"></i>
+                                                        </button>
+                                                    }
+                                                </div>
+                                                <img src="@photo.PreviewUrl" alt="@string.Format(L["signal_create_photo_alt"], GetPhotoLabel(slot))" />
+                                            </article>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(SaveErrorMessageKey))
+                    {
+                        <div class="alert alert-error signal-create__status" role="alert">
+                            <span>@L[SaveErrorMessageKey]</span>
+                        </div>
+                    }
+                }
+            </div>
+        </section>
+
+        <div class="signal-create__actions">
+            @if (CurrentStep == SignalCreateStep.Type)
+            {
+                <a class="btn btn-ghost" href="/signals">@L["signal_create_cancel"]</a>
+            }
+            else
+            {
+                <button type="button" class="btn btn-ghost" @onclick="GoBack">@L["signal_create_back_button"]</button>
+            }
+
+            @if (CurrentStep == SignalCreateStep.Details)
+            {
+                <button type="button" class="btn btn-primary" @onclick="GoToPhotos">@L["signal_create_next"]</button>
+            }
+            else if (CurrentStep == SignalCreateStep.Photos)
+            {
+                <button type="button" class="btn btn-primary" @onclick="GoToReview">@L["signal_create_next"]</button>
+            }
+            else if (CurrentStep == SignalCreateStep.Review)
+            {
+                <button type="button" class="btn btn-primary" disabled="@IsSaving" @onclick="SaveAsync">
+                    @if (IsSaving)
+                    {
+                        <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                    }
+                    <span>@L["signal_create_save"]</span>
+                </button>
+            }
+        </div>
+    }
+</section>

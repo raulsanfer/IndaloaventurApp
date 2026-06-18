@@ -1,0 +1,9 @@
+@page "/alertas-alimentarias/alerta/{AlertId}"
+@using IndaloaventurApp.SharedUI.Components.FoodAlerts
+@using IndaloaventurApp.SharedUI.Components.Shell
+
+<PageTitle>Detalle de Alerta Alimentaria</PageTitle>
+
+<AuthenticatedShell ActiveHref="/alertas-alimentarias">
+    <FoodAlertDetailView AlertId="@AlertId" CategoryCode="@CategoryCode" />
+</AuthenticatedShell>

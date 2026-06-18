@@ -1,0 +1,181 @@
+@using IndaloaventurApp.SharedUI.Resources
+
+<section class="settings-signal-categories">
+    <header class="settings-signal-categories__header">
+        <nav class="settings-signal-categories__breadcrumb" aria-label="@L["settings_signal_categories_breadcrumb_label"]">
+            <a class="settings-signal-categories__breadcrumb-link" href="/mi-cuenta">@L["shell_nav_my_account"]</a>
+            <span class="settings-signal-categories__breadcrumb-separator" aria-hidden="true">/</span>
+            <a class="settings-signal-categories__breadcrumb-link" href="/configuracion">@L["settings_title"]</a>
+            <span class="settings-signal-categories__breadcrumb-separator" aria-hidden="true">/</span>
+            <a class="settings-signal-categories__breadcrumb-link" href="/configuracion/signals">@L["settings_admin_signals_title"]</a>
+            <span class="settings-signal-categories__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="settings-signal-categories__breadcrumb-current" aria-current="page">@L["settings_admin_signal_categories_title"]</span>
+        </nav>
+
+        <div class="settings-signal-categories__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="settings-signal-categories__hero-topline">
+                    <p class="settings-signal-categories__eyebrow">@L["settings_admin_title"]</p>
+                    <span class="badge badge-outline settings-signal-categories__hero-badge">@L["settings_admin_signal_categories_title"]</span>
+                </div>
+                <h1>@L["settings_signal_categories_title"]</h1>
+                <p>@L["settings_signal_categories_summary"]</p>
+            </div>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessageKey))
+    {
+        <div role="status" class="alert alert-success settings-signal-categories__status settings-signal-categories__status--success">
+            <span>@L[StatusMessageKey]</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div role="alert" class="alert alert-error settings-signal-categories__status settings-signal-categories__status--error">
+            <span>@L[ErrorMessageKey]</span>
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="alert settings-signal-categories__feedback">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["settings_signal_categories_loading"]</span>
+        </div>
+    }
+    else
+    {
+        <div class="settings-signal-categories__stack">
+            <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm settings-signal-categories__fieldset" aria-label="@L[IsEditing ? "settings_signal_categories_edit_title" : "settings_signal_categories_new_title"]">
+                <legend class="fieldset-legend settings-signal-categories__legend">@L[IsEditing ? "settings_signal_categories_edit_title" : "settings_signal_categories_new_title"]</legend>
+                <div class="card-body">
+                    <div class="settings-signal-categories__editor-header">
+                        <div>
+                            <p class="settings-signal-categories__editor-summary">@L["settings_signal_categories_editor_summary"]</p>
+                        </div>
+
+                        @if (IsEditing)
+                        {
+                            <span class="badge badge-accent badge-outline">@L["settings_signal_categories_edit"]</span>
+                        }
+                    </div>
+
+                    @if (IsEditing)
+                    {
+                        <p class="settings-signal-categories__editing-note">@L["settings_signal_categories_editing_hint"]</p>
+                    }
+
+                    <EditForm Model="Editor" OnSubmit="HandleSubmitAsync" class="settings-signal-categories__form">
+                        <div class="settings-signal-categories__field-grid">
+                            <label class="form-control settings-signal-categories__field" for="signal-category-name">
+                                <span class="label">
+                                    <span class="label-text settings-signal-categories__label-text">@L["settings_signal_categories_name_label"]</span>
+                                </span>
+                                <InputText id="signal-category-name"
+                                           class="input input-bordered settings-signal-categories__input"
+                                           @bind-Value="Editor.Name"
+                                           placeholder="@L["settings_signal_categories_name_placeholder"]" />
+                            </label>
+
+                            <label class="form-control settings-signal-categories__field" for="signal-category-icon">
+                                <span class="label">
+                                    <span class="label-text settings-signal-categories__label-text">@L["settings_signal_categories_icon_label"]</span>
+                                </span>
+                                <InputText id="signal-category-icon"
+                                           class="input input-bordered settings-signal-categories__input"
+                                           @bind-Value="Editor.IconName"
+                                           placeholder="@L["settings_signal_categories_icon_placeholder"]" />
+                            </label>
+                        </div>
+
+                        <div class="settings-signal-categories__form-row">
+                            <button type="submit" class="btn btn-primary settings-signal-categories__primary-button" disabled="@IsSubmitting">
+                                @L["settings_signal_categories_save"]
+                            </button>
+
+                            @if (IsEditing)
+                            {
+                                <button type="button" class="btn btn-ghost settings-signal-categories__cancel-button" disabled="@IsSubmitting" @onclick="CancelEdit">
+                                    @L["settings_signal_categories_cancel"]
+                                </button>
+                            }
+                        </div>
+                    </EditForm>
+                </div>
+            </fieldset>
+
+            <section class="card border border-base-200 bg-base-100 shadow-sm settings-signal-categories__list-section" aria-labelledby="signal-categories-list-title">
+                <div class="card-body">
+                    <div class="settings-signal-categories__section-header">
+                        <div>
+                            <p class="settings-signal-categories__section-kicker">@L["settings_admin_title"]</p>
+                            <h2 id="signal-categories-list-title">@L["settings_signal_categories_list_title"]</h2>
+                            <p class="settings-signal-categories__section-summary">@L["settings_signal_categories_list_summary"]</p>
+                        </div>
+
+                        <div class="settings-signal-categories__section-meta">
+                            <span class="badge badge-neutral badge-outline">@Categories.Count</span>
+
+                            @if (IsEditing)
+                            {
+                                <button type="button" class="btn btn-outline settings-signal-categories__new-button" @onclick="BeginCreate">
+                                    @L["settings_signal_categories_new"]
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Categories.Count == 0)
+                    {
+                        <div class="alert settings-signal-categories__feedback settings-signal-categories__feedback--empty">
+                            <span>@L["settings_signal_categories_empty"]</span>
+                            <span class="settings-signal-categories__empty-hint">@L["settings_signal_categories_empty_hint"]</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="list rounded-box border border-base-200 bg-base-100 settings-signal-categories__list">
+                            @foreach (var category in Categories)
+                            {
+                                <li class="list-row settings-signal-categories__list-item">
+                                    <div class="settings-signal-categories__list-copy">
+                                        <div class="settings-signal-categories__headline">
+                                            @if (!string.IsNullOrWhiteSpace(category.IconName))
+                                            {
+                                                <span class="settings-signal-categories__icon-preview">
+                                                    <i class="bi @category.IconName" aria-hidden="true"></i>
+                                                </span>
+                                            }
+                                            <strong>@category.Name</strong>
+                                        </div>
+                                        <small>@string.Format(L["settings_signal_categories_icon_format"], category.IconName ?? L["settings_signal_categories_icon_empty"])</small>
+                                    </div>
+
+                                    <div class="settings-signal-categories__actions">
+                                        <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEdit(category)">
+                                            @L["settings_signal_categories_edit"]
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-ghost settings-signal-categories__danger-button" disabled="@(DeletingCategoryId == category.Id)" @onclick="() => DeleteAsync(category)">
+                                            @L["settings_signal_categories_delete"]
+                                        </button>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(LoadErrorKey))
+                    {
+                        <div>
+                            <button type="button" class="btn btn-outline settings-signal-categories__retry-button" @onclick="ReloadAsync">
+                                @L["settings_signal_categories_retry"]
+                            </button>
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+    }
+</section>

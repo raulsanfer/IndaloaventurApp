@@ -1,0 +1,158 @@
+@using IndaloaventurApp.SharedUI.Resources
+
+<section class="settings-cargos">
+    <header class="settings-cargos__header">
+        <nav class="settings-cargos__breadcrumb" aria-label="@L["settings_cargos_breadcrumb_label"]">
+            <a class="settings-cargos__breadcrumb-link" href="/configuracion">@L["settings_title"]</a>
+            <span class="settings-cargos__breadcrumb-separator" aria-hidden="true">/</span>
+            <span class="settings-cargos__breadcrumb-current" aria-current="page">@L["settings_admin_cargos_title"]</span>
+        </nav>
+
+        <div class="settings-cargos__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="settings-cargos__hero-topline">
+                    <p class="settings-cargos__eyebrow">@L["settings_admin_title"]</p>
+                    <span class="badge badge-outline settings-cargos__hero-badge">@L["settings_admin_cargos_title"]</span>
+                </div>
+                <h1>@L["settings_admin_cargos_title"]</h1>
+                <p>@L["settings_cargos_summary"]</p>
+            </div>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessageKey))
+    {
+        <div role="status" class="alert alert-success settings-cargos__status settings-cargos__status--success">
+            <span>@L[StatusMessageKey]</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessageKey))
+    {
+        <div role="alert" class="alert alert-error settings-cargos__status settings-cargos__status--error">
+            <span>@L[ErrorMessageKey]</span>
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="alert settings-cargos__feedback">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["settings_cargos_loading"]</span>
+        </div>
+    }
+    else
+    {
+        <div class="settings-cargos__stack">
+            <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm settings-cargos__fieldset" aria-label="@L[IsEditing ? "settings_cargos_edit_title" : "settings_cargos_new_title"]">
+                <legend class="fieldset-legend settings-cargos__legend">@L[IsEditing ? "settings_cargos_edit_title" : "settings_cargos_new_title"]</legend>
+                <div class="card-body">
+                    <div class="settings-cargos__editor-header">
+                        <div>
+                            <p class="settings-cargos__editor-summary">@L["settings_cargos_editor_summary"]</p>
+                        </div>
+
+                        @if (IsEditing)
+                        {
+                            <span class="badge badge-accent badge-outline">@L["settings_cargos_edit"]</span>
+                        }
+                    </div>
+
+                    @if (IsEditing)
+                    {
+                        <p class="settings-cargos__editing-note">@L["settings_cargos_editing_hint"]</p>
+                    }
+
+                    <EditForm Model="Editor" OnSubmit="HandleSubmitAsync" class="settings-cargos__form">
+                        <label class="label" for="cargo-description">
+                            <span class="label-text settings-cargos__label-text">@L["settings_cargos_name_label"]</span>
+                        </label>
+
+                        <div class="settings-cargos__form-row">
+                            <div class="join settings-cargos__editor-join">
+                                <InputText id="cargo-description"
+                                           class="input input-bordered join-item settings-cargos__input"
+                                           @bind-Value="Editor.Description"
+                                           placeholder="@L["settings_cargos_description_placeholder"]" />
+
+                                <button type="submit" class="btn btn-primary join-item settings-cargos__primary-button" disabled="@IsSubmitting">
+                                    @L["settings_cargos_save"]
+                                </button>
+                            </div>
+
+                            @if (IsEditing)
+                            {
+                                <button type="button" class="btn btn-ghost settings-cargos__cancel-button" disabled="@IsSubmitting" @onclick="CancelEdit">
+                                    @L["settings_cargos_cancel"]
+                                </button>
+                            }
+                        </div>
+                    </EditForm>
+                </div>
+            </fieldset>
+
+            <section class="card border border-base-200 bg-base-100 shadow-sm settings-cargos__list-section" aria-labelledby="cargos-list-title">
+                <div class="card-body">
+                    <div class="settings-cargos__section-header">
+                        <div>
+                            <p class="settings-cargos__section-kicker">@L["settings_admin_title"]</p>
+                            <h2 id="cargos-list-title">@L["settings_admin_cargos_list_title"]</h2>
+                            <p class="settings-cargos__section-summary">@L["settings_cargos_list_summary"]</p>
+                        </div>
+
+                        <div class="settings-cargos__section-meta">
+                            <span class="badge badge-neutral badge-outline">@Cargos.Count</span>
+
+                            @if (IsEditing)
+                            {
+                                <button type="button" class="btn btn-outline settings-cargos__new-button" @onclick="BeginCreate">
+                                    @L["settings_cargos_new"]
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Cargos.Count == 0)
+                    {
+                        <div class="alert settings-cargos__feedback settings-cargos__feedback--empty">
+                            <span>@L["settings_cargos_empty"]</span>
+                            <span class="settings-cargos__empty-hint">@L["settings_cargos_empty_hint"]</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="list rounded-box border border-base-200 bg-base-100 settings-cargos__list">
+                            @foreach (var cargo in Cargos)
+                            {
+                                <li class="list-row settings-cargos__list-item">
+                                    <div class="settings-cargos__list-copy">
+                                        <strong>@cargo.Description</strong>
+                                        <small>@string.Format(L["settings_cargos_id_format"], cargo.Id)</small>
+                                    </div>
+
+                                    <div class="settings-cargos__actions">
+                                        <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEdit(cargo)">
+                                            @L["settings_cargos_edit"]
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-ghost settings-cargos__danger-button" disabled aria-disabled="true" title="@L["settings_cargos_delete_coming_soon"]">
+                                            @L["settings_cargos_delete"]
+                                        </button>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(LoadErrorKey))
+                    {
+                        <div>
+                            <button type="button" class="btn btn-outline settings-cargos__retry-button" @onclick="ReloadAsync">
+                                @L["settings_cargos_retry"]
+                            </button>
+                        </div>
+                    }
+                </div>
+            </section>
+        </div>
+    }
+</section>

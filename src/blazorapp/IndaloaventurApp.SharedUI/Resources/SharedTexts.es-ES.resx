@@ -1,0 +1,500 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="app_name" xml:space="preserve"><value>Club Indaloaventura</value></data>
+  <data name="login_title" xml:space="preserve"><value>Bienvenid@ al club</value></data>
+  <data name="login_subtitle" xml:space="preserve"><value>Accede para planificar tu próxima aventura.</value></data>
+  <data name="login_user_label" xml:space="preserve"><value>Usuario o email</value></data>
+  <data name="login_user_placeholder" xml:space="preserve"><value>aventurero01@correo.com</value></data>
+  <data name="login_password_label" xml:space="preserve"><value>Contraseña</value></data>
+  <data name="login_password_placeholder" xml:space="preserve"><value>••••••••</value></data>
+  <data name="login_remember_me" xml:space="preserve"><value>Recordarme</value></data>
+  <data name="login_forgot_password" xml:space="preserve"><value>¿Olvidaste la contraseña?</value></data>
+  <data name="login_submit" xml:space="preserve"><value>Entrar</value></data>
+  <data name="login_social_divider" xml:space="preserve"><value>o continúa con</value></data>
+  <data name="login_google" xml:space="preserve"><value>Google</value></data>
+  <data name="login_facebook" xml:space="preserve"><value>Facebook</value></data>
+  <data name="login_social_loading" xml:space="preserve"><value>Validando tu acceso con Google...</value></data>
+  <data name="login_social_provider_coming_soon" xml:space="preserve"><value>Disponible en una próxima iteración.</value></data>
+  <data name="login_social_google_unavailable" xml:space="preserve"><value>Google no está disponible ahora mismo.</value></data>
+  <data name="login_join_message" xml:space="preserve"><value>¿Aún no eres socio?</value></data>
+  <data name="login_join_link" xml:space="preserve"><value>Únete al club</value></data>
+  <data name="footer_terms" xml:space="preserve"><value>Términos</value></data>
+  <data name="footer_privacy" xml:space="preserve"><value>Privacidad</value></data>
+  <data name="footer_support" xml:space="preserve"><value>Soporte</value></data>
+  <data name="login_error_invalid_credentials" xml:space="preserve"><value>No se pudo validar el usuario. Revisa tus datos.</value></data>
+  <data name="login_error_unavailable" xml:space="preserve"><value>Servicio no disponible temporalmente.</value></data>
+  <data name="login_social_google_failed_error" xml:space="preserve"><value>No se pudo completar el acceso con Google. Inténtalo de nuevo.</value></data>
+  <data name="login_social_google_unavailable_error" xml:space="preserve"><value>El acceso con Google no está disponible temporalmente.</value></data>
+  <data name="auth_recovery_eyebrow" xml:space="preserve"><value>Recuperación de acceso</value></data>
+  <data name="auth_recovery_title" xml:space="preserve"><value>He olvidado mi contraseña</value></data>
+  <data name="auth_recovery_summary" xml:space="preserve"><value>Indica el email asociado a tu cuenta y te enviaremos instrucciones para definir una nueva contraseña.</value></data>
+  <data name="auth_recovery_email_label" xml:space="preserve"><value>Email</value></data>
+  <data name="auth_recovery_email_placeholder" xml:space="preserve"><value>tuemail@dominio.com</value></data>
+  <data name="auth_recovery_submit" xml:space="preserve"><value>Enviar instrucciones</value></data>
+  <data name="auth_recovery_back_to_login" xml:space="preserve"><value>Volver al login</value></data>
+  <data name="auth_recovery_neutral_message" xml:space="preserve"><value>Si existe una cuenta asociada al email indicado, te hemos enviado instrucciones para recuperar tu contraseña.</value></data>
+  <data name="auth_recovery_error" xml:space="preserve"><value>No se pudo iniciar la recuperación de contraseña.</value></data>
+  <data name="auth_reset_eyebrow" xml:space="preserve"><value>Definir nueva contraseña</value></data>
+  <data name="auth_reset_title" xml:space="preserve"><value>Restablecer contraseña</value></data>
+  <data name="auth_reset_summary" xml:space="preserve"><value>Introduce tu nueva contraseña para recuperar el acceso a la app.</value></data>
+  <data name="auth_reset_email_label" xml:space="preserve"><value>Email vinculado</value></data>
+  <data name="auth_reset_password_label" xml:space="preserve"><value>Nueva contraseña</value></data>
+  <data name="auth_reset_password_placeholder" xml:space="preserve"><value>Escribe tu nueva contraseña</value></data>
+  <data name="auth_reset_confirm_label" xml:space="preserve"><value>Confirmar nueva contraseña</value></data>
+  <data name="auth_reset_confirm_placeholder" xml:space="preserve"><value>Repite la nueva contraseña</value></data>
+  <data name="auth_reset_submit" xml:space="preserve"><value>Guardar nueva contraseña</value></data>
+  <data name="auth_reset_restart_link" xml:space="preserve"><value>Iniciar de nuevo la recuperación</value></data>
+  <data name="auth_reset_missing_link" xml:space="preserve"><value>El enlace de recuperación no es válido o está incompleto. Solicita uno nuevo para continuar.</value></data>
+  <data name="auth_reset_error" xml:space="preserve"><value>No se pudo restablecer la contraseña.</value></data>
+  <data name="auth_reset_login_success" xml:space="preserve"><value>La contraseña se ha actualizado correctamente. Ya puedes iniciar sesión.</value></data>
+  <data name="home_greeting" xml:space="preserve"><value>Hola, montañero</value></data>
+  <data name="home_title" xml:space="preserve"><value>Tu próximo reto empieza aquí</value></data>
+  <data name="home_summary" xml:space="preserve"><value>Consulta actividades, novedades o incidencias en la montaña.</value></data>
+  <data name="home_card_activities_title" xml:space="preserve"><value>Actividades</value></data>
+  <data name="home_card_activities_description" xml:space="preserve"><value>Explora rutas y eventos programados.</value></data>
+  <data name="home_card_news_title" xml:space="preserve"><value>Novedades</value></data>
+  <data name="home_card_news_description" xml:space="preserve"><value>Publicaciones y avisos del club.</value></data>
+  <data name="home_card_signals_title" xml:space="preserve"><value>Señales</value></data>
+  <data name="home_card_signals_description" xml:space="preserve"><value>Gestiona incidencias en la montaña.</value></data>
+  <data name="food_alerts_home_title" xml:space="preserve"><value>Alertas Alimentarias</value></data>
+  <data name="food_alerts_home_summary" xml:space="preserve"><value>Consulta avisos alimentarios segmentados por categoría para acceder rápidamente al listado y al detalle de cada alerta.</value></data>
+  <data name="food_alerts_home_list_label" xml:space="preserve"><value>Categorías de alertas alimentarias</value></data>
+  <data name="food_alerts_category_general_title" xml:space="preserve"><value>Generales</value></data>
+  <data name="food_alerts_category_general_subtitle" xml:space="preserve"><value>Alertas alimentarias de interés para toda la población</value></data>
+  <data name="food_alerts_category_supplements_title" xml:space="preserve"><value>Complementos Alimenticios</value></data>
+  <data name="food_alerts_category_supplements_subtitle" xml:space="preserve"><value>Alertas alimentarias para personas que consumen complementos alimenticios</value></data>
+  <data name="food_alerts_category_allergies_title" xml:space="preserve"><value>Alergias</value></data>
+  <data name="food_alerts_category_allergies_subtitle" xml:space="preserve"><value>Alertas alimentarias para personas con alergias, intolerancias u otros efectos adversos a determinadas sustancias</value></data>
+  <data name="food_alerts_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de alertas alimentarias</value></data>
+  <data name="food_alerts_detail_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de detalle de alerta alimentaria</value></data>
+  <data name="food_alerts_back_home" xml:space="preserve"><value>Volver a Alertas Alimentarias</value></data>
+  <data name="food_alerts_back_category" xml:space="preserve"><value>Volver al listado</value></data>
+  <data name="food_alerts_loading" xml:space="preserve"><value>Cargando alertas alimentarias...</value></data>
+  <data name="food_alerts_empty" xml:space="preserve"><value>No hay alertas para esta categoría.</value></data>
+  <data name="food_alerts_error" xml:space="preserve"><value>No pudimos cargar las alertas alimentarias ahora mismo.</value></data>
+  <data name="food_alerts_timeout" xml:space="preserve"><value>La consulta de alertas está tardando demasiado. Inténtalo de nuevo.</value></data>
+  <data name="food_alerts_invalid_category" xml:space="preserve"><value>La categoría de alertas solicitada no es válida.</value></data>
+  <data name="food_alerts_list_label" xml:space="preserve"><value>Listado de alertas alimentarias</value></data>
+  <data name="food_alerts_detail_title" xml:space="preserve"><value>Detalle de la alerta</value></data>
+  <data name="food_alerts_detail_loading" xml:space="preserve"><value>Cargando detalle de la alerta...</value></data>
+  <data name="food_alerts_detail_error" xml:space="preserve"><value>No pudimos cargar esta alerta ahora mismo.</value></data>
+  <data name="food_alerts_detail_not_found" xml:space="preserve"><value>No hemos encontrado la alerta solicitada.</value></data>
+  <data name="food_alerts_detail_source" xml:space="preserve"><value>Ver fuente original</value></data>
+  <data name="home_news_eyebrow" xml:space="preserve"><value>Actualidad del club</value></data>
+  <data name="home_news_title" xml:space="preserve"><value>Últimas noticias</value></data>
+  <data name="home_news_loading" xml:space="preserve"><value>Cargando noticias...</value></data>
+  <data name="home_news_empty" xml:space="preserve"><value>No hay noticias publicadas por ahora.</value></data>
+  <data name="home_news_error" xml:space="preserve"><value>No pudimos cargar las noticias ahora mismo.</value></data>
+  <data name="home_news_placeholder" xml:space="preserve"><value>Sin imagen</value></data>
+  <data name="shell_header_welcome" xml:space="preserve"><value>Bienvenid@</value></data>
+  <data name="shell_header_status" xml:space="preserve"><value>Cuenta validada</value></data>
+  <data name="shell_header_notifications" xml:space="preserve"><value>Notificaciones</value></data>
+  <data name="shell_nav_home" xml:space="preserve"><value>Home</value></data>
+  <data name="shell_nav_signals" xml:space="preserve"><value>Signals</value></data>
+  <data name="shell_nav_club" xml:space="preserve"><value>Mi Club</value></data>
+  <data name="shell_nav_my_account" xml:space="preserve"><value>Mi Cuenta</value></data>
+  <data name="signal_home_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de Señales</value></data>
+  <data name="signal_home_back" xml:space="preserve"><value>Volver a Home</value></data>
+  <data name="signal_home_eyebrow" xml:space="preserve"><value>Señales activas</value></data>
+  <data name="signal_home_title" xml:space="preserve"><value>Signals</value></data>
+  <data name="signal_home_summary" xml:space="preserve"><value>Consulta incidencias, avisos y señales activas del entorno de montaña desde un único listado visual.</value></data>
+  <data name="signal_home_search_label" xml:space="preserve"><value>Buscar señales</value></data>
+  <data name="signal_home_search_placeholder" xml:space="preserve"><value>Buscar por descripción o zona...</value></data>
+  <data name="signal_home_categories_label" xml:space="preserve"><value>Filtros por categorías de señales</value></data>
+  <data name="signal_home_all_categories" xml:space="preserve"><value>Todos</value></data>
+  <data name="signal_home_loading" xml:space="preserve"><value>Cargando señales...</value></data>
+  <data name="signal_home_empty" xml:space="preserve"><value>No hay señales para el filtro actual.</value></data>
+  <data name="signal_home_error" xml:space="preserve"><value>No pudimos cargar las señales ahora mismo.</value></data>
+  <data name="signal_home_timeout" xml:space="preserve"><value>La carga de señales está tardando demasiado. Inténtalo de nuevo.</value></data>
+  <data name="signal_home_list_label" xml:space="preserve"><value>Listado de señales</value></data>
+  <data name="signal_home_image_alt" xml:space="preserve"><value>Imagen de la señal {0}</value></data>
+  <data name="signal_home_meta_fallback" xml:space="preserve"><value>Incidencia activa</value></data>
+  <data name="signal_home_date_today" xml:space="preserve"><value>Hoy, {0}</value></data>
+  <data name="signal_home_date_yesterday" xml:space="preserve"><value>Ayer</value></data>
+  <data name="signal_create_fab_label" xml:space="preserve"><value>Crear señal</value></data>
+  <data name="signal_create_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de creación de señal</value></data>
+  <data name="signal_create_back" xml:space="preserve"><value>Volver a Signals</value></data>
+  <data name="signal_create_eyebrow" xml:space="preserve"><value>Nueva incidencia</value></data>
+  <data name="signal_create_title" xml:space="preserve"><value>Crear Signal</value></data>
+  <data name="signal_create_summary" xml:space="preserve"><value>Completa este flujo guiado para registrar una nueva señal desde el móvil con tipología, datos, fotos y revisión final.</value></data>
+  <data name="signal_create_step_type" xml:space="preserve"><value>1. Tipo</value></data>
+  <data name="signal_create_step_details" xml:space="preserve"><value>2. Datos</value></data>
+  <data name="signal_create_step_photos" xml:space="preserve"><value>3. Fotos</value></data>
+  <data name="signal_create_step_review" xml:space="preserve"><value>4. Resumen</value></data>
+  <data name="signal_create_type_title" xml:space="preserve"><value>Selecciona la tipología</value></data>
+  <data name="signal_create_type_summary" xml:space="preserve"><value>Elige el tipo de señal que mejor encaje con la incidencia observada.</value></data>
+  <data name="signal_create_type_loading" xml:space="preserve"><value>Cargando tipologías disponibles...</value></data>
+  <data name="signal_create_type_list_label" xml:space="preserve"><value>Listado de tipologías disponibles</value></data>
+  <data name="signal_create_type_required" xml:space="preserve"><value>Selecciona una tipología para continuar.</value></data>
+  <data name="signal_create_details_title" xml:space="preserve"><value>Completa los datos principales</value></data>
+  <data name="signal_create_details_summary" xml:space="preserve"><value>Añade una descripción clara, al menos una etiqueta y, si quieres, tu ubicación actual.</value></data>
+  <data name="signal_create_title_label" xml:space="preserve"><value>Título</value></data>
+  <data name="signal_create_title_placeholder" xml:space="preserve"><value>Resume la incidencia en una frase corta</value></data>
+  <data name="signal_create_title_required" xml:space="preserve"><value>El título es obligatorio para continuar.</value></data>
+  <data name="signal_create_description_label" xml:space="preserve"><value>Descripción</value></data>
+  <data name="signal_create_description_placeholder" xml:space="preserve"><value>Describe la incidencia, el estado del camino o cualquier detalle útil...</value></data>
+  <data name="signal_create_description_required" xml:space="preserve"><value>La descripción es obligatoria para continuar.</value></data>
+  <data name="signal_create_tags_label" xml:space="preserve"><value>Tags</value></data>
+  <data name="signal_create_tags_placeholder" xml:space="preserve"><value>piedras, barranco, precaución</value></data>
+  <data name="signal_create_tags_hint" xml:space="preserve"><value>Separa las etiquetas con comas para que se guarden correctamente.</value></data>
+  <data name="signal_create_tags_required" xml:space="preserve"><value>Añade al menos una etiqueta para guardar la señal.</value></data>
+  <data name="signal_create_location_label" xml:space="preserve"><value>Ubicación</value></data>
+  <data name="signal_create_location_use_current" xml:space="preserve"><value>Usar ubicación actual</value></data>
+  <data name="signal_create_location_clear" xml:space="preserve"><value>Quitar ubicación</value></data>
+  <data name="signal_create_location_error" xml:space="preserve"><value>No pudimos recuperar tu ubicación. Puedes continuar sin ella.</value></data>
+  <data name="signal_create_location_value" xml:space="preserve"><value>{0:0.000000}, {1:0.000000}</value></data>
+  <data name="signal_create_location_empty" xml:space="preserve"><value>Sin ubicación asociada</value></data>
+  <data name="signal_create_photos_title" xml:space="preserve"><value>Añade las fotos</value></data>
+  <data name="signal_create_photos_summary" xml:space="preserve"><value>Añade la imagen principal y, si quieres, una segunda foto opcional usando la cámara o eligiendo una foto existente desde la galería o tus archivos.</value></data>
+  <data name="signal_create_photos_label" xml:space="preserve"><value>Fotos</value></data>
+  <data name="signal_create_photos_required" xml:space="preserve"><value>Debes añadir Foto 1 antes de continuar.</value></data>
+  <data name="signal_create_photo_1" xml:space="preserve"><value>Foto 1</value></data>
+  <data name="signal_create_photo_2" xml:space="preserve"><value>Foto 2</value></data>
+  <data name="signal_create_photo_1_camera_button" xml:space="preserve"><value>Usar cámara</value></data>
+  <data name="signal_create_photo_2_camera_button" xml:space="preserve"><value>Usar cámara</value></data>
+  <data name="signal_create_photo_1_gallery_button" xml:space="preserve"><value>Elegir de galería</value></data>
+  <data name="signal_create_photo_2_gallery_button" xml:space="preserve"><value>Elegir de galería</value></data>
+  <data name="signal_create_photo_1_hint" xml:space="preserve"><value>Captura una vista general de la incidencia.</value></data>
+  <data name="signal_create_photo_2_hint" xml:space="preserve"><value>Opcional: añade un segundo ángulo o un detalle útil.</value></data>
+  <data name="signal_create_photo_alt" xml:space="preserve"><value>Vista previa de {0}</value></data>
+  <data name="signal_create_photo_2_remove" xml:space="preserve"><value>Eliminar Foto 2</value></data>
+  <data name="signal_create_photo_processing" xml:space="preserve"><value>Procesando imagen...</value></data>
+  <data name="signal_create_photo_too_large" xml:space="preserve"><value>La imagen procesada sigue superando el tamaño máximo permitido de 2 MB.</value></data>
+  <data name="signal_create_photo_cannot_optimize" xml:space="preserve"><value>No se ha podido adaptar automáticamente la imagen al límite de 2 MB. Prueba con otra foto.</value></data>
+  <data name="signal_create_photo_processing_error" xml:space="preserve"><value>No se ha podido procesar la imagen seleccionada. Inténtalo de nuevo.</value></data>
+  <data name="signal_create_photo_invalid_type" xml:space="preserve"><value>El archivo seleccionado no es una imagen compatible.</value></data>
+  <data name="signal_create_review_title" xml:space="preserve"><value>Revisa la información</value></data>
+  <data name="signal_create_review_summary" xml:space="preserve"><value>Comprueba los datos antes de publicar la nueva señal. Desde aquí también puedes descartar la segunda imagen si no quieres subirla.</value></data>
+  <data name="signal_create_type_label" xml:space="preserve"><value>Tipología</value></data>
+  <data name="signal_create_required_badge" xml:space="preserve"><value>Obligatorio</value></data>
+  <data name="signal_create_optional_badge" xml:space="preserve"><value>Opcional</value></data>
+  <data name="signal_create_cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="signal_create_back_button" xml:space="preserve"><value>Volver</value></data>
+  <data name="signal_create_next" xml:space="preserve"><value>Siguiente</value></data>
+  <data name="signal_create_save" xml:space="preserve"><value>Guardar</value></data>
+  <data name="signal_create_save_error" xml:space="preserve"><value>No pudimos guardar la señal. Inténtalo de nuevo.</value></data>
+  <data name="signal_create_save_validation_error" xml:space="preserve"><value>Revisa los datos de la señal antes de guardarla.</value></data>
+  <data name="signal_create_save_auth_error" xml:space="preserve"><value>Tu sesión ya no es válida. Accede de nuevo para guardar la señal.</value></data>
+  <data name="signal_create_save_timeout" xml:space="preserve"><value>El guardado está tardando demasiado. Vuelve a intentarlo.</value></data>
+  <data name="signal_create_success_title" xml:space="preserve"><value>Signal creada</value></data>
+  <data name="signal_create_success_message" xml:space="preserve"><value>La nueva señal se ha guardado correctamente y ya forma parte del listado activo.</value></data>
+  <data name="signal_create_success_back" xml:space="preserve"><value>Volver al listado</value></data>
+  <data name="signal_detail_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de detalle de signal</value></data>
+  <data name="signal_detail_back" xml:space="preserve"><value>Volver a Signals</value></data>
+  <data name="signal_detail_title" xml:space="preserve"><value>Detalle de la signal</value></data>
+  <data name="signal_detail_summary" xml:space="preserve"><value>Consulta toda la información disponible de esta señal y su ubicación si está informada.</value></data>
+  <data name="signal_detail_loading" xml:space="preserve"><value>Cargando detalle de la señal...</value></data>
+  <data name="signal_detail_error" xml:space="preserve"><value>No pudimos cargar esta señal ahora mismo.</value></data>
+  <data name="signal_detail_timeout" xml:space="preserve"><value>La carga del detalle está tardando demasiado. Inténtalo de nuevo.</value></data>
+  <data name="signal_detail_not_found" xml:space="preserve"><value>No hemos encontrado la señal solicitada.</value></data>
+  <data name="signal_detail_tab_data" xml:space="preserve"><value>Datos de la signal</value></data>
+  <data name="signal_detail_tab_comments" xml:space="preserve"><value>Comentarios</value></data>
+  <data name="signal_detail_tab_map" xml:space="preserve"><value>Mapa/Ubicación</value></data>
+  <data name="signal_detail_field_category" xml:space="preserve"><value>Categoría</value></data>
+  <data name="signal_detail_field_status" xml:space="preserve"><value>Estado</value></data>
+  <data name="signal_detail_field_created" xml:space="preserve"><value>Creada</value></data>
+  <data name="signal_detail_field_updated" xml:space="preserve"><value>Actualizada</value></data>
+  <data name="signal_detail_field_tags" xml:space="preserve"><value>Tags</value></data>
+  <data name="signal_detail_edit_action" xml:space="preserve"><value>Editar</value></data>
+  <data name="signal_detail_edit_title" xml:space="preserve"><value>Editar signal</value></data>
+  <data name="signal_detail_edit_summary" xml:space="preserve"><value>Solo puedes actualizar el título, la descripción y el estado de tu propia signal.</value></data>
+  <data name="signal_detail_edit_badge" xml:space="preserve"><value>Edición propia</value></data>
+  <data name="signal_detail_edit_save" xml:space="preserve"><value>Guardar cambios</value></data>
+  <data name="signal_detail_edit_cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="signal_detail_edit_success" xml:space="preserve"><value>La signal se ha actualizado correctamente.</value></data>
+  <data name="signal_detail_edit_error" xml:space="preserve"><value>No pudimos guardar los cambios de esta signal.</value></data>
+  <data name="signal_detail_edit_validation_error" xml:space="preserve"><value>Revisa el título y la descripción antes de guardar.</value></data>
+  <data name="signal_detail_edit_forbidden" xml:space="preserve"><value>No tienes permisos para editar esta signal.</value></data>
+  <data name="signal_detail_edit_auth_error" xml:space="preserve"><value>Tu sesión ya no es válida para editar esta signal.</value></data>
+  <data name="signal_detail_edit_title_required" xml:space="preserve"><value>El título es obligatorio para editar la signal.</value></data>
+  <data name="signal_detail_edit_description_required" xml:space="preserve"><value>La descripción es obligatoria para editar la signal.</value></data>
+  <data name="signal_detail_tags_empty" xml:space="preserve"><value>Sin tags asociados</value></data>
+  <data name="signal_detail_comments_empty" xml:space="preserve"><value>Sin comentarios asociados</value></data>
+  <data name="signal_detail_comments_count" xml:space="preserve"><value>{0} comentarios</value></data>
+  <data name="signal_detail_status_active" xml:space="preserve"><value>Activa</value></data>
+  <data name="signal_detail_status_archived" xml:space="preserve"><value>Archivada</value></data>
+  <data name="signal_detail_updated_at" xml:space="preserve"><value>Actualizada {0}</value></data>
+  <data name="signal_detail_map_frame_title" xml:space="preserve"><value>Mapa de ubicación de la signal</value></data>
+  <data name="signal_detail_map_open" xml:space="preserve"><value>Abrir mapa</value></data>
+  <data name="signal_detail_location_empty" xml:space="preserve"><value>Esta señal no tiene ubicación informada.</value></data>
+  <data name="mi_club_eyebrow" xml:space="preserve"><value>Área del socio</value></data>
+  <data name="mi_club_title" xml:space="preserve"><value>Mi Club</value></data>
+  <data name="mi_club_summary" xml:space="preserve"><value>Accede a utilidades y contactos importantes del club desde un único punto.</value></data>
+  <data name="mi_club_back" xml:space="preserve"><value>Volver a Mi Club</value></data>
+  <data name="mi_club_phonebook_title" xml:space="preserve"><value>Teléfonos de interés</value></data>
+  <data name="mi_club_phonebook_description" xml:space="preserve"><value>Consulta teléfonos, emails y otros datos útiles de contacto.</value></data>
+  <data name="mi_club_phonebook_summary" xml:space="preserve"><value>Listado actualizado de contactos del club con acceso rápido a teléfono y correo electrónico.</value></data>
+  <data name="mi_club_phonebook_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de Teléfonos de interés</value></data>
+  <data name="mi_club_phonebook_loading" xml:space="preserve"><value>Cargando contactos...</value></data>
+  <data name="mi_club_phonebook_empty" xml:space="preserve"><value>No hay contactos disponibles por ahora.</value></data>
+  <data name="mi_club_phonebook_error" xml:space="preserve"><value>No pudimos cargar la agenda telefónica.</value></data>
+  <data name="mi_club_phonebook_section_phones" xml:space="preserve"><value>Teléfonos</value></data>
+  <data name="mi_club_phonebook_section_details" xml:space="preserve"><value>Más información</value></data>
+  <data name="mi_club_phonebook_phone_primary" xml:space="preserve"><value>Teléfono principal</value></data>
+  <data name="mi_club_phonebook_phone_secondary" xml:space="preserve"><value>Teléfono secundario</value></data>
+  <data name="mi_club_phonebook_email" xml:space="preserve"><value>Email</value></data>
+  <data name="mi_club_phonebook_address" xml:space="preserve"><value>Dirección</value></data>
+  <data name="mi_club_phonebook_notes" xml:space="preserve"><value>Observaciones</value></data>
+  <data name="mi_club_federative_licenses_title" xml:space="preserve"><value>Licencias Federativas</value></data>
+  <data name="mi_club_federative_licenses_description" xml:space="preserve"><value>Consulta el histórico de tus licencias y accede a su gestión visual.</value></data>
+  <data name="mi_club_federative_licenses_summary" xml:space="preserve"><value>Revisa tus licencias agrupadas por temporada.</value></data>
+  <data name="mi_club_federative_licenses_request" xml:space="preserve"><value>Solicitar</value></data>
+  <data name="mi_club_federative_licenses_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de Licencias Federativas</value></data>
+  <data name="mi_club_federative_licenses_loading" xml:space="preserve"><value>Cargando licencias federativas...</value></data>
+  <data name="mi_club_federative_licenses_empty" xml:space="preserve"><value>No tienes licencias registradas por ahora.</value></data>
+  <data name="mi_club_federative_licenses_error" xml:space="preserve"><value>No pudimos cargar tus licencias federativas.</value></data>
+  <data name="mi_club_federative_licenses_not_available" xml:space="preserve"><value>Esta sección solo está disponible para miembros con acceso de socio.</value></data>
+  <data name="mi_club_federative_licenses_header_license" xml:space="preserve"><value>Licencia</value></data>
+  <data name="mi_club_federative_licenses_header_status" xml:space="preserve"><value>Estado</value></data>
+  <data name="mi_club_federative_licenses_label_category" xml:space="preserve"><value>Categoría</value></data>
+  <data name="mi_club_federative_licenses_label_scope" xml:space="preserve"><value>Ámbito</value></data>
+  <data name="mi_club_federative_licenses_season" xml:space="preserve"><value>Temporada {0}</value></data>
+  <data name="mi_club_federative_licenses_season_with_modality" xml:space="preserve"><value>{0} · {1}</value></data>
+  <data name="mi_club_federative_licenses_request_title" xml:space="preserve"><value>Solicitar Licencia</value></data>
+  <data name="mi_club_federative_licenses_request_modality" xml:space="preserve"><value>Modalidad</value></data>
+  <data name="mi_club_federative_licenses_request_modality_full" xml:space="preserve"><value>Temporada Completa</value></data>
+  <data name="mi_club_federative_licenses_request_modality_half" xml:space="preserve"><value>Media Temporada</value></data>
+  <data name="mi_club_federative_licenses_request_season" xml:space="preserve"><value>Temporada</value></data>
+  <data name="mi_club_federative_licenses_request_license" xml:space="preserve"><value>Tipología</value></data>
+  <data name="mi_club_federative_licenses_request_category" xml:space="preserve"><value>Categoría</value></data>
+  <data name="mi_club_federative_licenses_request_select_season" xml:space="preserve"><value>Selecciona una temporada</value></data>
+  <data name="mi_club_federative_licenses_request_select_license" xml:space="preserve"><value>Selecciona una tipología</value></data>
+  <data name="mi_club_federative_licenses_request_select_category" xml:space="preserve"><value>Selecciona una categoría</value></data>
+  <data name="mi_club_federative_licenses_request_rates_loading" xml:space="preserve"><value>Cargando tarifas disponibles...</value></data>
+  <data name="mi_club_federative_licenses_request_rates_empty" xml:space="preserve"><value>Todavía no hay tarifas disponibles para esa temporada.</value></data>
+  <data name="mi_club_federative_licenses_request_catalog_invalid" xml:space="preserve"><value>No hemos podido resolver una tarifa válida para la selección indicada.</value></data>
+  <data name="mi_club_federative_licenses_request_price" xml:space="preserve"><value>Precio Club</value></data>
+  <data name="mi_club_federative_licenses_request_cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="mi_club_federative_licenses_request_confirm" xml:space="preserve"><value>Confirmar</value></data>
+  <data name="mi_club_federative_licenses_request_confirm_loading" xml:space="preserve"><value>Confirmando...</value></data>
+  <data name="mi_club_federative_licenses_request_error" xml:space="preserve"><value>No pudimos completar la solicitud de licencia.</value></data>
+  <data name="wordpress_post_eyebrow" xml:space="preserve"><value>Noticia</value></data>
+  <data name="wordpress_post_loading" xml:space="preserve"><value>Cargando noticia...</value></data>
+  <data name="wordpress_post_error" xml:space="preserve"><value>No pudimos cargar esta noticia.</value></data>
+  <data name="wordpress_post_back" xml:space="preserve"><value>Volver a Home</value></data>
+  <data name="mi_cuenta_loading" xml:space="preserve"><value>Cargando tu cuenta...</value></data>
+  <data name="mi_cuenta_load_error" xml:space="preserve"><value>No pudimos cargar tu información de miembro.</value></data>
+  <data name="mi_cuenta_data_section" xml:space="preserve"><value>MIS DATOS</value></data>
+  <data name="mi_cuenta_cargo_title" xml:space="preserve"><value>Cargo</value></data>
+  <data name="mi_cuenta_cargo_default" xml:space="preserve"><value>Cargo #{0}</value></data>
+  <data name="mi_cuenta_peaks" xml:space="preserve"><value>CUMBRES</value></data>
+  <data name="mi_cuenta_distance" xml:space="preserve"><value>RECORRIDOS</value></data>
+  <data name="mi_cuenta_activity_section" xml:space="preserve"><value>MI ACTIVIDAD</value></data>
+  <data name="mi_cuenta_support_section" xml:space="preserve"><value>AJUSTES Y SOPORTE</value></data>
+  <data name="mi_cuenta_link_subscriptions" xml:space="preserve"><value>Mis Inscripciones</value></data>
+  <data name="mi_cuenta_link_favorite_routes" xml:space="preserve"><value>Mis Rutas Favoritas</value></data>
+  <data name="mi_cuenta_link_member_file" xml:space="preserve"><value>Ficha Socio</value></data>
+  <data name="mi_cuenta_link_licenses" xml:space="preserve"><value>Licencias Federativas</value></data>
+  <data name="mi_cuenta_link_join_member" xml:space="preserve"><value>Hazte socio</value></data>
+  <data name="mi_cuenta_external_link" xml:space="preserve"><value>Externo</value></data>
+  <data name="mi_cuenta_coming_soon" xml:space="preserve"><value>próximamente</value></data>
+  <data name="mi_cuenta_link_settings" xml:space="preserve"><value>Configuración</value></data>
+  <data name="mi_cuenta_link_help" xml:space="preserve"><value>Ayuda</value></data>
+  <data name="mi_cuenta_link_signout" xml:space="preserve"><value>Cerrar Sesión</value></data>
+  <data name="member_file_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de Ficha de Socio</value></data>
+  <data name="member_file_title" xml:space="preserve"><value>Ficha de Socio</value></data>
+  <data name="member_file_summary" xml:space="preserve"><value>Consulta y actualiza tus datos personales, contacto y consentimientos desde un único formulario seguro.</value></data>
+  <data name="member_file_loading" xml:space="preserve"><value>Cargando tu ficha de socio...</value></data>
+  <data name="member_file_not_available" xml:space="preserve"><value>Esta pantalla solo está disponible para usuarios identificados como socios.</value></data>
+  <data name="member_file_personal_section" xml:space="preserve"><value>Datos del socio</value></data>
+  <data name="member_file_personal_summary" xml:space="preserve"><value>Revisa tus datos identificativos y de contacto antes de guardar cualquier cambio.</value></data>
+  <data name="member_file_secure_badge" xml:space="preserve"><value>Edición segura</value></data>
+  <data name="member_file_cargo_id" xml:space="preserve"><value>ID del cargo</value></data>
+  <data name="member_file_dni" xml:space="preserve"><value>DNI</value></data>
+  <data name="member_file_nombre" xml:space="preserve"><value>Nombre</value></data>
+  <data name="member_file_apellidos" xml:space="preserve"><value>Apellidos</value></data>
+  <data name="member_file_email" xml:space="preserve"><value>Email</value></data>
+  <data name="member_file_phone" xml:space="preserve"><value>Teléfono</value></data>
+  <data name="member_file_birthdate" xml:space="preserve"><value>Fecha de nacimiento</value></data>
+  <data name="member_file_postcode" xml:space="preserve"><value>Código postal</value></data>
+  <data name="member_file_address" xml:space="preserve"><value>Dirección</value></data>
+  <data name="member_file_city" xml:space="preserve"><value>Población</value></data>
+  <data name="member_file_province" xml:space="preserve"><value>Provincia</value></data>
+  <data name="member_file_allergies" xml:space="preserve"><value>Alergias</value></data>
+  <data name="member_file_consents_section" xml:space="preserve"><value>Consentimientos</value></data>
+  <data name="member_file_consents_summary" xml:space="preserve"><value>Actualiza tus preferencias de privacidad, uso de imágenes y cobro en cuenta.</value></data>
+  <data name="member_file_privacy" xml:space="preserve"><value>Acepto la política de privacidad</value></data>
+  <data name="member_file_images" xml:space="preserve"><value>Acepto el uso de imágenes</value></data>
+  <data name="member_file_billing" xml:space="preserve"><value>Acepto el cobro en cuenta</value></data>
+  <data name="member_file_save" xml:space="preserve"><value>Guardar cambios</value></data>
+  <data name="member_file_load_error" xml:space="preserve"><value>No pudimos cargar tu ficha de socio.</value></data>
+  <data name="member_file_save_error" xml:space="preserve"><value>No pudimos guardar los cambios de tu ficha.</value></data>
+  <data name="member_file_save_validation_error" xml:space="preserve"><value>Revisa los valores indicados antes de guardar tu ficha.</value></data>
+  <data name="member_file_save_success" xml:space="preserve"><value>Tu ficha de socio se ha actualizado correctamente.</value></data>
+  <data name="member_file_not_found" xml:space="preserve"><value>No hemos encontrado tu ficha de socio en este momento.</value></data>
+  <data name="mi_cuenta_points_title" xml:space="preserve"><value>PROGRAMA DE PUNTOS</value></data>
+  <data name="mi_cuenta_points_balance" xml:space="preserve"><value>Tienes {0} Almeries</value></data>
+  <data name="mi_cuenta_points_description" xml:space="preserve"><value>Canjea tus puntos por descuentos en equipos y expediciones oficiales.</value></data>
+  <data name="mi_cuenta_points_cta" xml:space="preserve"><value>VER TIENDA</value></data>
+  <data name="settings_eyebrow" xml:space="preserve"><value>Mi cuenta</value></data>
+  <data name="settings_title" xml:space="preserve"><value>Configuración</value></data>
+  <data name="settings_summary" xml:space="preserve"><value>Gestiona los accesos y herramientas disponibles para tu cuenta.</value></data>
+  <data name="settings_admin_title" xml:space="preserve"><value>Administración</value></data>
+  <data name="settings_admin_description" xml:space="preserve"><value>Accede a utilidades reservadas para usuarios administradores.</value></data>
+  <data name="settings_admin_cargos_title" xml:space="preserve"><value>Cargos</value></data>
+  <data name="settings_admin_cargos_description" xml:space="preserve"><value>Gestiona el catálogo de cargos disponibles para los miembros.</value></data>
+  <data name="settings_admin_federative_licenses_title" xml:space="preserve"><value>Licencias Federativas</value></data>
+  <data name="settings_admin_users_title" xml:space="preserve"><value>Usuarios</value></data>
+  <data name="settings_admin_users_description" xml:space="preserve"><value>Busca usuarios y gestiona su ficha de socio desde administración.</value></data>
+  <data name="settings_admin_signals_title" xml:space="preserve"><value>Signals</value></data>
+  <data name="settings_admin_signal_categories_title" xml:space="preserve"><value>Categorías</value></data>
+  <data name="settings_back" xml:space="preserve"><value>Volver a Configuración</value></data>
+  <data name="settings_cargos_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de gestión de cargos</value></data>
+  <data name="settings_cargos_summary" xml:space="preserve"><value>Gestiona el catálogo de cargos desde una lista simple con alta y edición rápida.</value></data>
+  <data name="settings_admin_cargos_list_title" xml:space="preserve"><value>Listado actual</value></data>
+  <data name="settings_cargos_loading" xml:space="preserve"><value>Cargando cargos...</value></data>
+  <data name="settings_cargos_empty" xml:space="preserve"><value>No hay cargos disponibles todavía.</value></data>
+  <data name="settings_cargos_new" xml:space="preserve"><value>Nuevo cargo</value></data>
+  <data name="settings_cargos_edit" xml:space="preserve"><value>Editar</value></data>
+  <data name="settings_cargos_delete" xml:space="preserve"><value>Borrar</value></data>
+  <data name="settings_cargos_delete_coming_soon" xml:space="preserve"><value>La eliminación de cargos estará disponible en una próxima versión.</value></data>
+  <data name="settings_cargos_confirm_delete" xml:space="preserve"><value>Confirmar</value></data>
+  <data name="settings_cargos_cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="settings_cargos_retry" xml:space="preserve"><value>Reintentar</value></data>
+  <data name="settings_cargos_create_title" xml:space="preserve"><value>Crear cargo</value></data>
+  <data name="settings_cargos_edit_title" xml:space="preserve"><value>Editar cargo</value></data>
+  <data name="settings_cargos_new_title" xml:space="preserve"><value>Nuevo Cargo</value></data>
+  <data name="settings_cargos_name_label" xml:space="preserve"><value>Nombre del cargo</value></data>
+  <data name="settings_cargos_description_label" xml:space="preserve"><value>Nombre del cargo</value></data>
+  <data name="settings_cargos_description_placeholder" xml:space="preserve"><value>Escribe el nombre del cargo</value></data>
+  <data name="settings_cargos_editor_summary" xml:space="preserve"><value>Crea un cargo nuevo o reutiliza este mismo bloque para editar uno existente.</value></data>
+  <data name="settings_cargos_list_summary" xml:space="preserve"><value>Consulta el catálogo actual y elige el cargo que quieres actualizar.</value></data>
+  <data name="settings_cargos_empty_hint" xml:space="preserve"><value>Empieza creando el primer cargo desde el formulario superior.</value></data>
+  <data name="settings_cargos_save" xml:space="preserve"><value>Guardar</value></data>
+  <data name="settings_cargos_create_submit" xml:space="preserve"><value>Guardar cargo</value></data>
+  <data name="settings_cargos_save_changes" xml:space="preserve"><value>Guardar cambios</value></data>
+  <data name="settings_cargos_editing_hint" xml:space="preserve"><value>Estás editando un cargo existente. Guarda para actualizar la lista.</value></data>
+  <data name="settings_cargos_id_format" xml:space="preserve"><value>ID {0}</value></data>
+  <data name="settings_cargos_description_required" xml:space="preserve"><value>La descripción del cargo es obligatoria.</value></data>
+  <data name="settings_cargos_load_error" xml:space="preserve"><value>No pudimos cargar los cargos.</value></data>
+  <data name="settings_cargos_create_error" xml:space="preserve"><value>No pudimos crear el cargo.</value></data>
+  <data name="settings_cargos_update_error" xml:space="preserve"><value>No pudimos actualizar el cargo.</value></data>
+  <data name="settings_cargos_delete_error" xml:space="preserve"><value>No pudimos eliminar el cargo.</value></data>
+  <data name="settings_cargos_delete_conflict" xml:space="preserve"><value>No se puede eliminar este cargo porque está en uso.</value></data>
+  <data name="settings_cargos_create_success" xml:space="preserve"><value>Cargo creado correctamente.</value></data>
+  <data name="settings_cargos_update_success" xml:space="preserve"><value>Cargo actualizado correctamente.</value></data>
+  <data name="settings_cargos_delete_success" xml:space="preserve"><value>Cargo eliminado correctamente.</value></data>
+  <data name="settings_users_manage_federative_licenses" xml:space="preserve"><value>Licencias</value></data>
+  <data name="settings_federative_licenses_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de gestión de licencias federativas</value></data>
+  <data name="settings_federative_licenses_summary" xml:space="preserve"><value>Consulta y tramita solicitudes de licencias federativas de cualquier usuario.</value></data>
+  <data name="settings_federative_licenses_filters_title" xml:space="preserve"><value>Filtros</value></data>
+  <data name="settings_federative_licenses_filters_summary" xml:space="preserve"><value>Acota las solicitudes por usuario, temporada o estado para localizar la gestión que necesitas.</value></data>
+  <data name="settings_federative_licenses_filter_user" xml:space="preserve"><value>UserId</value></data>
+  <data name="settings_federative_licenses_filter_user_placeholder" xml:space="preserve"><value>GUID del usuario</value></data>
+  <data name="settings_federative_licenses_filter_season" xml:space="preserve"><value>Temporada</value></data>
+  <data name="settings_federative_licenses_filter_season_placeholder" xml:space="preserve"><value>Ej. 2026</value></data>
+  <data name="settings_federative_licenses_filter_status" xml:space="preserve"><value>Estado</value></data>
+  <data name="settings_federative_licenses_filter_status_all" xml:space="preserve"><value>Todos los estados</value></data>
+  <data name="settings_federative_licenses_apply_filters" xml:space="preserve"><value>Aplicar filtros</value></data>
+  <data name="settings_federative_licenses_clear_filters" xml:space="preserve"><value>Limpiar</value></data>
+  <data name="settings_federative_licenses_results_title" xml:space="preserve"><value>Solicitudes</value></data>
+  <data name="settings_federative_licenses_results_summary" xml:space="preserve"><value>Revisa el histórico completo y actualiza el estado de cada solicitud sin alterar sus datos originales.</value></data>
+  <data name="settings_federative_licenses_loading" xml:space="preserve"><value>Cargando solicitudes de licencias...</value></data>
+  <data name="settings_federative_licenses_empty" xml:space="preserve"><value>No hemos encontrado solicitudes con los filtros actuales.</value></data>
+  <data name="settings_federative_licenses_owner_self" xml:space="preserve"><value>Propia</value></data>
+  <data name="settings_federative_licenses_season_format" xml:space="preserve"><value>Temporada {0}</value></data>
+  <data name="settings_federative_licenses_created_at" xml:space="preserve"><value>Creada: {0}</value></data>
+  <data name="settings_federative_licenses_user_id_format" xml:space="preserve"><value>UserId: {0}</value></data>
+  <data name="settings_federative_licenses_edit_status" xml:space="preserve"><value>Estado</value></data>
+  <data name="settings_federative_licenses_save_status" xml:space="preserve"><value>Guardar estado</value></data>
+  <data name="settings_federative_licenses_invalid_user" xml:space="preserve"><value>El filtro de usuario debe ser un GUID válido.</value></data>
+  <data name="settings_federative_licenses_invalid_season" xml:space="preserve"><value>La temporada debe ser un número válido.</value></data>
+  <data name="settings_federative_licenses_load_error" xml:space="preserve"><value>No pudimos cargar las solicitudes de licencias federativas.</value></data>
+  <data name="settings_federative_licenses_update_success" xml:space="preserve"><value>Estado actualizado correctamente.</value></data>
+  <data name="settings_federative_licenses_update_not_found" xml:space="preserve"><value>La solicitud ya no existe o no coincide con el usuario indicado.</value></data>
+  <data name="settings_federative_licenses_update_validation" xml:space="preserve"><value>El estado indicado no es válido para la solicitud.</value></data>
+  <data name="settings_federative_licenses_update_forbidden" xml:space="preserve"><value>No tienes permisos para gestionar esta solicitud.</value></data>
+  <data name="settings_federative_licenses_update_error" xml:space="preserve"><value>No pudimos actualizar el estado de la solicitud.</value></data>
+  <data name="settings_users_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de gestión de usuarios</value></data>
+  <data name="settings_users_title" xml:space="preserve"><value>Usuarios</value></data>
+  <data name="settings_users_summary" xml:space="preserve"><value>Localiza un usuario por email y decide si debes editar su ficha de socio o crearla automáticamente.</value></data>
+  <data name="settings_users_search_title" xml:space="preserve"><value>Buscar usuario</value></data>
+  <data name="settings_users_search_summary" xml:space="preserve"><value>Introduce el email exacto para revisar si el usuario ya dispone de ficha de socio.</value></data>
+  <data name="settings_users_search_label" xml:space="preserve"><value>Email del usuario</value></data>
+  <data name="settings_users_search_placeholder" xml:space="preserve"><value>usuario@dominio.com</value></data>
+  <data name="settings_users_search" xml:space="preserve"><value>Buscar</value></data>
+  <data name="settings_users_results_title" xml:space="preserve"><value>Resultado</value></data>
+  <data name="settings_users_results_summary" xml:space="preserve"><value>Accede a la ficha existente o inicia su creación en un solo paso.</value></data>
+  <data name="settings_users_loading" xml:space="preserve"><value>Buscando usuarios...</value></data>
+  <data name="settings_users_loading_all" xml:space="preserve"><value>Cargando usuarios...</value></data>
+  <data name="settings_users_loading_filtered" xml:space="preserve"><value>Buscando usuarios...</value></data>
+  <data name="settings_users_idle" xml:space="preserve"><value>Empieza con una búsqueda por email para ver usuarios aquí.</value></data>
+  <data name="settings_users_empty" xml:space="preserve"><value>No encontramos usuarios con ese email.</value></data>
+  <data name="settings_users_empty_all" xml:space="preserve"><value>No hay usuarios disponibles para mostrar.</value></data>
+  <data name="settings_users_empty_filtered" xml:space="preserve"><value>No encontramos usuarios con ese email.</value></data>
+  <data name="settings_users_search_error" xml:space="preserve"><value>No pudimos completar la búsqueda de usuarios.</value></data>
+  <data name="settings_users_create_error" xml:space="preserve"><value>No pudimos crear la ficha del usuario seleccionado.</value></data>
+  <data name="settings_users_edit_member_file" xml:space="preserve"><value>Editar</value></data>
+  <data name="settings_users_create_member_file" xml:space="preserve"><value>Crear Ficha</value></data>
+  <data name="settings_users_member_badge" xml:space="preserve"><value>Socio</value></data>
+  <data name="settings_users_non_member_badge" xml:space="preserve"><value>No socio</value></data>
+  <data name="settings_users_active_badge" xml:space="preserve"><value>Activo</value></data>
+  <data name="settings_users_inactive_badge" xml:space="preserve"><value>Desactivado</value></data>
+  <data name="settings_users_roles_label" xml:space="preserve"><value>Roles</value></data>
+  <data name="settings_admin_member_file_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de ficha administrativa de socio</value></data>
+  <data name="settings_admin_member_file_title" xml:space="preserve"><value>Ficha de Socio</value></data>
+  <data name="settings_admin_member_file_summary" xml:space="preserve"><value>Actualiza la ficha de un socio desde administración manteniendo las mismas validaciones y seguridad del autoservicio.</value></data>
+  <data name="settings_admin_member_file_badge" xml:space="preserve"><value>Administración</value></data>
+  <data name="settings_admin_member_file_secure_badge" xml:space="preserve"><value>Edición administrativa</value></data>
+  <data name="settings_admin_member_file_cargo_empty_option" xml:space="preserve"><value>Sin cargo</value></data>
+  <data name="settings_admin_member_file_load_error" xml:space="preserve"><value>No pudimos cargar la ficha del socio.</value></data>
+  <data name="settings_admin_member_file_save_error" xml:space="preserve"><value>No pudimos guardar los cambios de la ficha.</value></data>
+  <data name="settings_admin_member_file_save_validation_error" xml:space="preserve"><value>Revisa los datos indicados antes de guardar la ficha.</value></data>
+  <data name="settings_admin_member_file_save_success" xml:space="preserve"><value>La ficha de socio se ha actualizado correctamente.</value></data>
+  <data name="settings_admin_member_file_not_found" xml:space="preserve"><value>No hemos encontrado la ficha del socio solicitado.</value></data>
+  <data name="settings_admin_member_file_deactivate" xml:space="preserve"><value>Desactivar</value></data>
+  <data name="settings_admin_member_file_reactivate" xml:space="preserve"><value>Reactivar</value></data>
+  <data name="settings_admin_member_file_deactivate_success" xml:space="preserve"><value>La cuenta del usuario se ha desactivado correctamente.</value></data>
+  <data name="settings_admin_member_file_reactivate_success" xml:space="preserve"><value>La cuenta del usuario se ha reactivado correctamente.</value></data>
+  <data name="settings_admin_member_file_state_change_error" xml:space="preserve"><value>No pudimos cambiar el estado de la cuenta del usuario.</value></data>
+  <data name="settings_signals_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de administración de signals</value></data>
+  <data name="settings_signals_title" xml:space="preserve"><value>Administración de Signals</value></data>
+  <data name="settings_signals_summary" xml:space="preserve"><value>Accede a las herramientas privadas del dominio Signals y prepara futuras gestiones administrativas.</value></data>
+  <data name="settings_signal_categories_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de categorías de signals</value></data>
+  <data name="settings_signal_categories_title" xml:space="preserve"><value>Categorías de Signals</value></data>
+  <data name="settings_signal_categories_summary" xml:space="preserve"><value>Gestiona las categorías disponibles para clasificar señales mediante nombre e icono.</value></data>
+  <data name="settings_signal_categories_loading" xml:space="preserve"><value>Cargando categorías...</value></data>
+  <data name="settings_signal_categories_new_title" xml:space="preserve"><value>Nueva categoría</value></data>
+  <data name="settings_signal_categories_edit_title" xml:space="preserve"><value>Editar categoría</value></data>
+  <data name="settings_signal_categories_editor_summary" xml:space="preserve"><value>Define el nombre visible y el icono textual asociado a la categoría.</value></data>
+  <data name="settings_signal_categories_editing_hint" xml:space="preserve"><value>Estás modificando una categoría existente.</value></data>
+  <data name="settings_signal_categories_name_label" xml:space="preserve"><value>Nombre</value></data>
+  <data name="settings_signal_categories_name_placeholder" xml:space="preserve"><value>Ej: Obstáculo</value></data>
+  <data name="settings_signal_categories_icon_label" xml:space="preserve"><value>Icono</value></data>
+  <data name="settings_signal_categories_icon_placeholder" xml:space="preserve"><value>Ej: bi-sign-turn-right-fill</value></data>
+  <data name="settings_signal_categories_save" xml:space="preserve"><value>Guardar</value></data>
+  <data name="settings_signal_categories_cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="settings_signal_categories_new" xml:space="preserve"><value>Nueva categoría</value></data>
+  <data name="settings_signal_categories_edit" xml:space="preserve"><value>Editar</value></data>
+  <data name="settings_signal_categories_delete" xml:space="preserve"><value>Borrar</value></data>
+  <data name="settings_signal_categories_list_title" xml:space="preserve"><value>Listado actual</value></data>
+  <data name="settings_signal_categories_list_summary" xml:space="preserve"><value>Revisa las categorías registradas y actúa sobre cada una desde el listado.</value></data>
+  <data name="settings_signal_categories_empty" xml:space="preserve"><value>No hay categorías registradas todavía.</value></data>
+  <data name="settings_signal_categories_empty_hint" xml:space="preserve"><value>Crea la primera categoría para empezar a clasificar señales.</value></data>
+  <data name="settings_signal_categories_retry" xml:space="preserve"><value>Reintentar</value></data>
+  <data name="settings_signal_categories_name_required" xml:space="preserve"><value>Debes indicar un nombre para la categoría.</value></data>
+  <data name="settings_signal_categories_validation_error" xml:space="preserve"><value>Revisa los datos de la categoría antes de guardar.</value></data>
+  <data name="settings_signal_categories_load_error" xml:space="preserve"><value>No pudimos cargar las categorías de signals.</value></data>
+  <data name="settings_signal_categories_create_error" xml:space="preserve"><value>No pudimos crear la categoría.</value></data>
+  <data name="settings_signal_categories_update_error" xml:space="preserve"><value>No pudimos actualizar la categoría.</value></data>
+  <data name="settings_signal_categories_delete_error" xml:space="preserve"><value>No pudimos eliminar la categoría.</value></data>
+  <data name="settings_signal_categories_delete_blocked" xml:space="preserve"><value>No se puede eliminar una categoría que tenga señales asignadas.</value></data>
+  <data name="settings_signal_categories_not_found" xml:space="preserve"><value>La categoría ya no está disponible.</value></data>
+  <data name="settings_signal_categories_create_success" xml:space="preserve"><value>La categoría se ha creado correctamente.</value></data>
+  <data name="settings_signal_categories_update_success" xml:space="preserve"><value>La categoría se ha actualizado correctamente.</value></data>
+  <data name="settings_signal_categories_delete_success" xml:space="preserve"><value>La categoría se ha eliminado correctamente.</value></data>
+  <data name="settings_signal_categories_icon_format" xml:space="preserve"><value>Icono: {0}</value></data>
+  <data name="settings_signal_categories_icon_empty" xml:space="preserve"><value>Sin icono</value></data>
+</root>
