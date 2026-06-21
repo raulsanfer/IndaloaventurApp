@@ -15,7 +15,7 @@ The system MUST define repository interfaces in the domain or application bounda
 - **THEN** the system SHALL define a dedicated repository abstraction for create, load by `Guid`, update, delete, and list/query support required by application use cases
 
 ### Requirement: Infrastructure repository implementations
-The system MUST provide Infrastructure implementations of repository contracts using EF Core for write consistency and transactional behavior.
+The system MUST provide Infrastructure implementations of repository contracts using EF Core for write consistency and transactional behavior. When an aggregate requires hybrid persistence, Infrastructure SHALL coordinate relational metadata persistence with the corresponding external storage backend.
 
 #### Scenario: Transactional save
 - **WHEN** multiple aggregate changes are committed within a command
@@ -24,6 +24,10 @@ The system MUST provide Infrastructure implementations of repository contracts u
 #### Scenario: Phonebook repository persistence mapping
 - **WHEN** `FichaContacto` data is persisted through Infrastructure
 - **THEN** the system SHALL map the aggregate and Value Objects to SQL Server with schema constraints that preserve domain invariants
+
+#### Scenario: Signal repository with hybrid image persistence
+- **WHEN** a `Signal` is created or updated with associated images
+- **THEN** the system SHALL persist `Signal` metadata in SQL Server and SHALL coordinate the image references with the configured filesystem storage backend
 
 ### Requirement: Read model access isolation
 The system MUST keep read-model query access separate from repository write abstractions.

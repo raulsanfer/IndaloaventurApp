@@ -2,9 +2,10 @@
 
 ## Purpose
 TBD - created by archiving change admin-federative-license-status-management. Update Purpose after archive.
+
 ## Requirements
 ### Requirement: El sistema MUST permitir que un usuario con rol Admin consulte y filtre todas las solicitudes de licencia federativa
-El sistema MUST exponer una consulta autenticada restringida a rol `Admin` para recuperar todas las `SolicitudLicenciaFederativa` creadas en el sistema. La consulta SHALL admitir filtros opcionales al menos por `UserId`, `Temporada` y `Estado`, y cada resultado SHALL incluir la informacion funcional necesaria para administracion, incluyendo propietario, temporada, estado, fecha de creacion y datos de la tarifa asociada.
+El sistema MUST exponer una consulta autenticada restringida a rol `Admin` para recuperar todas las `SolicitudLicenciaFederativa` creadas en el sistema. La consulta SHALL admitir filtros opcionales al menos por `UserId`, `Temporada` y `Estado`, y cada resultado SHALL incluir la informacion funcional necesaria para administracion, incluyendo propietario, temporada, estado, fecha de creacion y datos de la tarifa asociada con al menos `Licencia`, `Categoria`, `Territorio`, `MediaTemporada`, `PrecioClub` y `PrecioIndependiente`.
 
 #### Scenario: Admin consulta todas las solicitudes sin filtros
 - **WHEN** un usuario autenticado con rol `Admin` solicita el listado administrativo sin informar filtros
@@ -54,4 +55,3 @@ El sistema MUST limitar la operacion administrativa al cambio de `Estado`, prese
 #### Scenario: Cambio administrativo de estado no altera otros datos
 - **WHEN** un usuario con rol `Admin` actualiza el estado de una solicitud existente
 - **THEN** el sistema SHALL mantener sin cambios `Temporada`, `TarifaLicenciaFederativaId`, `FechaCreacionUtc` y `UserId`
-
