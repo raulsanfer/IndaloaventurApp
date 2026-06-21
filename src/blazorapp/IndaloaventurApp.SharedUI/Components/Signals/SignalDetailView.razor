@@ -157,6 +157,55 @@
                 }
 
                 <article class="card border border-base-200 bg-base-100 shadow-sm signal-detail__content-card">
+                    <div class="card-body signal-detail__images">
+                        <div class="signal-detail__section-head">
+                            <div>
+                                <h2>@L["signal_detail_images_title"]</h2>
+                                <p class="signal-detail__muted">@L["signal_detail_images_summary"]</p>
+                            </div>
+                        </div>
+
+                        @if (IsLoadingImages)
+                        {
+                            <div class="alert alert-info signal-detail__status" role="status">
+                                <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                                <span>@L["signal_detail_images_loading"]</span>
+                            </div>
+                        }
+                        else if (!string.IsNullOrWhiteSpace(ImagesErrorMessageKey))
+                        {
+                            <div class="alert alert-warning signal-detail__status" role="status">
+                                <i class="bi bi-image-alt" aria-hidden="true"></i>
+                                <span>@L[ImagesErrorMessageKey]</span>
+                            </div>
+                        }
+                        else if (!HasAnyImages)
+                        {
+                            <p class="signal-detail__muted">@L["signal_detail_images_empty"]</p>
+                        }
+                        else
+                        {
+                            <div class="signal-detail__image-grid">
+                                @foreach (var slot in ImageSlots)
+                                {
+                                    var imageUrl = GetImageUrl(slot);
+
+                                    if (!string.IsNullOrWhiteSpace(imageUrl))
+                                    {
+                                        <figure class="signal-detail__image-card">
+                                            <img src="@imageUrl"
+                                                 alt="@GetImageAlt(slot)"
+                                                 class="signal-detail__image" />
+                                            <figcaption class="signal-detail__image-caption">@GetImageLabel(slot)</figcaption>
+                                        </figure>
+                                    }
+                                }
+                            </div>
+                        }
+                    </div>
+                </article>
+
+                <article class="card border border-base-200 bg-base-100 shadow-sm signal-detail__content-card">
                     @if (IsEditing && CanEditSignal)
                     {
                         <div class="card-body signal-detail__edit-shell">

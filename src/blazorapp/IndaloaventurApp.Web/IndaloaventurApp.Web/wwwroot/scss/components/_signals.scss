@@ -496,6 +496,7 @@
 .signal-detail__header,
 .signal-detail__panel,
 .signal-detail__description,
+.signal-detail__images,
 .signal-detail__comments,
 .signal-detail__map-card,
 .signal-detail__tags,
@@ -739,6 +740,32 @@
   gap: 0.9rem;
 }
 
+.signal-detail__image-grid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.signal-detail__image-card {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.signal-detail__image {
+  width: 100%;
+  min-height: 220px;
+  max-height: 360px;
+  border-radius: 1rem;
+  object-fit: cover;
+  display: block;
+  background: linear-gradient(160deg, #fff4e8 0%, #ffe1c3 100%);
+}
+
+.signal-detail__image-caption {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #8a6e5b;
+}
+
 .signal-detail__comment {
   display: grid;
   gap: 0.45rem;
@@ -865,6 +892,10 @@
     align-items: center;
     margin-top: -4.5rem;
     margin-inline: 1rem;
+  }
+
+  .signal-detail__image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .signal-detail__overview-grid {

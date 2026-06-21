@@ -9,6 +9,8 @@ public interface ISignalService
 
     Task<ServiceResult<SignalDetailItem>> GetSignalAsync(Guid signalId, CancellationToken cancellationToken = default);
 
+    Task<ServiceResult<SignalImagesItem>> GetSignalImagesAsync(Guid signalId, CancellationToken cancellationToken = default);
+
     Task<ServiceResult<IReadOnlyList<SignalCommentItem>>> GetSignalCommentsAsync(Guid signalId, CancellationToken cancellationToken = default);
 
     Task<ServiceResult<IReadOnlyList<SignalCategoryItem>>> GetSignalCategoriesAsync(CancellationToken cancellationToken = default);

@@ -3,7 +3,9 @@ using MediatR;
 
 namespace IndaloAventurApi.Application.Features.TrailSignals.Signals.GetSignalImages;
 
-public sealed class GetSignalImagesQueryHandler(ISignalRepository signalRepository) : IRequestHandler<GetSignalImagesQuery, SignalImagesDto>
+public sealed class GetSignalImagesQueryHandler(
+    ISignalRepository signalRepository,
+    ISignalImageStorage signalImageStorage) : IRequestHandler<GetSignalImagesQuery, SignalImagesDto>
 {
     public async Task<SignalImagesDto> Handle(GetSignalImagesQuery request, CancellationToken cancellationToken)
     {
@@ -13,6 +15,7 @@ public sealed class GetSignalImagesQueryHandler(ISignalRepository signalReposito
             throw new KeyNotFoundException("La senal no existe.");
         }
 
-        return new SignalImagesDto(signal.Id, signal.Foto1, signal.Foto2);
+        var images = await signalImageStorage.ReadAsync(signal.Foto1Path, signal.Foto2Path, cancellationToken);
+        return new SignalImagesDto(signal.Id, images.Foto1, images.Foto2);
     }
 }

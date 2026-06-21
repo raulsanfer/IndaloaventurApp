@@ -229,7 +229,7 @@ public partial class SignalCreateView
             Draft.Title.Trim(),
             Draft.Description.Trim(),
             Draft.Photo1!.Content,
-            Draft.Photo2?.Content ?? Array.Empty<byte>(),
+            SignalImageCodec.NormalizeOptionalPhotoContent(Draft.Photo2),
             IsActive: true,
             Draft.TypeId!.Value,
             string.Join(",", ParsedTags));
@@ -375,11 +375,10 @@ public partial class SignalCreateView
                 return;
             }
 
-            var photo = new SignalPhotoDraft(
+            var photo = SignalImageCodec.CreatePhotoDraft(
                 processedPhoto.Content,
                 processedPhoto.ContentType,
-                processedPhoto.FileName,
-                BuildPreviewUrl(processedPhoto.Content, processedPhoto.ContentType));
+                processedPhoto.FileName);
 
             if (slot == 1)
             {
@@ -447,11 +446,6 @@ public partial class SignalCreateView
         return extensionIndex < 0
             ? $"{originalFileName}.jpg"
             : $"{originalFileName[..extensionIndex]}.jpg";
-    }
-
-    private static string BuildPreviewUrl(byte[] bytes, string contentType)
-    {
-        return $"data:{contentType};base64,{Convert.ToBase64String(bytes)}";
     }
 
     private static string MapCreateErrorKey(string? errorCode)

@@ -9,6 +9,7 @@ using IndaloAventurApi.Application.Abstractions.Security;
 using IndaloAventurApi.Application.Features.Auth.PasswordRecovery;
 using IndaloAventurApi.Application.Features.LicenciasFederativas.CreateSolicitudLicenciaFederativa;
 using IndaloAventurApi.Infrastructure.Email;
+using IndaloAventurApi.Infrastructure.Media;
 using IndaloAventurApi.Application.Abstractions.TrailSignals;
 using IndaloAventurApi.Application.Abstractions.WordPress;
 using IndaloAventurApi.Infrastructure.Persistence;
@@ -39,9 +40,12 @@ public static class DependencyInjection
         services.Configure<SmtpEmailSenderOptions>(configuration.GetSection(SmtpEmailSenderOptions.SectionName));
         services.Configure<FederativeLicenseRequestNotificationOptions>(configuration.GetSection(FederativeLicenseRequestNotificationOptions.SectionName));
         services.Configure<WordPressOptions>(configuration.GetSection(WordPressOptions.SectionName));
+        services.Configure<SignalImageStorageOptions>(configuration.GetSection(SignalImageStorageOptions.SectionName));
 
         var wordPressOptions = configuration.GetSection(WordPressOptions.SectionName).Get<WordPressOptions>() ?? new WordPressOptions();
         ValidateWordPressOptions(wordPressOptions);
+        var signalImageStorageOptions = configuration.GetSection(SignalImageStorageOptions.SectionName).Get<SignalImageStorageOptions>() ?? new SignalImageStorageOptions();
+        ValidateSignalImageStorageOptions(signalImageStorageOptions);
 
         var connectionString = configuration.GetConnectionString("api_ContextConnection")
             ?? configuration.GetConnectionString("DefaultConnection")
@@ -60,6 +64,7 @@ public static class DependencyInjection
         services.AddScoped<ISolicitudLicenciaFederativaRepository, SolicitudLicenciaFederativaRepository>();
         services.AddScoped<ISignalTypeRepository, SignalTypeRepository>();
         services.AddScoped<ISignalRepository, SignalRepository>();
+        services.AddSingleton<ISignalImageStorage, FileSystemSignalImageStorage>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IEmailSender, SmtpEmailSender>();
         services.AddScoped<IIdentityService, IdentityService>();
@@ -86,6 +91,9 @@ public static class DependencyInjection
             options.Password.RequireUppercase = true;
             options.Password.RequireLowercase = true;
             options.Password.RequireNonAlphanumeric = false;
+            options.Lockout.AllowedForNewUsers = true;
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
         })
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -129,6 +137,14 @@ public static class DependencyInjection
         if (options.DefaultPostsPageSize <= 0 || options.DefaultPostsPageSize > 100)
         {
             throw new InvalidOperationException("La configuracion de WordPress requiere 'DefaultPostsPageSize' entre 1 y 100.");
+        }
+    }
+
+    private static void ValidateSignalImageStorageOptions(SignalImageStorageOptions options)
+    {
+        if (string.IsNullOrWhiteSpace(options.RootPath))
+        {
+            throw new InvalidOperationException("La configuracion de imagenes de senales requiere 'RootPath'.");
         }
     }
 }

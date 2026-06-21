@@ -10,4 +10,7 @@ IndaloAventurAPI es un API REST desarrollada sobre stack .Net y base de datos Sq
 ## Claves a tener en cuenta
 - Todos los literales usados en el API que puedan representarse en un front o cliente, deben ir en Espanol, no hacemos uso de localizacion.
 - En identidad, el rol `Member` es el rol tecnico por defecto para cualquier usuario registrado o creado en su primer login social.
+- Un usuario con rol `Member` es solo un socio potencial: puede usar la app y solicitar hacerse socio del club, pero no se considera socio real mientras no haya sido validado administrativamente y haya pagado su cuota.
 - El flag `IsMember` no equivale a ese rol: solo lo marca administracion cuando el usuario pasa a ser socio del club tras validar el pago de su cuota.
+- Cualquier autorizacion o regla funcional que dependa de ser socio real del club MUST basarse en `IsMember`, no en la mera presencia del rol tecnico `Member`.
+- Las imagenes de `Signal` se almacenan en filesystem bajo la ruta configurada en `SignalImageStorage:RootPath`; esa ruta MUST existir con permisos de lectura/escritura para el proceso del API y MUST incluirse en la estrategia operativa de backup junto con la base de datos SQL Server.

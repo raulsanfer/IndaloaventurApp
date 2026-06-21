@@ -1,4 +1,4 @@
-using System.Security.Claims;
+using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application.Abstractions.FichasSocio;
 using IndaloAventurApi.Application.Features.FichasSocio.CreateFichaSocio;
 using IndaloAventurApi.Application.Features.FichasSocio.GetFichaSocio;
@@ -11,20 +11,20 @@ namespace IndaloAventurApi.Api.Features.FichasSocio;
 
 [ApiController]
 [Route("api/fichas-socio")]
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.Authenticated)]
 public sealed class FichasSocioController(IMediator mediator) : ControllerBase
 {
     [HttpPost("{userId:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(typeof(FichaSocioDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<FichaSocioDto>> CreateByUserId(Guid userId, [FromBody] UpdateFichaSocioRequest request, CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new CreateFichaSocioCommand(
-            GetCurrentUserId(),
+            User.GetRequiredUserId(),
             userId,
-            IsAdmin(),
+            User.HasAdminRole(),
             request.CargoId,
             request.Nombre,
             request.Apellidos,
@@ -49,8 +49,8 @@ public sealed class FichasSocioController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<FichaSocioDto>> GetMe(CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
-        var result = await mediator.Send(new GetFichaSocioQuery(userId, userId, IsAdmin()), cancellationToken);
+        var userId = User.GetRequiredUserId();
+        var result = await mediator.Send(new GetFichaSocioQuery(userId, userId, User.HasAdminRole()), cancellationToken);
         return Ok(result);
     }
 
@@ -60,7 +60,7 @@ public sealed class FichasSocioController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<FichaSocioDto>> GetByUserId(Guid userId, CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new GetFichaSocioQuery(GetCurrentUserId(), userId, IsAdmin()), cancellationToken);
+        var result = await mediator.Send(new GetFichaSocioQuery(User.GetRequiredUserId(), userId, User.HasAdminRole()), cancellationToken);
         return Ok(result);
     }
 
@@ -70,11 +70,11 @@ public sealed class FichasSocioController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<FichaSocioDto>> UpdateMe([FromBody] UpdateFichaSocioRequest request, CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
+        var userId = User.GetRequiredUserId();
         var result = await mediator.Send(new UpdateFichaSocioCommand(
             userId,
             userId,
-            IsAdmin(),
+            User.HasAdminRole(),
             request.CargoId,
             request.Nombre,
             request.Apellidos,
@@ -102,9 +102,9 @@ public sealed class FichasSocioController(IMediator mediator) : ControllerBase
     public async Task<ActionResult<FichaSocioDto>> UpdateByUserId(Guid userId, [FromBody] UpdateFichaSocioRequest request, CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new UpdateFichaSocioCommand(
-            GetCurrentUserId(),
+            User.GetRequiredUserId(),
             userId,
-            IsAdmin(),
+            User.HasAdminRole(),
             request.CargoId,
             request.Nombre,
             request.Apellidos,
@@ -122,22 +122,6 @@ public sealed class FichasSocioController(IMediator mediator) : ControllerBase
             request.AceptaCobroCuenta), cancellationToken);
 
         return Ok(result);
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(value, out var userId))
-        {
-            throw new UnauthorizedAccessException("No se pudo resolver el usuario autenticado.");
-        }
-
-        return userId;
-    }
-
-    private bool IsAdmin()
-    {
-        return User.IsInRole("Admin");
     }
 
     public sealed record UpdateFichaSocioRequest(

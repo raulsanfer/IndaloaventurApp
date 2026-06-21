@@ -3,6 +3,7 @@ using IndaloAventurApi.Application.Features.Auth.PasswordRecovery;
 using IndaloAventurApi.Application.Features.Auth.Register;
 using IndaloAventurApi.Application.Features.Auth.SocialLogin;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IndaloAventurApi.Api.Features.Auth;
@@ -11,6 +12,7 @@ namespace IndaloAventurApi.Api.Features.Auth;
 [Route("api/auth")]
 public sealed class AuthController(IMediator mediator) : ControllerBase
 {
+    [AllowAnonymous]
     [HttpPost("register")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -20,6 +22,7 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
         return Ok();
     }
 
+    [AllowAnonymous]
     [HttpPost("login")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -29,6 +32,7 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
         return Ok(response);
     }
 
+    [AllowAnonymous]
     [HttpPost("social-login")]
     [ProducesResponseType(typeof(LoginResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -38,6 +42,7 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
         return Ok(response);
     }
 
+    [AllowAnonymous]
     [HttpPost("passrecovery")]
     [ProducesResponseType(typeof(PasswordRecoveryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -49,6 +54,7 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
         return Ok(response);
     }
 
+    [AllowAnonymous]
     [HttpPost("reset-password")]
     [ProducesResponseType(typeof(PasswordRecoveryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

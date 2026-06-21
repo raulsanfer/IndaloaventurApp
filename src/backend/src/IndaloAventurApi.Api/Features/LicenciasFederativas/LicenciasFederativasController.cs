@@ -1,7 +1,6 @@
-using System.Security.Claims;
 using System.Text.Json.Serialization;
+using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application.Abstractions.LicenciasFederativas;
-using IndaloAventurApi.Application.Abstractions.Security;
 using IndaloAventurApi.Application.Features.LicenciasFederativas.CreateSolicitudLicenciaFederativa;
 using IndaloAventurApi.Application.Features.LicenciasFederativas.GetAdminSolicitudesLicenciaFederativa;
 using IndaloAventurApi.Application.Features.LicenciasFederativas.GetMiSolicitudLicenciaFederativa;
@@ -17,7 +16,7 @@ namespace IndaloAventurApi.Api.Features.LicenciasFederativas;
 
 [ApiController]
 [Route("api/licencias-federativas")]
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.Authenticated)]
 public sealed class LicenciasFederativasController(IMediator mediator) : ControllerBase
 {
     [HttpGet("tarifas")]
@@ -33,6 +32,7 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
     }
 
     [HttpPost("me/solicitudes")]
+    [Authorize(Policy = AuthorizationPolicies.ClubMember)]
     [ProducesResponseType(typeof(SolicitudLicenciaFederativaDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -43,9 +43,9 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
         CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new CreateSolicitudLicenciaFederativaCommand(
-            GetCurrentUserId(),
-            GetCurrentUserEmail(),
-            GetCurrentUserIsMember(),
+            User.GetRequiredUserId(),
+            User.GetRequiredEmail(),
+            User.GetRequiredIsMember(),
             request.Temporada,
             request.TarifaLicenciaFederativaId), cancellationToken);
 
@@ -56,7 +56,7 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
     [ProducesResponseType(typeof(IReadOnlyCollection<SolicitudLicenciaFederativaDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyCollection<SolicitudLicenciaFederativaDto>>> GetMyRequests(CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new GetMisSolicitudesLicenciaFederativaQuery(GetCurrentUserId()), cancellationToken);
+        var result = await mediator.Send(new GetMisSolicitudesLicenciaFederativaQuery(User.GetRequiredUserId()), cancellationToken);
         return Ok(result);
     }
 
@@ -65,12 +65,12 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<SolicitudLicenciaFederativaDto>> GetMyRequestById(Guid solicitudId, CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new GetMiSolicitudLicenciaFederativaQuery(GetCurrentUserId(), solicitudId), cancellationToken);
+        var result = await mediator.Send(new GetMiSolicitudLicenciaFederativaQuery(User.GetRequiredUserId(), solicitudId), cancellationToken);
         return Ok(result);
     }
 
     [HttpGet("admin/solicitudes")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(typeof(IReadOnlyCollection<AdminSolicitudLicenciaFederativaDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyCollection<AdminSolicitudLicenciaFederativaDto>>> GetAdminRequests(
         [FromQuery] Guid? userId,
@@ -83,7 +83,7 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
     }
 
     [HttpPut("admin/users/{userId:guid}/solicitudes/{solicitudId:guid}/estado")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(typeof(AdminSolicitudLicenciaFederativaDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -95,39 +95,6 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
     {
         var result = await mediator.Send(new UpdateAdminSolicitudLicenciaFederativaEstadoCommand(userId, solicitudId, request.Estado), cancellationToken);
         return Ok(result);
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(value, out var userId))
-        {
-            throw new UnauthorizedAccessException("No se pudo resolver el usuario autenticado.");
-        }
-
-        return userId;
-    }
-
-    private string GetCurrentUserEmail()
-    {
-        var value = User.FindFirstValue(ClaimTypes.Email);
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            throw new UnauthorizedAccessException("No se pudo resolver el email del usuario autenticado.");
-        }
-
-        return value;
-    }
-
-    private bool GetCurrentUserIsMember()
-    {
-        var claimValue = User.FindFirstValue(AuthClaimNames.IsMember);
-        if (!bool.TryParse(claimValue, out var isMember))
-        {
-            throw new UnauthorizedAccessException("No se pudo resolver el estado de socio del usuario autenticado.");
-        }
-
-        return isMember;
     }
 
     public sealed record CreateSolicitudLicenciaFederativaRequest(int Temporada, int TarifaLicenciaFederativaId);

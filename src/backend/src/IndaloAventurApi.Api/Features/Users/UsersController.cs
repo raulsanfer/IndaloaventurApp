@@ -1,3 +1,4 @@
+using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application.Abstractions.Identity;
 using IndaloAventurApi.Application.Features.Users.CreateManagedUser;
 using IndaloAventurApi.Application.Features.Users.DeactivateManagedUser;
@@ -12,7 +13,7 @@ namespace IndaloAventurApi.Api.Features.Users;
 
 [ApiController]
 [Route("api/users")]
-[Authorize(Roles = "Admin")]
+[Authorize(Policy = AuthorizationPolicies.Admin)]
 public sealed class UsersController(IMediator mediator) : ControllerBase
 {
     [HttpGet]

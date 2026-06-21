@@ -1,5 +1,6 @@
 namespace IndaloaventurApp.Frontend.Tests;
 
+using System;
 using System.Threading.Tasks;
 using Bunit;
 using IndaloaventurApp.SharedUI.Abstractions.Session;
@@ -9,9 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 public sealed class SessionInitializationGateTests : BunitContext
 {
     [Fact]
-    public void HidesChildContentUntilSessionInitializationCompletes()
+    public async Task HidesChildContentUntilSessionInitializationCompletes()
     {
-        var initializationTcs = new TaskCompletionSource();
+        var initializationTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var completionTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var sessionService = new RecordingSessionService
         {
             IsInitialized = false
@@ -21,6 +23,7 @@ public sealed class SessionInitializationGateTests : BunitContext
         {
             await initializationTcs.Task;
             sessionService.IsInitialized = true;
+            completionTcs.SetResult();
         };
 
         Services.AddSingleton<ISessionService>(sessionService);
@@ -33,10 +36,10 @@ public sealed class SessionInitializationGateTests : BunitContext
 
         initializationTcs.SetResult();
 
-        cut.WaitForAssertion(() =>
-        {
-            Assert.Equal(1, sessionService.EnsureInitializedCallCount);
-            Assert.Contains("protected-content", cut.Markup);
-        });
+        await completionTcs.Task.WaitAsync(TimeSpan.FromSeconds(15));
+        cut.Render();
+
+        Assert.Equal(1, sessionService.EnsureInitializedCallCount);
+        Assert.Contains("protected-content", cut.Markup);
     }
 }

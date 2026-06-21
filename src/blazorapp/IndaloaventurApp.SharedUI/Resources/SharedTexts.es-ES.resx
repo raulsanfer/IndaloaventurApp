@@ -202,6 +202,13 @@
   <data name="signal_detail_tab_data" xml:space="preserve"><value>Datos de la signal</value></data>
   <data name="signal_detail_tab_comments" xml:space="preserve"><value>Comentarios</value></data>
   <data name="signal_detail_tab_map" xml:space="preserve"><value>Mapa/Ubicación</value></data>
+  <data name="signal_detail_images_title" xml:space="preserve"><value>Fotos de la signal</value></data>
+  <data name="signal_detail_images_summary" xml:space="preserve"><value>Las imágenes se cargan aparte del detalle principal para no bloquear el resto de la información.</value></data>
+  <data name="signal_detail_images_loading" xml:space="preserve"><value>Cargando fotos de la signal...</value></data>
+  <data name="signal_detail_images_empty" xml:space="preserve"><value>Esta signal no tiene fotos disponibles.</value></data>
+  <data name="signal_detail_images_error" xml:space="preserve"><value>No se han podido cargar las fotos de esta signal.</value></data>
+  <data name="signal_detail_images_timeout" xml:space="preserve"><value>La carga de fotos está tardando demasiado. Inténtalo de nuevo.</value></data>
+  <data name="signal_detail_photo_alt" xml:space="preserve"><value>{0} de la signal {1}</value></data>
   <data name="signal_detail_field_category" xml:space="preserve"><value>Categoría</value></data>
   <data name="signal_detail_field_status" xml:space="preserve"><value>Estado</value></data>
   <data name="signal_detail_field_created" xml:space="preserve"><value>Creada</value></data>

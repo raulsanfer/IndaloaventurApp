@@ -1,3 +1,4 @@
+using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application.Abstractions.TrailSignals;
 using IndaloAventurApi.Application.Features.TrailSignals.SignalTypes.CreateSignalType;
 using IndaloAventurApi.Application.Features.TrailSignals.SignalTypes.DeleteSignalType;
@@ -11,7 +12,7 @@ namespace IndaloAventurApi.Api.Features.TrailSignals;
 
 [ApiController]
 [Route("api/signal-types")]
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.Authenticated)]
 public sealed class SignalTypesController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
@@ -23,7 +24,7 @@ public sealed class SignalTypesController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<int>> Create([FromBody] CreateSignalTypeRequest request, CancellationToken cancellationToken)
@@ -33,7 +34,7 @@ public sealed class SignalTypesController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -44,7 +45,7 @@ public sealed class SignalTypesController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)

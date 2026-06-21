@@ -14,7 +14,7 @@ public sealed class IdentityService(
     {
         // Todo usuario nuevo entra con rol Member para poder usar la app,
         // pero IsMember permanece a false hasta que administracion lo marque como socio del club.
-        var user = new Usuario { UserName = email, Email = email, IsMember = false };
+        var user = new Usuario { UserName = email, Email = email, LockoutEnabled = true, IsMember = false };
         var result = await userManager.CreateAsync(user, password);
         if (result.Succeeded)
         {
@@ -32,6 +32,8 @@ public sealed class IdentityService(
             return (false, null, [], false);
         }
 
+        await EnsureLockoutEnabledAsync(user);
+
         if (await userManager.IsLockedOutAsync(user))
         {
             return (false, null, [], false);
@@ -40,8 +42,11 @@ public sealed class IdentityService(
         var valid = await userManager.CheckPasswordAsync(user, password);
         if (!valid)
         {
+            await userManager.AccessFailedAsync(user);
             return (false, null, [], false);
         }
+
+        await userManager.ResetAccessFailedCountAsync(user);
 
         var roles = await userManager.GetRolesAsync(user);
         return (true, user.Id, roles, user.IsMember);
@@ -69,6 +74,7 @@ public sealed class IdentityService(
                     UserName = validation.Email,
                     Email = validation.Email,
                     EmailConfirmed = true,
+                    LockoutEnabled = true,
                     IsMember = false
                 };
 
@@ -81,6 +87,10 @@ public sealed class IdentityService(
                 await EnsureRoleExistsAsync(IdentityRoles.Member);
                 await userManager.AddToRoleAsync(user, IdentityRoles.Member);
             }
+            else
+            {
+                await EnsureLockoutEnabledAsync(user);
+            }
 
             var addLoginResult = await userManager.AddLoginAsync(user, loginInfo);
             if (!addLoginResult.Succeeded)
@@ -88,6 +98,8 @@ public sealed class IdentityService(
                 return (false, null, null, [], false, addLoginResult.Errors.Select(x => x.Description));
             }
         }
+
+        await EnsureLockoutEnabledAsync(user);
 
         if (await userManager.IsLockedOutAsync(user))
         {
@@ -111,7 +123,7 @@ public sealed class IdentityService(
 
     public async Task<(bool Succeeded, Guid UserId, IEnumerable<string> Errors)> CreateUserAsync(string email, string password, IEnumerable<string> roles, CancellationToken cancellationToken)
     {
-        var user = new Usuario { UserName = email, Email = email, IsMember = false };
+        var user = new Usuario { UserName = email, Email = email, LockoutEnabled = true, IsMember = false };
         var result = await userManager.CreateAsync(user, password);
         if (!result.Succeeded)
         {
@@ -235,6 +247,7 @@ public sealed class IdentityService(
         }
         
         user.LockoutEnd = null;
+        await userManager.ResetAccessFailedCountAsync(user);
         var result = await userManager.UpdateAsync(user);
         return result.Succeeded
             ? (true, [])
@@ -288,5 +301,16 @@ public sealed class IdentityService(
         {
             await roleManager.CreateAsync(new IdentityRole<Guid>(role));
         }
+    }
+
+    private async Task EnsureLockoutEnabledAsync(Usuario user)
+    {
+        if (user.LockoutEnabled)
+        {
+            return;
+        }
+
+        user.LockoutEnabled = true;
+        await userManager.UpdateAsync(user);
     }
 }

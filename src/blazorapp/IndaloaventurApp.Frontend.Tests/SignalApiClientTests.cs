@@ -10,11 +10,12 @@ using IndaloaventurApp.Web.Client.Infrastructure.Signals;
 public sealed class SignalApiClientTests
 {
     [Fact]
-    public async Task GetSignalHomeDataAsync_MapsPrimaryImageToDataUrl_WhenImagesEndpointReturnsPhoto()
+    public async Task GetSignalHomeDataAsync_DoesNotCallImagesEndpointAndLeavesImageUrlNull()
     {
         var signalId = Guid.Parse("d1f11ecb-0d25-4432-89f0-ae39e34f5461");
         var sessionService = new RecordingSessionService();
         sessionService.SetSession(TestSessions.MemberSession);
+        var imagesEndpointCalls = 0;
 
         var handler = new StubHttpMessageHandler(request =>
         {
@@ -63,15 +64,7 @@ public sealed class SignalApiClientTests
 
             if (request.RequestUri?.AbsolutePath == $"/api/signals/{signalId}/images")
             {
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(JsonSerializer.Serialize(new
-                    {
-                        signalId,
-                        foto1 = new byte[] { 0xFF, 0xD8, 0xFF, 0xEE },
-                        foto2 = Array.Empty<byte>()
-                    }), Encoding.UTF8, "application/json")
-                });
+                imagesEndpointCalls++;
             }
 
             throw new InvalidOperationException($"Unexpected endpoint {request.RequestUri}");
@@ -90,11 +83,12 @@ public sealed class SignalApiClientTests
         Assert.NotNull(result.Value);
         var signal = Assert.Single(result.Value.Signals);
         Assert.Equal("Piedra desprendida", signal.Title);
-        Assert.StartsWith("data:image/jpeg;base64,", signal.ImageUrl);
+        Assert.Null(signal.ImageUrl);
+        Assert.Equal(0, imagesEndpointCalls);
     }
 
     [Fact]
-    public async Task GetSignalHomeDataAsync_LeavesImageUrlNull_WhenImagesEndpointHasNoUsablePhoto()
+    public async Task GetSignalImagesAsync_MapsPhotosToDataUrls()
     {
         var signalId = Guid.Parse("d1f11ecb-0d25-4432-89f0-ae39e34f5461");
         var sessionService = new RecordingSessionService();
@@ -102,47 +96,46 @@ public sealed class SignalApiClientTests
 
         var handler = new StubHttpMessageHandler(request =>
         {
-            if (request.RequestUri?.AbsolutePath == "/api/signal-types")
+            if (request.RequestUri?.AbsolutePath == $"/api/signals/{signalId}/images")
             {
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
                 {
-                    Content = new StringContent(JsonSerializer.Serialize(new[]
+                    Content = new StringContent(JsonSerializer.Serialize(new
                     {
-                        new
-                        {
-                            id = 8,
-                            nombre = "Senderismo",
-                            icono = "sign-turn-right-fill"
-                        }
+                        signalId,
+                        foto1 = new byte[] { 0xFF, 0xD8, 0xFF, 0xEE },
+                        foto2 = new byte[] { 0x89, 0x50, 0x4E, 0x47, 0, 0, 0, 0 }
                     }), Encoding.UTF8, "application/json")
                 });
             }
 
-            if (request.RequestUri?.AbsolutePath == "/api/signals")
-            {
-                return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(JsonSerializer.Serialize(new[]
-                    {
-                        new
-                        {
-                            id = signalId,
-                            latitud = 0,
-                            longitud = 0,
-                            titulo = "Piedra desprendida",
-                            descripcion = "Hay una piedra de gran tamano invadiendo parte del sendero.",
-                            activo = true,
-                            userIdAlta = Guid.NewGuid(),
-                            fechaAlta = new DateTime(2026, 6, 3, 20, 6, 0, DateTimeKind.Utc),
-                            fechaModificacion = new DateTime(2026, 6, 3, 22, 6, 0, DateTimeKind.Utc),
-                            userIdModificacion = Guid.NewGuid(),
-                            tipo = 8,
-                            tags = "senderos, piedras"
-                        }
-                    }), Encoding.UTF8, "application/json")
-                });
-            }
+            throw new InvalidOperationException($"Unexpected endpoint {request.RequestUri}");
+        });
 
+        using var httpClient = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://localhost")
+        };
+
+        var sut = new SignalApiClient(httpClient, sessionService);
+
+        var result = await sut.GetSignalImagesAsync(signalId);
+
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+        Assert.StartsWith("data:image/jpeg;base64,", result.Value.Photo1Url);
+        Assert.StartsWith("data:image/png;base64,", result.Value.Photo2Url);
+    }
+
+    [Fact]
+    public async Task GetSignalImagesAsync_ReturnsEmptyImageUrls_WhenPayloadHasNoUsablePhoto()
+    {
+        var signalId = Guid.Parse("d1f11ecb-0d25-4432-89f0-ae39e34f5461");
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.MemberSession);
+
+        var handler = new StubHttpMessageHandler(request =>
+        {
             if (request.RequestUri?.AbsolutePath == $"/api/signals/{signalId}/images")
             {
                 return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
@@ -166,12 +159,12 @@ public sealed class SignalApiClientTests
 
         var sut = new SignalApiClient(httpClient, sessionService);
 
-        var result = await sut.GetSignalHomeDataAsync(new SignalListQuery(string.Empty, null, OnlyActive: true));
+        var result = await sut.GetSignalImagesAsync(signalId);
 
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
-        var signal = Assert.Single(result.Value.Signals);
-        Assert.Null(signal.ImageUrl);
+        Assert.Null(result.Value.Photo1Url);
+        Assert.Null(result.Value.Photo2Url);
     }
 
     [Fact]

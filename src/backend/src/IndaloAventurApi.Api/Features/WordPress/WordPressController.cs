@@ -1,3 +1,4 @@
+using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application.Abstractions.WordPress;
 using IndaloAventurApi.Application.Features.WordPress.GetWordPressPostBySlug;
 using IndaloAventurApi.Application.Features.WordPress.GetWordPressPosts;
@@ -9,7 +10,7 @@ namespace IndaloAventurApi.Api.Features.WordPress;
 
 [ApiController]
 [Route("api/wordpress")]
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.Authenticated)]
 public sealed class WordPressController(IMediator mediator) : ControllerBase
 {
     [HttpGet("posts")]

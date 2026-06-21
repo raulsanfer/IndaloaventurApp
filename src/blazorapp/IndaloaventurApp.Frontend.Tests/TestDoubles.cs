@@ -223,6 +223,8 @@ internal sealed class RecordingSignalService : ISignalService
 
     public Func<Guid, CancellationToken, Task<ServiceResult<SignalDetailItem>>>? GetSignalHandler { get; init; }
 
+    public Func<Guid, CancellationToken, Task<ServiceResult<SignalImagesItem>>>? GetSignalImagesHandler { get; init; }
+
     public Func<Guid, CancellationToken, Task<ServiceResult<IReadOnlyList<SignalCommentItem>>>>? GetSignalCommentsHandler { get; init; }
 
     public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<SignalCategoryItem>>>>? GetSignalCategoriesHandler { get; init; }
@@ -247,6 +249,12 @@ internal sealed class RecordingSignalService : ISignalService
     {
         return GetSignalHandler?.Invoke(signalId, cancellationToken)
             ?? Task.FromResult(ServiceResult<SignalDetailItem>.Failure(new ServiceError("signals.not_found", "Missing signal detail handler")));
+    }
+
+    public Task<ServiceResult<SignalImagesItem>> GetSignalImagesAsync(Guid signalId, CancellationToken cancellationToken = default)
+    {
+        return GetSignalImagesHandler?.Invoke(signalId, cancellationToken)
+            ?? Task.FromResult(ServiceResult<SignalImagesItem>.Success(new SignalImagesItem(signalId, null, null)));
     }
 
     public Task<ServiceResult<IReadOnlyList<SignalCommentItem>>> GetSignalCommentsAsync(Guid signalId, CancellationToken cancellationToken = default)

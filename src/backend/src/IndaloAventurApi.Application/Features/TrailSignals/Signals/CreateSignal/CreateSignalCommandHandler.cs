@@ -6,7 +6,8 @@ namespace IndaloAventurApi.Application.Features.TrailSignals.Signals.CreateSigna
 
 public sealed class CreateSignalCommandHandler(
     ISignalRepository signalRepository,
-    ISignalTypeRepository signalTypeRepository) : IRequestHandler<CreateSignalCommand, Guid>
+    ISignalTypeRepository signalTypeRepository,
+    ISignalImageStorage signalImageStorage) : IRequestHandler<CreateSignalCommand, Guid>
 {
     public async Task<Guid> Handle(CreateSignalCommand request, CancellationToken cancellationToken)
     {
@@ -15,20 +16,32 @@ public sealed class CreateSignalCommandHandler(
             throw new InvalidOperationException("El tipo de senal indicado no existe.");
         }
 
+        var signalId = Guid.NewGuid();
+        var storedImages = await signalImageStorage.SaveAsync(signalId, request.Foto1, request.Foto2 ?? [], cancellationToken);
+
         var signal = Signal.Crear(
+            signalId,
             request.Latitud,
             request.Longitud,
             request.Titulo,
             request.Descripcion,
-            request.Foto1,
-            request.Foto2,
+            storedImages.Foto1Path,
+            storedImages.Foto2Path,
             request.Activo,
             request.UserIdAlta,
             request.Tipo,
             request.Tags);
 
-        await signalRepository.AddAsync(signal, cancellationToken);
-        await signalRepository.SaveChangesAsync(cancellationToken);
-        return signal.Id;
+        try
+        {
+            await signalRepository.AddAsync(signal, cancellationToken);
+            await signalRepository.SaveChangesAsync(cancellationToken);
+            return signal.Id;
+        }
+        catch
+        {
+            await signalImageStorage.DeleteAsync(storedImages.Foto1Path, storedImages.Foto2Path, cancellationToken);
+            throw;
+        }
     }
 }

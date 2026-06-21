@@ -34,9 +34,9 @@ public sealed class SignalApiClient(HttpClient httpClient, ISessionService sessi
             var categoryMap = (categories.Value ?? Array.Empty<SignalCategoryItem>())
                 .ToDictionary(item => item.Id);
 
-            var cards = await Task.WhenAll(
-                (signals.Value ?? Array.Empty<SignalDto>())
-                    .Select(signal => MapSignalAsync(signal, categoryMap, cancellationToken)));
+            var cards = (signals.Value ?? Array.Empty<SignalDto>())
+                .Select(signal => MapSignal(signal, categoryMap))
+                .ToArray();
 
             return ServiceResult<SignalHomeData>.Success(
                 new SignalHomeData(categories.Value ?? Array.Empty<SignalCategoryItem>(), cards));
@@ -109,6 +109,54 @@ public sealed class SignalApiClient(HttpClient httpClient, ISessionService sessi
         catch (NotSupportedException)
         {
             return ServiceResult<SignalDetailItem>.Failure(new ServiceError("signals.invalid_payload", "La respuesta de senales no tiene un formato valido."));
+        }
+    }
+
+    public async Task<ServiceResult<SignalImagesItem>> GetSignalImagesAsync(Guid signalId, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var request = CreateAuthorizedRequest(HttpMethod.Get, BuildSignalImagesEndpoint(signalId));
+            using var response = await httpClient.SendAsync(request, cancellationToken);
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return ServiceResult<SignalImagesItem>.Failure(new ServiceError("auth.session_invalid", "Sesion invalida."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return ServiceResult<SignalImagesItem>.Failure(new ServiceError("signals.not_found", "La senal no existe."));
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return ServiceResult<SignalImagesItem>.Failure(new ServiceError("signals.images_unavailable", $"Error HTTP {(int)response.StatusCode}."));
+            }
+
+            var payload = await response.Content.ReadFromJsonAsync<SignalImagesDto>(cancellationToken: cancellationToken);
+            if (payload is null)
+            {
+                return ServiceResult<SignalImagesItem>.Failure(new ServiceError("signals.invalid_payload", "La respuesta de senales no tiene un formato valido."));
+            }
+
+            return ServiceResult<SignalImagesItem>.Success(MapSignalImages(payload));
+        }
+        catch (HttpRequestException)
+        {
+            return ServiceResult<SignalImagesItem>.Failure(new ServiceError("signals.unavailable", "No se pudo conectar con las senales."));
+        }
+        catch (TaskCanceledException)
+        {
+            return ServiceResult<SignalImagesItem>.Failure(new ServiceError("signals.timeout", "Tiempo de espera agotado."));
+        }
+        catch (JsonException)
+        {
+            return ServiceResult<SignalImagesItem>.Failure(new ServiceError("signals.invalid_payload", "La respuesta de senales no tiene un formato valido."));
+        }
+        catch (NotSupportedException)
+        {
+            return ServiceResult<SignalImagesItem>.Failure(new ServiceError("signals.invalid_payload", "La respuesta de senales no tiene un formato valido."));
         }
     }
 
@@ -227,7 +275,7 @@ public sealed class SignalApiClient(HttpClient httpClient, ISessionService sessi
                     requestModel.Title,
                     requestModel.Description,
                     requestModel.Photo1,
-                    requestModel.Photo2,
+                    SignalImageCodec.NormalizeOptionalPhotoContent(requestModel.Photo2),
                     requestModel.IsActive,
                     requestModel.TypeId,
                     requestModel.Tags));
@@ -517,56 +565,7 @@ public sealed class SignalApiClient(HttpClient httpClient, ISessionService sessi
     private static string BuildSignalImagesEndpoint(Guid signalId)
         => $"{SignalsEndpoint}/{signalId:D}/images";
 
-    private async Task<SignalCardItem> MapSignalAsync(
-        SignalDto dto,
-        IReadOnlyDictionary<int, SignalCategoryItem> categoryMap,
-        CancellationToken cancellationToken)
-    {
-        var imageUrl = await GetPrimaryImageUrlAsync(dto.Id, cancellationToken);
-        return MapSignal(dto, categoryMap, imageUrl);
-    }
-
-    private async Task<string?> GetPrimaryImageUrlAsync(Guid signalId, CancellationToken cancellationToken)
-    {
-        try
-        {
-            using var request = CreateAuthorizedRequest(HttpMethod.Get, BuildSignalImagesEndpoint(signalId));
-            using var response = await httpClient.SendAsync(request, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            var payload = await response.Content.ReadFromJsonAsync<SignalImagesDto>(cancellationToken: cancellationToken);
-            var imageBytes = payload?.Foto1?.Length > 0
-                ? payload.Foto1
-                : payload?.Foto2?.Length > 0
-                    ? payload.Foto2
-                    : null;
-
-            if (imageBytes is null || imageBytes.Length == 0)
-            {
-                return null;
-            }
-
-            return BuildImageDataUrl(imageBytes);
-        }
-        catch (HttpRequestException)
-        {
-            return null;
-        }
-        catch (JsonException)
-        {
-            return null;
-        }
-        catch (NotSupportedException)
-        {
-            return null;
-        }
-    }
-
-    private static SignalCardItem MapSignal(SignalDto dto, IReadOnlyDictionary<int, SignalCategoryItem> categoryMap, string? imageUrl)
+    private static SignalCardItem MapSignal(SignalDto dto, IReadOnlyDictionary<int, SignalCategoryItem> categoryMap)
     {
         var category = categoryMap.TryGetValue(dto.Tipo, out var resolvedCategory)
             ? resolvedCategory
@@ -592,10 +591,18 @@ public sealed class SignalApiClient(HttpClient httpClient, ISessionService sessi
             timestamp,
             BuildMetaLabel(dto.Tags, dto.Latitud, dto.Longitud, dto.Activo),
             dto.Activo,
-            imageUrl,
+            null,
             dto.Tags,
             dto.Latitud,
             dto.Longitud);
+    }
+
+    private static SignalImagesItem MapSignalImages(SignalImagesDto dto)
+    {
+        return new SignalImagesItem(
+            dto.SignalId,
+            dto.Foto1 is { Length: > 0 } ? SignalImageCodec.BuildPreviewUrl(dto.Foto1) : null,
+            dto.Foto2 is { Length: > 0 } ? SignalImageCodec.BuildPreviewUrl(dto.Foto2) : null);
     }
 
     private static SignalDetailItem MapSignalDetail(SignalDto dto, IReadOnlyDictionary<int, SignalCategoryItem> categoryMap)
@@ -665,52 +672,6 @@ public sealed class SignalApiClient(HttpClient httpClient, ISessionService sessi
         return string.IsNullOrWhiteSpace(description)
             ? title
             : description;
-    }
-
-    private static string BuildImageDataUrl(byte[] bytes)
-        => $"data:{GetImageMimeType(bytes)};base64,{Convert.ToBase64String(bytes)}";
-
-    private static string GetImageMimeType(byte[] bytes)
-    {
-        if (bytes.Length >= 8 &&
-            bytes[0] == 0x89 &&
-            bytes[1] == 0x50 &&
-            bytes[2] == 0x4E &&
-            bytes[3] == 0x47)
-        {
-            return "image/png";
-        }
-
-        if (bytes.Length >= 3 &&
-            bytes[0] == 0xFF &&
-            bytes[1] == 0xD8 &&
-            bytes[2] == 0xFF)
-        {
-            return "image/jpeg";
-        }
-
-        if (bytes.Length >= 6 &&
-            bytes[0] == 0x47 &&
-            bytes[1] == 0x49 &&
-            bytes[2] == 0x46)
-        {
-            return "image/gif";
-        }
-
-        if (bytes.Length >= 12 &&
-            bytes[0] == 0x52 &&
-            bytes[1] == 0x49 &&
-            bytes[2] == 0x46 &&
-            bytes[3] == 0x46 &&
-            bytes[8] == 0x57 &&
-            bytes[9] == 0x45 &&
-            bytes[10] == 0x42 &&
-            bytes[11] == 0x50)
-        {
-            return "image/webp";
-        }
-
-        return "image/jpeg";
     }
 
     private static string BuildMetaLabel(string? tags, float latitude, float longitude, bool isActive)

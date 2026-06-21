@@ -16,8 +16,8 @@ public sealed class Signal : Entity, IAggregateRoot
         float longitud,
         string titulo,
         string descripcion,
-        byte[] foto1,
-        byte[] foto2,
+        string foto1Path,
+        string foto2Path,
         bool activo,
         Guid userIdAlta,
         DateTime fechaAlta,
@@ -31,8 +31,8 @@ public sealed class Signal : Entity, IAggregateRoot
         Longitud = longitud;
         Titulo = titulo;
         Descripcion = descripcion;
-        Foto1 = foto1;
-        Foto2 = foto2;
+        Foto1Path = foto1Path;
+        Foto2Path = foto2Path;
         Activo = activo;
         UserIdAlta = userIdAlta;
         FechaAlta = fechaAlta;
@@ -47,8 +47,8 @@ public sealed class Signal : Entity, IAggregateRoot
     public float Longitud { get; private set; }
     public string Titulo { get; private set; } = string.Empty;
     public string Descripcion { get; private set; } = string.Empty;
-    public byte[] Foto1 { get; private set; } = [];
-    public byte[] Foto2 { get; private set; } = [];
+    public string Foto1Path { get; private set; } = string.Empty;
+    public string Foto2Path { get; private set; } = string.Empty;
     public bool Activo { get; private set; }
     public Guid UserIdAlta { get; private set; }
     public DateTime FechaAlta { get; private set; }
@@ -60,23 +60,24 @@ public sealed class Signal : Entity, IAggregateRoot
     public IReadOnlyCollection<SignalComment> Comentarios => _comentarios;
 
     public static Signal Crear(
+        Guid id,
         float latitud,
         float longitud,
         string titulo,
         string descripcion,
-        byte[] foto1,
-        byte[]? foto2,
+        string foto1Path,
+        string? foto2Path,
         bool activo,
         Guid userIdAlta,
         int tipo,
         string tags,
         DateTime? fechaAlta = null)
     {
-        var foto2Normalizada = foto2 ?? [];
-        ValidarCreacion(titulo, descripcion, foto1, userIdAlta, tipo, tags);
+        var foto2Normalizada = foto2Path ?? string.Empty;
+        ValidarCreacion(id, titulo, descripcion, foto1Path, userIdAlta, tipo, tags);
 
         var now = (fechaAlta ?? DateTime.UtcNow).ToUniversalTime();
-        return new Signal(Guid.NewGuid(), latitud, longitud, titulo.Trim(), descripcion.Trim(), foto1.ToArray(), foto2Normalizada.ToArray(), activo, userIdAlta, now, now, userIdAlta, tipo, tags.Trim());
+        return new Signal(id, latitud, longitud, titulo.Trim(), descripcion.Trim(), foto1Path.Trim(), foto2Normalizada.Trim(), activo, userIdAlta, now, now, userIdAlta, tipo, tags.Trim());
     }
 
     public void Actualizar(
@@ -84,27 +85,19 @@ public sealed class Signal : Entity, IAggregateRoot
         float longitud,
         string titulo,
         string descripcion,
-        byte[] foto1,
-        byte[] foto2,
         bool activo,
         Guid userIdModificacion,
-        int tipo,
-        string tags,
         DateTime? fechaModificacion = null)
     {
-        ValidarActualizacion(titulo, descripcion, foto1, foto2, userIdModificacion, tipo, tags);
+        ValidarEdicionPropia(titulo, descripcion, userIdModificacion);
 
         Latitud = latitud;
         Longitud = longitud;
         Titulo = titulo.Trim();
         Descripcion = descripcion.Trim();
-        Foto1 = foto1.ToArray();
-        Foto2 = foto2.ToArray();
         Activo = activo;
         UserIdModificacion = userIdModificacion;
         FechaModificacion = (fechaModificacion ?? DateTime.UtcNow).ToUniversalTime();
-        Tipo = tipo;
-        Tags = tags.Trim();
     }
 
     public void ActualizarContenidoPropio(
@@ -130,15 +123,20 @@ public sealed class Signal : Entity, IAggregateRoot
         return comentario;
     }
 
-    private static void ValidarCreacion(string titulo, string descripcion, byte[] foto1, Guid userId, int tipo, string tags)
+    public void ActualizarImagenes(string foto1Path, string foto2Path, Guid userIdModificacion, DateTime? fechaModificacion = null)
     {
-        ValidarComun(titulo, descripcion, foto1, userId, tipo, tags);
+        ValidarImagenes(foto1Path, userIdModificacion);
+
+        Foto1Path = foto1Path.Trim();
+        Foto2Path = foto2Path.Trim();
+        UserIdModificacion = userIdModificacion;
+        FechaModificacion = (fechaModificacion ?? DateTime.UtcNow).ToUniversalTime();
     }
 
-    private static void ValidarActualizacion(string titulo, string descripcion, byte[] foto1, byte[] foto2, Guid userId, int tipo, string tags)
+    private static void ValidarCreacion(Guid id, string titulo, string descripcion, string foto1Path, Guid userId, int tipo, string tags)
     {
-        ValidarComun(titulo, descripcion, foto1, userId, tipo, tags);
-        if (foto2.Length == 0) throw new DomainException("La foto 2 de la senal es obligatoria.");
+        if (id == Guid.Empty) throw new DomainException("El identificador de la senal es obligatorio.");
+        ValidarComun(titulo, descripcion, foto1Path, userId, tipo, tags);
     }
 
     private static void ValidarEdicionPropia(string titulo, string descripcion, Guid userId)
@@ -148,13 +146,19 @@ public sealed class Signal : Entity, IAggregateRoot
         if (userId == Guid.Empty) throw new DomainException("El usuario de operacion de la senal es obligatorio.");
     }
 
-    private static void ValidarComun(string titulo, string descripcion, byte[] foto1, Guid userId, int tipo, string tags)
+    private static void ValidarComun(string titulo, string descripcion, string foto1Path, Guid userId, int tipo, string tags)
     {
         if (string.IsNullOrWhiteSpace(titulo)) throw new DomainException("El titulo de la senal es obligatorio.");
         if (string.IsNullOrWhiteSpace(descripcion)) throw new DomainException("La descripcion de la senal es obligatoria.");
-        if (foto1.Length == 0) throw new DomainException("La foto 1 de la senal es obligatoria.");
+        if (string.IsNullOrWhiteSpace(foto1Path)) throw new DomainException("La foto 1 de la senal es obligatoria.");
         if (userId == Guid.Empty) throw new DomainException("El usuario de operacion de la senal es obligatorio.");
         if (tipo <= 0) throw new DomainException("El tipo de senal es obligatorio.");
         if (string.IsNullOrWhiteSpace(tags)) throw new DomainException("Las etiquetas de la senal son obligatorias.");
+    }
+
+    private static void ValidarImagenes(string foto1Path, Guid userId)
+    {
+        if (string.IsNullOrWhiteSpace(foto1Path)) throw new DomainException("La foto 1 de la senal es obligatoria.");
+        if (userId == Guid.Empty) throw new DomainException("El usuario de operacion de la senal es obligatorio.");
     }
 }

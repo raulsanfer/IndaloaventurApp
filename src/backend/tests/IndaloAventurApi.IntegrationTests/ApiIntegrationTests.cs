@@ -876,7 +876,12 @@ public sealed class ApiIntegrationTests : IClassFixture<CustomWebApplicationFact
 
 public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
 {
+    public const string TestJwtIssuer = "IndaloAventurApi.Tests";
+    public const string TestJwtAudience = "IndaloAventurApp.Tests";
+    public const string TestJwtKey = "indaloaventurapi-tests-signing-key-1234567890";
+
     private readonly string _databaseName = $"indalo-api-tests-{Guid.NewGuid():N}";
+    private readonly string _signalImageRoot = Path.Combine(Path.GetTempPath(), $"indalo-signal-images-{Guid.NewGuid():N}");
     private readonly FakeEmailSender _fakeEmailSender = new();
     private readonly FakeWordPressService _fakeWordPressService = new();
 
@@ -894,7 +899,12 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseEnvironment("Development");
         builder.UseSetting("ConnectionStrings:api_ContextConnection", ConnectionString);
         builder.UseSetting("ConnectionStrings:DefaultConnection", ConnectionString);
+        builder.UseSetting("Jwt:Issuer", TestJwtIssuer);
+        builder.UseSetting("Jwt:Audience", TestJwtAudience);
+        builder.UseSetting("Jwt:Key", TestJwtKey);
+        builder.UseSetting("Jwt:AccessTokenMinutes", "60");
         builder.UseSetting("Testing:UseEnsureCreated", "true");
+        builder.UseSetting("SignalImageStorage:RootPath", _signalImageRoot);
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<ApplicationDbContext>();
@@ -948,6 +958,11 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
         try
         {
+            if (Directory.Exists(_signalImageRoot))
+            {
+                Directory.Delete(_signalImageRoot, recursive: true);
+            }
+
             using var connection = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=master;Trusted_Connection=True;TrustServerCertificate=True");
             connection.Open();
 

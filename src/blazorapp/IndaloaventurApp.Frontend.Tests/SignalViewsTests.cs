@@ -152,6 +152,98 @@ public sealed class SignalViewsTests : BunitContext
     }
 
     [Fact]
+    public void SignalDetailView_RendersAvailableImagesWithoutBlockingDetail()
+    {
+        var signalId = Guid.NewGuid();
+        var signalService = new RecordingSignalService
+        {
+            GetSignalHandler = (id, _) => Task.FromResult(ServiceResult<SignalDetailItem>.Success(
+                BuildDetailItem(
+                    id,
+                    title: "Piedra desprendida",
+                    description: "Hay una piedra de gran tamano invadiendo parte del sendero.",
+                    ownerUserId: Guid.NewGuid()))),
+            GetSignalImagesHandler = (id, _) => Task.FromResult(ServiceResult<SignalImagesItem>.Success(
+                new SignalImagesItem(
+                    id,
+                    "data:image/jpeg;base64,/9j/uno",
+                    "data:image/jpeg;base64,/9j/dos"))),
+            GetSignalCommentsHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(Array.Empty<SignalCommentItem>()))
+        };
+
+        RegisterDetailServices(signalService);
+
+        var cut = Render<SignalDetailView>(parameters => parameters.Add(x => x.SignalId, signalId));
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains("Piedra desprendida", cut.Markup);
+            Assert.Equal(2, cut.FindAll(".signal-detail__image-card").Count);
+            Assert.Contains("signal_detail_images_title", cut.Markup);
+        });
+    }
+
+    [Fact]
+    public void SignalDetailView_ShowsSingleImageWhenOnlyOnePhotoIsAvailable()
+    {
+        var signalId = Guid.NewGuid();
+        var signalService = new RecordingSignalService
+        {
+            GetSignalHandler = (id, _) => Task.FromResult(ServiceResult<SignalDetailItem>.Success(
+                BuildDetailItem(
+                    id,
+                    title: "Rama caida",
+                    description: "Bloquea el paso junto al cortijo.",
+                    ownerUserId: Guid.NewGuid()))),
+            GetSignalImagesHandler = (id, _) => Task.FromResult(ServiceResult<SignalImagesItem>.Success(
+                new SignalImagesItem(
+                    id,
+                    "data:image/jpeg;base64,/9j/solo",
+                    null))),
+            GetSignalCommentsHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(Array.Empty<SignalCommentItem>()))
+        };
+
+        RegisterDetailServices(signalService);
+
+        var cut = Render<SignalDetailView>(parameters => parameters.Add(x => x.SignalId, signalId));
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Single(cut.FindAll(".signal-detail__image-card"));
+            Assert.DoesNotContain("signal_detail_images_empty", cut.Markup);
+        });
+    }
+
+    [Fact]
+    public void SignalDetailView_ShowsImageErrorWithoutBlockingDetail()
+    {
+        var signalId = Guid.NewGuid();
+        var signalService = new RecordingSignalService
+        {
+            GetSignalHandler = (id, _) => Task.FromResult(ServiceResult<SignalDetailItem>.Success(
+                BuildDetailItem(
+                    id,
+                    title: "Rama caida",
+                    description: "Bloquea el paso junto al cortijo.",
+                    ownerUserId: Guid.NewGuid()))),
+            GetSignalImagesHandler = (_, _) => Task.FromResult(ServiceResult<SignalImagesItem>.Failure(
+                new ServiceError("signals.images_unavailable", "error"))),
+            GetSignalCommentsHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(Array.Empty<SignalCommentItem>()))
+        };
+
+        RegisterDetailServices(signalService);
+
+        var cut = Render<SignalDetailView>(parameters => parameters.Add(x => x.SignalId, signalId));
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains("Rama caida", cut.Markup);
+            Assert.Contains("signal_detail_images_error", cut.Markup);
+            Assert.DoesNotContain("signal_detail_error", cut.Markup);
+        });
+    }
+
+    [Fact]
     public void SignalDetailView_ShowsMap_WhenSignalHasCoordinates()
     {
         var signalService = new RecordingSignalService

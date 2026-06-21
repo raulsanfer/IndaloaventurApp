@@ -80,7 +80,8 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
-        var handler = new CreateSignalCommandHandler(signalRepo, typeRepo);
+        var imageStorage = new FakeSignalImageStorage();
+        var handler = new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage);
 
         await Assert.ThrowsAsync<InvalidOperationException>(() => handler.Handle(new CreateSignalCommand(
             37.1f, -2.2f, "Sendero con piedras", "Piedras en camino", [1], [2], true, Guid.NewGuid(), 999, "piedras"), CancellationToken.None));
@@ -91,16 +92,17 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
+        var imageStorage = new FakeSignalImageStorage();
         var aviso = SignalType.Crear("Aviso", "i");
         await typeRepo.AddAsync(aviso, CancellationToken.None);
-        var handler = new CreateSignalCommandHandler(signalRepo, typeRepo);
+        var handler = new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage);
 
         var signalId = await handler.Handle(new CreateSignalCommand(1, 1, "Solo una foto", "Desc", [1], null, true, Guid.NewGuid(), aviso.Id, "tag"), CancellationToken.None);
 
         var signal = await signalRepo.GetByIdAsync(signalId, CancellationToken.None);
         Assert.NotNull(signal);
-        Assert.Equal([1], signal!.Foto1);
-        Assert.Empty(signal.Foto2);
+        Assert.Equal($"{signalId:N}/foto1.bin", signal!.Foto1Path);
+        Assert.Equal(string.Empty, signal.Foto2Path);
     }
 
     [Fact]
@@ -108,11 +110,12 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
+        var imageStorage = new FakeSignalImageStorage();
         var aviso = SignalType.Crear("Aviso", "i");
         await typeRepo.AddAsync(aviso, CancellationToken.None);
         var incidencia = SignalType.Crear("Incidencia", "i2");
         await typeRepo.AddAsync(incidencia, CancellationToken.None);
-        var createHandler = new CreateSignalCommandHandler(signalRepo, typeRepo);
+        var createHandler = new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage);
 
         await createHandler.Handle(new CreateSignalCommand(1, 1, "Aviso uno", "Uno", [1], [11], true, Guid.NewGuid(), aviso.Id, "tag1"), CancellationToken.None);
         await createHandler.Handle(new CreateSignalCommand(2, 2, "Incidencia dos", "Dos", [2], [22], true, Guid.NewGuid(), incidencia.Id, "tag2"), CancellationToken.None);
@@ -130,9 +133,10 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
+        var imageStorage = new FakeSignalImageStorage();
         var aviso = SignalType.Crear("Aviso", "i");
         await typeRepo.AddAsync(aviso, CancellationToken.None);
-        var createHandler = new CreateSignalCommandHandler(signalRepo, typeRepo);
+        var createHandler = new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage);
         var ownerId = Guid.NewGuid();
         var signalId = await createHandler.Handle(new CreateSignalCommand(1, 1, "Titulo original", "Desc", [5], [6], true, ownerId, aviso.Id, "t"), CancellationToken.None);
         var original = await signalRepo.GetByIdAsync(signalId, CancellationToken.None);
@@ -148,8 +152,8 @@ public sealed class TrailSignalsHandlersTests
         Assert.Equal(updateUser, updated.UserIdModificacion);
         Assert.Equal("Titulo actualizado", updated.Titulo);
         Assert.False(updated.Activo);
-        Assert.Equal([5], updated.Foto1);
-        Assert.Equal([6], updated.Foto2);
+        Assert.Equal($"{signalId:N}/foto1.bin", updated.Foto1Path);
+        Assert.Equal($"{signalId:N}/foto2.bin", updated.Foto2Path);
         Assert.Equal(aviso.Id, updated.Tipo);
         Assert.Equal("t", updated.Tags);
     }
@@ -159,11 +163,12 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
+        var imageStorage = new FakeSignalImageStorage();
         var aviso = SignalType.Crear("Aviso", "i");
         await typeRepo.AddAsync(aviso, CancellationToken.None);
 
         var ownerId = Guid.NewGuid();
-        var signalId = await new CreateSignalCommandHandler(signalRepo, typeRepo)
+        var signalId = await new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage)
             .Handle(new CreateSignalCommand(1, 1, "Titulo original", "Desc", [5], [6], true, ownerId, aviso.Id, "t"), CancellationToken.None);
 
         var updateHandler = new UpdateSignalCommandHandler(signalRepo);
@@ -177,12 +182,13 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
+        var imageStorage = new FakeSignalImageStorage();
         var aviso = SignalType.Crear("Aviso", "i");
         await typeRepo.AddAsync(aviso, CancellationToken.None);
-        var createHandler = new CreateSignalCommandHandler(signalRepo, typeRepo);
+        var createHandler = new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage);
         var signalId = await createHandler.Handle(new CreateSignalCommand(1, 1, "Titulo imagenes", "Desc", [9], [10], true, Guid.NewGuid(), aviso.Id, "t"), CancellationToken.None);
 
-        var queryHandler = new GetSignalImagesQueryHandler(signalRepo);
+        var queryHandler = new GetSignalImagesQueryHandler(signalRepo, imageStorage);
         var result = await queryHandler.Handle(new GetSignalImagesQuery(signalId), CancellationToken.None);
 
         Assert.Equal(signalId, result.SignalId);
@@ -195,12 +201,13 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
+        var imageStorage = new FakeSignalImageStorage();
         var aviso = SignalType.Crear("Aviso", "i");
         await typeRepo.AddAsync(aviso, CancellationToken.None);
-        var createHandler = new CreateSignalCommandHandler(signalRepo, typeRepo);
+        var createHandler = new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage);
         var signalId = await createHandler.Handle(new CreateSignalCommand(1, 1, "Titulo imagen unica", "Desc", [9], null, true, Guid.NewGuid(), aviso.Id, "t"), CancellationToken.None);
 
-        var queryHandler = new GetSignalImagesQueryHandler(signalRepo);
+        var queryHandler = new GetSignalImagesQueryHandler(signalRepo, imageStorage);
         var result = await queryHandler.Handle(new GetSignalImagesQuery(signalId), CancellationToken.None);
 
         Assert.Equal(signalId, result.SignalId);
@@ -213,9 +220,10 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
+        var imageStorage = new FakeSignalImageStorage();
         var aviso = SignalType.Crear("Aviso", "i");
         await typeRepo.AddAsync(aviso, CancellationToken.None);
-        var signalId = await new CreateSignalCommandHandler(signalRepo, typeRepo)
+        var signalId = await new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage)
             .Handle(new CreateSignalCommand(1, 1, "Titulo comentario", "Desc", [1], [2], true, Guid.NewGuid(), aviso.Id, "tag"), CancellationToken.None);
 
         var commentUserId = Guid.NewGuid();
@@ -255,9 +263,10 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
+        var imageStorage = new FakeSignalImageStorage();
         var aviso = SignalType.Crear("Aviso", "i");
         await typeRepo.AddAsync(aviso, CancellationToken.None);
-        var signalId = await new CreateSignalCommandHandler(signalRepo, typeRepo)
+        var signalId = await new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage)
             .Handle(new CreateSignalCommand(1, 1, "Titulo historial", "Desc", [1], [2], true, Guid.NewGuid(), aviso.Id, "tag"), CancellationToken.None);
 
         var signal = await signalRepo.GetByIdAsync(signalId, CancellationToken.None);
@@ -279,9 +288,10 @@ public sealed class TrailSignalsHandlersTests
     {
         var signalRepo = new InMemorySignalRepository();
         var typeRepo = new InMemorySignalTypeRepository();
+        var imageStorage = new FakeSignalImageStorage();
         var aviso = SignalType.Crear("Aviso", "i");
         await typeRepo.AddAsync(aviso, CancellationToken.None);
-        var signalId = await new CreateSignalCommandHandler(signalRepo, typeRepo)
+        var signalId = await new CreateSignalCommandHandler(signalRepo, typeRepo, imageStorage)
             .Handle(new CreateSignalCommand(1, 1, "Titulo detalle", "Descripcion detalle", [1], [2], true, Guid.NewGuid(), aviso.Id, "tag"), CancellationToken.None);
 
         var handler = new Features.TrailSignals.Signals.GetSignalById.GetSignalByIdQueryHandler(signalRepo);
@@ -338,12 +348,17 @@ public sealed class TrailSignalsHandlersTests
             => Task.FromResult(_items.SingleOrDefault(x => x.Id == id));
 
         public Task<IReadOnlyCollection<SignalComment>> GetCommentsBySignalIdAsync(Guid signalId, CancellationToken cancellationToken)
-            => Task.FromResult((IReadOnlyCollection<SignalComment>)_items
-                .SingleOrDefault(x => x.Id == signalId)?
-                .Comentarios
-                .OrderBy(x => x.FechaComentario)
-                .ThenBy(x => x.Id)
-                .ToArray() ?? []);
+        {
+            var signal = _items.SingleOrDefault(x => x.Id == signalId);
+            IReadOnlyCollection<SignalComment> comments = signal is null
+                ? []
+                : signal.Comentarios
+                    .OrderBy(x => x.FechaComentario)
+                    .ThenBy(x => x.Id)
+                    .ToArray();
+
+            return Task.FromResult(comments);
+        }
 
         public Task<IReadOnlyCollection<Signal>> SearchAsync(string? tags, bool? activo, string? descripcion, int? tipo, CancellationToken cancellationToken)
         {
@@ -357,5 +372,59 @@ public sealed class TrailSignalsHandlersTests
 
         public Task SaveChangesAsync(CancellationToken cancellationToken)
             => Task.CompletedTask;
+    }
+
+    private sealed class FakeSignalImageStorage : ISignalImageStorage
+    {
+        private readonly Dictionary<string, byte[]> _files = [];
+
+        public Task<StoredSignalImages> SaveAsync(Guid signalId, byte[] foto1, byte[] foto2, CancellationToken cancellationToken)
+        {
+            var foto1Path = $"{signalId:N}/foto1.bin";
+            var foto2Path = foto2.Length > 0 ? $"{signalId:N}/foto2.bin" : string.Empty;
+
+            _files[foto1Path] = foto1.ToArray();
+            if (!string.IsNullOrWhiteSpace(foto2Path))
+            {
+                _files[foto2Path] = foto2.ToArray();
+            }
+
+            return Task.FromResult(new StoredSignalImages(foto1Path, foto2Path));
+        }
+
+        public async Task<StoredSignalImages> ReplaceAsync(Guid signalId, string currentFoto1Path, string currentFoto2Path, byte[] foto1, byte[] foto2, CancellationToken cancellationToken)
+        {
+            var storedImages = await SaveAsync(signalId, foto1, foto2, cancellationToken);
+
+            if (!string.Equals(currentFoto1Path, storedImages.Foto1Path, StringComparison.Ordinal))
+            {
+                _files.Remove(currentFoto1Path);
+            }
+
+            if (!string.Equals(currentFoto2Path, storedImages.Foto2Path, StringComparison.Ordinal))
+            {
+                _files.Remove(currentFoto2Path);
+            }
+
+            return storedImages;
+        }
+
+        public Task<SignalImageContent> ReadAsync(string foto1Path, string foto2Path, CancellationToken cancellationToken)
+        {
+            var foto1 = _files[foto1Path];
+            var foto2 = string.IsNullOrWhiteSpace(foto2Path) ? [] : _files[foto2Path];
+            return Task.FromResult(new SignalImageContent(foto1, foto2));
+        }
+
+        public Task DeleteAsync(string foto1Path, string foto2Path, CancellationToken cancellationToken)
+        {
+            _files.Remove(foto1Path);
+            if (!string.IsNullOrWhiteSpace(foto2Path))
+            {
+                _files.Remove(foto2Path);
+            }
+
+            return Task.CompletedTask;
+        }
     }
 }

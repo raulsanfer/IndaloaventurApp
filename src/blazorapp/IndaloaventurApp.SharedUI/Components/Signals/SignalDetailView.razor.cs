@@ -33,15 +33,23 @@ public partial class SignalDetailView
 
     protected string? SaveErrorMessageKey { get; private set; }
 
+    protected string? ImagesErrorMessageKey { get; private set; }
+
     protected SignalDetailTab ActiveTab { get; private set; } = SignalDetailTab.Data;
 
     protected bool IsEditing { get; private set; }
 
     protected bool IsSaving { get; private set; }
 
+    protected bool IsLoadingImages { get; private set; }
+
     protected SignalDetailEditorModel Editor { get; private set; } = new();
 
     protected IReadOnlyList<SignalCommentItem> Comments { get; private set; } = Array.Empty<SignalCommentItem>();
+
+    protected SignalImagesItem? Images { get; private set; }
+
+    protected IReadOnlyList<int> ImageSlots { get; } = [1, 2];
 
     protected IReadOnlyList<string> Tags =>
         string.IsNullOrWhiteSpace(Signal?.Tags)
@@ -85,6 +93,10 @@ public partial class SignalDetailView
         SessionService.CurrentSession?.UserId is Guid currentUserId &&
         currentUserId == Signal.OwnerUserId;
 
+    protected bool HasAnyImages =>
+        !string.IsNullOrWhiteSpace(Images?.Photo1Url) ||
+        !string.IsNullOrWhiteSpace(Images?.Photo2Url);
+
     protected override async Task OnParametersSetAsync()
     {
         await SessionService.EnsureInitializedAsync();
@@ -119,6 +131,15 @@ public partial class SignalDetailView
 
     protected string GetStatusText(SignalDetailItem signal)
         => signal.IsActive ? L["signal_detail_status_active"] : L["signal_detail_status_archived"];
+
+    protected string? GetImageUrl(int slot)
+        => slot == 1 ? Images?.Photo1Url : Images?.Photo2Url;
+
+    protected string GetImageLabel(int slot)
+        => slot == 1 ? L["signal_create_photo_1"] : L["signal_create_photo_2"];
+
+    protected string GetImageAlt(int slot)
+        => string.Format(L["signal_detail_photo_alt"], GetImageLabel(slot), Signal?.Title ?? L["signal_detail_title"].Value);
 
     protected void BeginEdit()
     {
@@ -190,7 +211,9 @@ public partial class SignalDetailView
     private async Task LoadAsync(bool clearFeedback = true)
     {
         IsLoading = true;
+        IsLoadingImages = false;
         ErrorMessageKey = null;
+        ImagesErrorMessageKey = null;
         SaveErrorMessageKey = null;
         if (clearFeedback)
         {
@@ -198,13 +221,12 @@ public partial class SignalDetailView
         }
 
         Signal = null;
+        Images = null;
         Comments = Array.Empty<SignalCommentItem>();
         ActiveTab = SignalDetailTab.Data;
         StateHasChanged();
 
         var result = await SignalService.GetSignalAsync(SignalId);
-
-        IsLoading = false;
 
         if (result.IsSuccess)
         {
@@ -215,13 +237,33 @@ public partial class SignalDetailView
                 Editor = SignalDetailEditorModel.FromSignal(signal);
             }
 
-            var commentsResult = await SignalService.GetSignalCommentsAsync(SignalId);
+            IsLoading = false;
+            IsLoadingImages = true;
+            StateHasChanged();
+
+            var commentsTask = SignalService.GetSignalCommentsAsync(SignalId);
+            var imagesTask = SignalService.GetSignalImagesAsync(SignalId);
+
+            var commentsResult = await commentsTask;
             Comments = commentsResult.IsSuccess
                 ? commentsResult.Value ?? Array.Empty<SignalCommentItem>()
                 : Array.Empty<SignalCommentItem>();
+
+            var imagesResult = await imagesTask;
+            if (imagesResult.IsSuccess)
+            {
+                Images = imagesResult.Value ?? new SignalImagesItem(SignalId, null, null);
+            }
+            else
+            {
+                ImagesErrorMessageKey = MapImagesErrorKey(imagesResult.Error?.Code);
+            }
+
+            IsLoadingImages = false;
             return;
         }
 
+        IsLoading = false;
         ErrorMessageKey = MapErrorKey(result.Error?.Code);
     }
 
@@ -244,6 +286,15 @@ public partial class SignalDetailView
             "signals.not_found" => "signal_detail_not_found",
             "auth.session_invalid" => "signal_detail_edit_auth_error",
             _ => "signal_detail_edit_error"
+        };
+    }
+
+    private static string MapImagesErrorKey(string? errorCode)
+    {
+        return errorCode switch
+        {
+            "signals.timeout" => "signal_detail_images_timeout",
+            _ => "signal_detail_images_error"
         };
     }
 

@@ -39,6 +39,7 @@ public static class IdentityBootstrapper
                 UserName = adminOptions.Email,
                 Email = adminOptions.Email,
                 EmailConfirmed = true,
+                LockoutEnabled = true,
                 IsMember = false
             };
 
@@ -46,6 +47,15 @@ public static class IdentityBootstrapper
             if (!createResult.Succeeded)
             {
                 throw new InvalidOperationException($"Unable to seed admin user: {string.Join("; ", createResult.Errors.Select(x => x.Description))}");
+            }
+        }
+        else if (!adminUser.LockoutEnabled)
+        {
+            adminUser.LockoutEnabled = true;
+            var updateResult = await userManager.UpdateAsync(adminUser);
+            if (!updateResult.Succeeded)
+            {
+                throw new InvalidOperationException($"Unable to enable lockout for admin user: {string.Join("; ", updateResult.Errors.Select(x => x.Description))}");
             }
         }
 

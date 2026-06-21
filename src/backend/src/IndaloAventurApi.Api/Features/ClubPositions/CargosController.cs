@@ -1,3 +1,4 @@
+using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application.Abstractions.ClubPositions;
 using IndaloAventurApi.Application.Features.ClubPositions.Cargos.CreateCargo;
 using IndaloAventurApi.Application.Features.ClubPositions.Cargos.DeleteCargo;
@@ -11,7 +12,7 @@ namespace IndaloAventurApi.Api.Features.ClubPositions;
 
 [ApiController]
 [Route("api/cargos")]
-[Authorize(Roles = "Admin")]
+[Authorize(Policy = AuthorizationPolicies.Admin)]
 public sealed class CargosController(IMediator mediator) : ControllerBase
 {
     [HttpGet]

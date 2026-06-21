@@ -15,8 +15,8 @@ public sealed class SignalConfiguration : IEntityTypeConfiguration<Signal>
         builder.Property(x => x.Longitud).IsRequired();
         builder.Property(x => x.Titulo).HasMaxLength(2000).IsRequired();
         builder.Property(x => x.Descripcion).HasMaxLength(2000).IsRequired();
-        builder.Property(x => x.Foto1).HasColumnType("varbinary(max)").IsRequired();
-        builder.Property(x => x.Foto2).HasColumnType("varbinary(max)").IsRequired();
+        builder.Property(x => x.Foto1Path).HasMaxLength(2048).IsRequired();
+        builder.Property(x => x.Foto2Path).HasMaxLength(2048).IsRequired();
         builder.Property(x => x.Activo).IsRequired();
         builder.Property(x => x.UserIdAlta).IsRequired();
         builder.Property(x => x.FechaAlta).IsRequired();

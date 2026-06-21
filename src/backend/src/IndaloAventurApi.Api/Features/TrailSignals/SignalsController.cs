@@ -1,4 +1,4 @@
-using System.Security.Claims;
+using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application.Abstractions.TrailSignals;
 using IndaloAventurApi.Application.Features.TrailSignals.Signals.CreateSignal;
 using IndaloAventurApi.Application.Features.TrailSignals.Signals.CreateSignalComment;
@@ -15,7 +15,7 @@ namespace IndaloAventurApi.Api.Features.TrailSignals;
 
 [ApiController]
 [Route("api/signals")]
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.Authenticated)]
 public sealed class SignalsController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
@@ -60,12 +60,12 @@ public sealed class SignalsController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin,Member")]
+    [Authorize(Policy = AuthorizationPolicies.MemberOrAdmin)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Guid>> Create([FromBody] CreateSignalRequest request, CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
+        var userId = User.GetRequiredUserId();
         var id = await mediator.Send(new CreateSignalCommand(
             request.Latitud,
             request.Longitud,
@@ -87,19 +87,19 @@ public sealed class SignalsController(IMediator mediator) : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Guid>> CreateComment(Guid id, [FromBody] CreateSignalCommentRequest request, CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
+        var userId = User.GetRequiredUserId();
         var commentId = await mediator.Send(new CreateSignalCommentCommand(id, userId, request.Texto), cancellationToken);
         return CreatedAtAction(nameof(GetComments), new { id }, commentId);
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin,Member")]
+    [Authorize(Policy = AuthorizationPolicies.MemberOrAdmin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateSignalRequest request, CancellationToken cancellationToken)
     {
-        var userId = GetCurrentUserId();
+        var userId = User.GetRequiredUserId();
         await mediator.Send(new UpdateSignalCommand(
             id,
             request.Titulo,
@@ -110,22 +110,11 @@ public sealed class SignalsController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin,Member")]
+    [Authorize(Policy = AuthorizationPolicies.MemberOrAdmin)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public IActionResult Delete(Guid id)
     {
         throw new InvalidOperationException("La eliminacion de senales no esta permitida.");
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(value, out var userId))
-        {
-            throw new UnauthorizedAccessException("No se pudo resolver el usuario autenticado.");
-        }
-
-        return userId;
     }
 
     public sealed record CreateSignalRequest(

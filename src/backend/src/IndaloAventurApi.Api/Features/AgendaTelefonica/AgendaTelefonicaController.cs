@@ -1,3 +1,4 @@
+using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application.Abstractions.Phonebook;
 using IndaloAventurApi.Application.Features.AgendaTelefonica.CreateFichaContacto;
 using IndaloAventurApi.Application.Features.AgendaTelefonica.DeleteFichaContacto;
@@ -12,7 +13,7 @@ namespace IndaloAventurApi.Api.Features.AgendaTelefonica;
 
 [ApiController]
 [Route("api/agenda-telefonica")]
-[Authorize]
+[Authorize(Policy = AuthorizationPolicies.Authenticated)]
 public sealed class AgendaTelefonicaController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
@@ -33,7 +34,7 @@ public sealed class AgendaTelefonicaController(IMediator mediator) : ControllerB
     }
 
     [HttpPost]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<Guid>> Create([FromBody] CreateFichaContactoCommand command, CancellationToken cancellationToken)
@@ -43,7 +44,7 @@ public sealed class AgendaTelefonicaController(IMediator mediator) : ControllerB
     }
 
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -54,7 +55,7 @@ public sealed class AgendaTelefonicaController(IMediator mediator) : ControllerB
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)

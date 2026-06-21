@@ -768,13 +768,15 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("FechaModificacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<byte[]>("Foto1")
+                    b.Property<string>("Foto1Path")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
-                    b.Property<byte[]>("Foto2")
+                    b.Property<string>("Foto2Path")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
 
                     b.Property<float>("Latitud")
                         .HasColumnType("real");

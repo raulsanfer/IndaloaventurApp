@@ -19,6 +19,6 @@ public partial class SessionInitializationGate
         }
 
         await SessionService.EnsureInitializedAsync();
-        StateHasChanged();
+        await InvokeAsync(StateHasChanged);
     }
 }
