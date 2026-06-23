@@ -13,9 +13,9 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 9.0.x
 
@@ -26,9 +26,9 @@ jobs:
         run: dotnet publish src/backend/src/IndaloAventurApi.Api/IndaloAventurApi.Api.csproj -c Release -o ./publish-backend
 
       - name: Deploy FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: .\publish-backend\
+          local-dir: ./publish-backend/
