@@ -1,7 +1,13 @@
 namespace IndaloAventurApi.Api.Security;
 
+/// <summary>
+/// Reune la matriz de autorizacion documentada para las rutas de la API.
+/// </summary>
 public static class ApiAuthorizationMatrix
 {
+    /// <summary>
+    /// Coleccion de reglas de acceso conocidas para cada endpoint documentado.
+    /// </summary>
     public static IReadOnlyCollection<ApiAuthorizationRule> Rules { get; } =
     [
         new("POST", "/api/auth/register", ApiAccessClassification.Anonymous, "Publico", "Registro anonimo."),

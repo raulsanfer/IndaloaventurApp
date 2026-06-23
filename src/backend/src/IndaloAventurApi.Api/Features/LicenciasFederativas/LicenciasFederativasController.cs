@@ -14,11 +14,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IndaloAventurApi.Api.Features.LicenciasFederativas;
 
+/// <summary>
+/// Gestiona tarifas y solicitudes de licencias federativas.
+/// </summary>
 [ApiController]
 [Route("api/licencias-federativas")]
 [Authorize(Policy = AuthorizationPolicies.Authenticated)]
 public sealed class LicenciasFederativasController(IMediator mediator) : ControllerBase
 {
+    /// <summary>
+    /// Devuelve las tarifas disponibles de licencias federativas.
+    /// </summary>
+    /// <param name="temporada">Temporada a consultar; si se omite se aplica el criterio por defecto del sistema.</param>
+    /// <param name="mediaTemporada">Filtra tarifas de media temporada cuando se indica.</param>
+    /// <param name="cancellationToken">Token para cancelar la consulta.</param>
+    /// <returns>Coleccion de tarifas que cumplen los filtros indicados.</returns>
     [HttpGet("tarifas")]
     [ProducesResponseType(typeof(IReadOnlyCollection<TarifaLicenciaFederativaDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -31,6 +41,12 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
         return Ok(result);
     }
 
+    /// <summary>
+    /// Crea una nueva solicitud de licencia federativa para el usuario autenticado.
+    /// </summary>
+    /// <param name="request">Temporada y tarifa solicitadas.</param>
+    /// <param name="cancellationToken">Token para cancelar la operacion.</param>
+    /// <returns>Solicitud creada con su estado inicial.</returns>
     [HttpPost("me/solicitudes")]
     [Authorize(Policy = AuthorizationPolicies.ClubMember)]
     [ProducesResponseType(typeof(SolicitudLicenciaFederativaDto), StatusCodes.Status201Created)]
@@ -52,6 +68,11 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
         return CreatedAtAction(nameof(GetMyRequestById), new { solicitudId = result.Id }, result);
     }
 
+    /// <summary>
+    /// Lista todas las solicitudes de licencia del usuario autenticado.
+    /// </summary>
+    /// <param name="cancellationToken">Token para cancelar la consulta.</param>
+    /// <returns>Coleccion de solicitudes del usuario autenticado.</returns>
     [HttpGet("me/solicitudes")]
     [ProducesResponseType(typeof(IReadOnlyCollection<SolicitudLicenciaFederativaDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyCollection<SolicitudLicenciaFederativaDto>>> GetMyRequests(CancellationToken cancellationToken)
@@ -60,6 +81,12 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
         return Ok(result);
     }
 
+    /// <summary>
+    /// Obtiene una solicitud de licencia concreta del usuario autenticado.
+    /// </summary>
+    /// <param name="solicitudId">Identificador de la solicitud.</param>
+    /// <param name="cancellationToken">Token para cancelar la consulta.</param>
+    /// <returns>Solicitud de licencia encontrada.</returns>
     [HttpGet("me/solicitudes/{solicitudId:guid}")]
     [ProducesResponseType(typeof(SolicitudLicenciaFederativaDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -69,6 +96,14 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
         return Ok(result);
     }
 
+    /// <summary>
+    /// Lista solicitudes de licencia con filtros administrativos.
+    /// </summary>
+    /// <param name="userId">Filtra por usuario propietario de la solicitud.</param>
+    /// <param name="temporada">Filtra por temporada de la licencia.</param>
+    /// <param name="estado">Filtra por estado actual de la solicitud.</param>
+    /// <param name="cancellationToken">Token para cancelar la consulta.</param>
+    /// <returns>Coleccion de solicitudes visibles para administracion.</returns>
     [HttpGet("admin/solicitudes")]
     [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(typeof(IReadOnlyCollection<AdminSolicitudLicenciaFederativaDto>), StatusCodes.Status200OK)]
@@ -82,6 +117,14 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
         return Ok(result);
     }
 
+    /// <summary>
+    /// Actualiza el estado administrativo de una solicitud de licencia.
+    /// </summary>
+    /// <param name="userId">Identificador del usuario propietario de la solicitud.</param>
+    /// <param name="solicitudId">Identificador de la solicitud a actualizar.</param>
+    /// <param name="request">Nuevo estado administrativo que se desea aplicar.</param>
+    /// <param name="cancellationToken">Token para cancelar la operacion.</param>
+    /// <returns>Solicitud actualizada con el nuevo estado.</returns>
     [HttpPut("admin/users/{userId:guid}/solicitudes/{solicitudId:guid}/estado")]
     [Authorize(Policy = AuthorizationPolicies.Admin)]
     [ProducesResponseType(typeof(AdminSolicitudLicenciaFederativaDto), StatusCodes.Status200OK)]
@@ -97,7 +140,17 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
         return Ok(result);
     }
 
+    /// <summary>
+    /// Datos necesarios para registrar una solicitud de licencia federativa.
+    /// </summary>
+    /// <param name="Temporada">Temporada federativa solicitada.</param>
+    /// <param name="TarifaLicenciaFederativaId">Identificador de la tarifa seleccionada.</param>
     public sealed record CreateSolicitudLicenciaFederativaRequest(int Temporada, int TarifaLicenciaFederativaId);
+
+    /// <summary>
+    /// Datos necesarios para cambiar el estado de una solicitud desde administracion.
+    /// </summary>
+    /// <param name="Estado">Nuevo estado que se desea asignar a la solicitud.</param>
     public sealed record UpdateAdminSolicitudLicenciaFederativaEstadoRequest(
         [property: JsonConverter(typeof(JsonStringEnumConverter))]
         EstadoSolicitudLicenciaFederativa Estado);

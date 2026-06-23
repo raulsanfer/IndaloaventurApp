@@ -6,10 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IndaloAventurApi.Api.Common;
 
+/// <summary>
+/// Convierte excepciones de la aplicacion en respuestas HTTP con formato Problem Details.
+/// </summary>
 public sealed class ProblemDetailsExceptionHandler(
     IProblemDetailsService problemDetailsService,
     ILogger<ProblemDetailsExceptionHandler> logger) : IExceptionHandler
 {
+    /// <summary>
+    /// Traduce la excepcion recibida a un codigo HTTP y un cuerpo estandarizado de error.
+    /// </summary>
+    /// <param name="httpContext">Contexto HTTP de la solicitud fallida.</param>
+    /// <param name="exception">Excepcion capturada durante el procesamiento.</param>
+    /// <param name="cancellationToken">Token para cancelar la escritura de la respuesta.</param>
+    /// <returns>
+    /// <see langword="true"/> cuando se ha escrito la respuesta de error; en caso contrario, <see langword="false"/>.
+    /// </returns>
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         logger.LogError(exception, "La solicitud ha fallado");

@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using IndaloAventurApi.Api.Common;
 using IndaloAventurApi.Api.Security;
@@ -16,7 +17,16 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    if (File.Exists(xmlPath))
+    {
+        options.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
+    }
+});
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddCors(options =>
@@ -145,4 +155,7 @@ await app.Services.InitializeSignalImageStorageAsync();
 
 app.Run();
 
+/// <summary>
+/// Punto de entrada de la aplicacion web.
+/// </summary>
 public partial class Program;
