@@ -21,5 +21,12 @@
     <ProjectReference Include="..\IndaloAventurApi.Application\IndaloAventurApi.Application.csproj" />
     <ProjectReference Include="..\IndaloAventurApi.Infrastructure\IndaloAventurApi.Infrastructure.csproj" />
   </ItemGroup>
-
+<ItemGroup>
+  <Content Update="appsettings.json">
+    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+  </Content>
+  <Content Update="appsettings.Development.json">
+    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+  </Content>
+</ItemGroup>
 </Project>
