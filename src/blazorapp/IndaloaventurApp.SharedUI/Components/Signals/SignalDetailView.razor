@@ -329,11 +329,36 @@
             <article class="card border border-base-200 bg-base-100 shadow-sm signal-detail__content-card">
                 <div class="card-body signal-detail__comments">
                     <div class="signal-detail__section-head">
-                        <h2>@L["signal_detail_tab_comments"]</h2>
-                        @* <span class="signal-detail__tags-caption">@GetCommentsCaption()</span> *@
+                        <div class="signal-detail__section-copy">
+                            <h2>@L["signal_detail_tab_comments"]</h2>
+                            <span class="signal-detail__tags-caption">@GetCommentsCaption()</span>
+                        </div>
+
+                        @if (CanCommentSignal)
+                        {
+                            <button type="button"
+                                    class="btn btn-outline signal-detail__comment-trigger"
+                                    disabled="@IsCreatingComment"
+                                    @onclick="OpenCommentModal">
+                                @L["signal_detail_comment_action"]
+                            </button>
+                        }
                     </div>
 
-                    @if (Comments.Count == 0)
+                    @if (!string.IsNullOrWhiteSpace(CommentStatusMessageKey))
+                    {
+                        <div class="alert alert-success signal-detail__status signal-detail__status--success" role="status">
+                            <span>@L[CommentStatusMessageKey]</span>
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(CommentsErrorMessageKey))
+                    {
+                        <div class="alert alert-warning signal-detail__status" role="status">
+                            <span>@L[CommentsErrorMessageKey]</span>
+                        </div>
+                    }
+                    else if (Comments.Count == 0)
                     {
                         <p class="signal-detail__muted">@L["signal_detail_comments_empty"]</p>
                     }
@@ -377,5 +402,66 @@
                 </div>
             </article>
         </section>
+
+        @if (IsCommentModalOpen)
+        {
+            <div class="modal modal-open" role="dialog" aria-modal="true" aria-labelledby="signal-comment-modal-title">
+                <div class="modal-box signal-detail__comment-modal">
+                    <div class="signal-detail__comment-modal-header">
+                        <div>
+                            <p class="signal-detail__muted">@L["signal_detail_tab_comments"]</p>
+                            <h2 id="signal-comment-modal-title">@L["signal_detail_comment_title"]</h2>
+                        </div>
+
+                        <button type="button"
+                                class="btn btn-sm btn-ghost"
+                                disabled="@IsCreatingComment"
+                                aria-label="@L["signal_detail_comment_cancel"]"
+                                @onclick="CloseCommentModal">
+                            x
+                        </button>
+                    </div>
+
+                    <div class="signal-detail__comment-modal-body">
+                        <label class="form-control signal-detail__comment-field" for="signal-comment-text">
+                            <span class="label">
+                                <span class="label-text">@L["signal_detail_comment_label"]</span>
+                            </span>
+                            <InputTextArea id="signal-comment-text"
+                                           class="textarea textarea-bordered signal-detail__comment-textarea"
+                                           @bind-Value="CommentEditor.Text"
+                                           placeholder="@L["signal_detail_comment_placeholder"]" />
+                        </label>
+
+                        @if (string.IsNullOrWhiteSpace(CommentEditor.Text))
+                        {
+                            <p class="signal-detail__comment-validation" role="alert">@L["signal_detail_comment_text_required"]</p>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(CommentErrorMessageKey))
+                        {
+                            <div class="alert alert-error signal-detail__status signal-detail__status--error" role="alert">
+                                <span>@L[CommentErrorMessageKey]</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="modal-action signal-detail__comment-actions">
+                        <button type="button"
+                                class="btn btn-ghost"
+                                disabled="@IsCreatingComment"
+                                @onclick="CloseCommentModal">
+                            @L["signal_detail_comment_cancel"]
+                        </button>
+                        <button type="button"
+                                class="btn btn-primary"
+                                disabled="@(!CanSubmitComment)"
+                                @onclick="SubmitCommentAsync">
+                            @(IsCreatingComment ? L["signal_detail_comment_confirm_loading"] : L["signal_detail_comment_confirm"])
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
     }
 </section>

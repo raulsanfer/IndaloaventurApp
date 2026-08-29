@@ -214,6 +214,61 @@ public sealed class SignalApiClient(HttpClient httpClient, ISessionService sessi
         }
     }
 
+    public async Task<ServiceResult<Guid>> CreateSignalCommentAsync(CreateSignalCommentRequest requestModel, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            using var request = CreateAuthorizedRequest(HttpMethod.Post, BuildSignalCommentsEndpoint(requestModel.SignalId));
+            request.Content = JsonContent.Create(new CreateSignalCommentDto(requestModel.Text));
+
+            using var response = await httpClient.SendAsync(request, cancellationToken);
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return ServiceResult<Guid>.Failure(new ServiceError("auth.session_invalid", "Sesion invalida."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                return ServiceResult<Guid>.Failure(new ServiceError("signals.comments_create_forbidden", "No tienes permisos para comentar esta senal."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return ServiceResult<Guid>.Failure(new ServiceError("signals.not_found", "La senal no existe."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return ServiceResult<Guid>.Failure(new ServiceError("signals.comments_create_validation", "El comentario no supera la validacion."));
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return ServiceResult<Guid>.Failure(new ServiceError("signals.comments_create_failed", $"Error HTTP {(int)response.StatusCode}."));
+            }
+
+            var createdId = await response.Content.ReadFromJsonAsync<Guid>(cancellationToken: cancellationToken);
+            return ServiceResult<Guid>.Success(createdId);
+        }
+        catch (HttpRequestException)
+        {
+            return ServiceResult<Guid>.Failure(new ServiceError("signals.unavailable", "No se pudo conectar con las senales."));
+        }
+        catch (TaskCanceledException)
+        {
+            return ServiceResult<Guid>.Failure(new ServiceError("signals.timeout", "Tiempo de espera agotado."));
+        }
+        catch (JsonException)
+        {
+            return ServiceResult<Guid>.Failure(new ServiceError("signals.invalid_payload", "La respuesta de senales no tiene un formato valido."));
+        }
+        catch (NotSupportedException)
+        {
+            return ServiceResult<Guid>.Failure(new ServiceError("signals.invalid_payload", "La respuesta de senales no tiene un formato valido."));
+        }
+    }
+
     public async Task<ServiceResult<IReadOnlyList<SignalCategoryItem>>> GetSignalCategoriesAsync(CancellationToken cancellationToken = default)
     {
         try
@@ -753,6 +808,9 @@ public sealed class SignalApiClient(HttpClient httpClient, ISessionService sessi
     private sealed record UpdateSignalTypeDto(
         string Nombre,
         string? Icono);
+
+    private sealed record CreateSignalCommentDto(
+        string Texto);
 
     private sealed record CreateSignalDto(
         float Latitud,

@@ -58,4 +58,9 @@ public sealed record AuthSession
     {
         return CanAccessOwnFederativeLicenses() || CanAdministerFederativeLicenses();
     }
+
+    public bool CanCommentSignals()
+    {
+        return IsInRole("Admin") || (IsMember && IsInRole("Member"));
+    }
 }

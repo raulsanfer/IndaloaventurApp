@@ -305,6 +305,80 @@ public sealed class SignalApiClientTests
     }
 
     [Fact]
+    public async Task CreateSignalCommentAsync_PostsTextToSignalCommentsEndpoint()
+    {
+        var signalId = Guid.Parse("8f57dc91-7a2f-49d7-b85b-5ce5848d8052");
+        var createdCommentId = Guid.Parse("a6b61236-c895-4f3a-89aa-ff2dbb75fd37");
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.MemberSession);
+
+        var handler = new StubHttpMessageHandler(async request =>
+        {
+            Assert.Equal(HttpMethod.Post, request.Method);
+            Assert.Equal($"/api/signals/{signalId}/comments", request.RequestUri?.AbsolutePath);
+
+            var payload = await request.Content!.ReadAsStringAsync();
+            using var document = JsonDocument.Parse(payload);
+            Assert.Equal("Nuevo comentario operativo", document.RootElement.GetProperty("texto").GetString());
+
+            return new HttpResponseMessage(HttpStatusCode.Created)
+            {
+                Content = new StringContent(JsonSerializer.Serialize(createdCommentId), Encoding.UTF8, "application/json")
+            };
+        });
+
+        using var httpClient = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://localhost")
+        };
+
+        var sut = new SignalApiClient(httpClient, sessionService);
+
+        var result = await sut.CreateSignalCommentAsync(new CreateSignalCommentRequest(signalId, "Nuevo comentario operativo"));
+
+        Assert.True(result.IsSuccess);
+        Assert.Equal(createdCommentId, result.Value);
+    }
+
+    [Fact]
+    public async Task CreateSignalCommentAsync_ReturnsValidationError_WhenApiReturns400()
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.MemberSession);
+
+        using var httpClient = new HttpClient(new StubHttpMessageHandler(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest))))
+        {
+            BaseAddress = new Uri("https://localhost")
+        };
+
+        var sut = new SignalApiClient(httpClient, sessionService);
+
+        var result = await sut.CreateSignalCommentAsync(new CreateSignalCommentRequest(Guid.NewGuid(), "Comentario"));
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal("signals.comments_create_validation", result.Error?.Code);
+    }
+
+    [Fact]
+    public async Task CreateSignalCommentAsync_ReturnsForbidden_WhenApiReturns403()
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.MemberSession);
+
+        using var httpClient = new HttpClient(new StubHttpMessageHandler(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.Forbidden))))
+        {
+            BaseAddress = new Uri("https://localhost")
+        };
+
+        var sut = new SignalApiClient(httpClient, sessionService);
+
+        var result = await sut.CreateSignalCommentAsync(new CreateSignalCommentRequest(Guid.NewGuid(), "Comentario"));
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal("signals.comments_create_forbidden", result.Error?.Code);
+    }
+
+    [Fact]
     public async Task CreateSignalCategoryAsync_PostsToSignalTypesEndpoint()
     {
         var sessionService = new RecordingSessionService();

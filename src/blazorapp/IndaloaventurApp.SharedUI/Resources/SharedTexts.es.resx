@@ -231,6 +231,21 @@
   <data name="signal_detail_tags_count" xml:space="preserve"><value>{0} etiquetas</value></data>
   <data name="signal_detail_comments_empty" xml:space="preserve"><value>Sin comentarios asociados</value></data>
   <data name="signal_detail_comments_count" xml:space="preserve"><value>{0} comentarios</value></data>
+  <data name="signal_detail_comments_error" xml:space="preserve"><value>No pudimos cargar los comentarios de esta signal.</value></data>
+  <data name="signal_detail_comments_timeout" xml:space="preserve"><value>La carga de comentarios está tardando demasiado. Inténtalo de nuevo.</value></data>
+  <data name="signal_detail_comment_action" xml:space="preserve"><value>Añadir comentario</value></data>
+  <data name="signal_detail_comment_title" xml:space="preserve"><value>Nuevo comentario</value></data>
+  <data name="signal_detail_comment_label" xml:space="preserve"><value>Comentario</value></data>
+  <data name="signal_detail_comment_placeholder" xml:space="preserve"><value>Escribe aquí el contexto o actualización que quieres asociar a esta signal...</value></data>
+  <data name="signal_detail_comment_confirm" xml:space="preserve"><value>Confirmar</value></data>
+  <data name="signal_detail_comment_confirm_loading" xml:space="preserve"><value>Enviando...</value></data>
+  <data name="signal_detail_comment_cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="signal_detail_comment_success" xml:space="preserve"><value>El comentario se ha añadido correctamente.</value></data>
+  <data name="signal_detail_comment_error" xml:space="preserve"><value>No pudimos guardar el comentario de esta signal.</value></data>
+  <data name="signal_detail_comment_validation_error" xml:space="preserve"><value>Revisa el texto del comentario antes de confirmarlo.</value></data>
+  <data name="signal_detail_comment_forbidden" xml:space="preserve"><value>No tienes permisos para comentar esta signal.</value></data>
+  <data name="signal_detail_comment_auth_error" xml:space="preserve"><value>Tu sesión ya no es válida para añadir comentarios.</value></data>
+  <data name="signal_detail_comment_text_required" xml:space="preserve"><value>El comentario es obligatorio.</value></data>
   <data name="signal_detail_status_active" xml:space="preserve"><value>Activa</value></data>
   <data name="signal_detail_status_archived" xml:space="preserve"><value>Archivada</value></data>
   <data name="signal_detail_updated_at" xml:space="preserve"><value>Actualizada {0}</value></data>
