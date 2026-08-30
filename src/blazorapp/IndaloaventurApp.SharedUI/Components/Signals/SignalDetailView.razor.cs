@@ -11,6 +11,8 @@ using Microsoft.Extensions.Localization;
 
 public partial class SignalDetailView
 {
+    private const string DefaultCommentErrorKey = "signal_detail_comment_error";
+
     [Parameter]
     public Guid SignalId { get; set; }
 
@@ -35,15 +37,27 @@ public partial class SignalDetailView
 
     protected string? ImagesErrorMessageKey { get; private set; }
 
+    protected string? CommentsErrorMessageKey { get; private set; }
+
+    protected string? CommentStatusMessageKey { get; private set; }
+
+    protected string? CommentErrorMessageKey { get; private set; }
+
     protected SignalDetailTab ActiveTab { get; private set; } = SignalDetailTab.Data;
 
     protected bool IsEditing { get; private set; }
 
     protected bool IsSaving { get; private set; }
 
+    protected bool IsCommentModalOpen { get; private set; }
+
+    protected bool IsCreatingComment { get; private set; }
+
     protected bool IsLoadingImages { get; private set; }
 
     protected SignalDetailEditorModel Editor { get; private set; } = new();
+
+    protected SignalCommentEditorModel CommentEditor { get; private set; } = new();
 
     protected IReadOnlyList<SignalCommentItem> Comments { get; private set; } = Array.Empty<SignalCommentItem>();
 
@@ -92,6 +106,15 @@ public partial class SignalDetailView
         Signal is not null &&
         SessionService.CurrentSession?.UserId is Guid currentUserId &&
         currentUserId == Signal.OwnerUserId;
+
+    protected bool CanCommentSignal =>
+        Signal is not null &&
+        SessionService.CurrentSession?.CanCommentSignals() == true;
+
+    protected bool CanSubmitComment =>
+        CanCommentSignal &&
+        !IsCreatingComment &&
+        !string.IsNullOrWhiteSpace(CommentEditor.Text);
 
     protected bool HasAnyImages =>
         !string.IsNullOrWhiteSpace(Images?.Photo1Url) ||
@@ -165,6 +188,74 @@ public partial class SignalDetailView
         }
     }
 
+    protected void OpenCommentModal()
+    {
+        if (!CanCommentSignal)
+        {
+            return;
+        }
+
+        CommentStatusMessageKey = null;
+        CommentErrorMessageKey = null;
+        CommentEditor = new SignalCommentEditorModel();
+        IsCommentModalOpen = true;
+    }
+
+    protected void CloseCommentModal()
+    {
+        if (IsCreatingComment)
+        {
+            return;
+        }
+
+        IsCommentModalOpen = false;
+        CommentErrorMessageKey = null;
+        CommentEditor = new SignalCommentEditorModel();
+    }
+
+    protected async Task SubmitCommentAsync()
+    {
+        if (!CanCommentSignal)
+        {
+            CommentErrorMessageKey = "signal_detail_comment_forbidden";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(CommentEditor.Text))
+        {
+            CommentErrorMessageKey = "signal_detail_comment_text_required";
+            return;
+        }
+
+        IsCreatingComment = true;
+        CommentErrorMessageKey = null;
+        CommentStatusMessageKey = null;
+
+        var result = await SignalService.CreateSignalCommentAsync(new CreateSignalCommentRequest(
+            SignalId,
+            CommentEditor.Text.Trim()));
+
+        if (!result.IsSuccess)
+        {
+            IsCreatingComment = false;
+            CommentErrorMessageKey = MapCreateCommentErrorKey(result.Error?.Code);
+            return;
+        }
+
+        var commentsReloaded = await LoadCommentsAsync();
+        IsCreatingComment = false;
+
+        if (!commentsReloaded)
+        {
+            CommentErrorMessageKey = CommentsErrorMessageKey ?? DefaultCommentErrorKey;
+            return;
+        }
+
+        IsCommentModalOpen = false;
+        CommentEditor = new SignalCommentEditorModel();
+        CommentStatusMessageKey = "signal_detail_comment_success";
+    }
+
     protected async Task SaveAsync()
     {
         if (!CanEditSignal || Signal is null)
@@ -214,16 +305,20 @@ public partial class SignalDetailView
         IsLoadingImages = false;
         ErrorMessageKey = null;
         ImagesErrorMessageKey = null;
+        CommentsErrorMessageKey = null;
         SaveErrorMessageKey = null;
+        CommentErrorMessageKey = null;
         if (clearFeedback)
         {
             StatusMessageKey = null;
+            CommentStatusMessageKey = null;
         }
 
         Signal = null;
         Images = null;
         Comments = Array.Empty<SignalCommentItem>();
         ActiveTab = SignalDetailTab.Data;
+        IsCommentModalOpen = false;
         StateHasChanged();
 
         var result = await SignalService.GetSignalAsync(SignalId);
@@ -241,13 +336,10 @@ public partial class SignalDetailView
             IsLoadingImages = true;
             StateHasChanged();
 
-            var commentsTask = SignalService.GetSignalCommentsAsync(SignalId);
+            var commentsTask = LoadCommentsAsync();
             var imagesTask = SignalService.GetSignalImagesAsync(SignalId);
 
-            var commentsResult = await commentsTask;
-            Comments = commentsResult.IsSuccess
-                ? commentsResult.Value ?? Array.Empty<SignalCommentItem>()
-                : Array.Empty<SignalCommentItem>();
+            await commentsTask;
 
             var imagesResult = await imagesTask;
             if (imagesResult.IsSuccess)
@@ -265,6 +357,22 @@ public partial class SignalDetailView
 
         IsLoading = false;
         ErrorMessageKey = MapErrorKey(result.Error?.Code);
+    }
+
+    private async Task<bool> LoadCommentsAsync()
+    {
+        CommentsErrorMessageKey = null;
+
+        var commentsResult = await SignalService.GetSignalCommentsAsync(SignalId);
+        if (!commentsResult.IsSuccess)
+        {
+            Comments = Array.Empty<SignalCommentItem>();
+            CommentsErrorMessageKey = MapCommentsErrorKey(commentsResult.Error?.Code);
+            return false;
+        }
+
+        Comments = commentsResult.Value ?? Array.Empty<SignalCommentItem>();
+        return true;
     }
 
     private static string MapErrorKey(string? errorCode)
@@ -286,6 +394,27 @@ public partial class SignalDetailView
             "signals.not_found" => "signal_detail_not_found",
             "auth.session_invalid" => "signal_detail_edit_auth_error",
             _ => "signal_detail_edit_error"
+        };
+    }
+
+    private static string MapCreateCommentErrorKey(string? errorCode)
+    {
+        return errorCode switch
+        {
+            "signals.comments_create_validation" => "signal_detail_comment_validation_error",
+            "signals.comments_create_forbidden" => "signal_detail_comment_forbidden",
+            "signals.not_found" => "signal_detail_not_found",
+            "auth.session_invalid" => "signal_detail_comment_auth_error",
+            _ => DefaultCommentErrorKey
+        };
+    }
+
+    private static string MapCommentsErrorKey(string? errorCode)
+    {
+        return errorCode switch
+        {
+            "signals.timeout" => "signal_detail_comments_timeout",
+            _ => "signal_detail_comments_error"
         };
     }
 
@@ -321,5 +450,10 @@ public partial class SignalDetailView
                 IsActive = signal.IsActive
             };
         }
+    }
+
+    protected sealed class SignalCommentEditorModel
+    {
+        public string Text { get; set; } = string.Empty;
     }
 }

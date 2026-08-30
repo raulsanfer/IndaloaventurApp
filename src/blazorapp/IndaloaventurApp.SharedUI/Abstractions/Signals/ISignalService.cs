@@ -13,6 +13,8 @@ public interface ISignalService
 
     Task<ServiceResult<IReadOnlyList<SignalCommentItem>>> GetSignalCommentsAsync(Guid signalId, CancellationToken cancellationToken = default);
 
+    Task<ServiceResult<Guid>> CreateSignalCommentAsync(CreateSignalCommentRequest request, CancellationToken cancellationToken = default);
+
     Task<ServiceResult<IReadOnlyList<SignalCategoryItem>>> GetSignalCategoriesAsync(CancellationToken cancellationToken = default);
 
     Task<ServiceResult<int>> CreateSignalCategoryAsync(CreateSignalCategoryRequest request, CancellationToken cancellationToken = default);

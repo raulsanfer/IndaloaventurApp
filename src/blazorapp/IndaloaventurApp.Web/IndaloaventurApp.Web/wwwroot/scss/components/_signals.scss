@@ -531,14 +531,16 @@
 }
 
 .signal-detail__edit-trigger,
-.signal-detail__edit-actions .btn {
+.signal-detail__edit-actions .btn,
+.signal-detail__comment-trigger {
   min-height: 2.5rem;
 }
 
 .signal-detail__hero-meta,
 .signal-detail__facts-grid,
 .signal-detail__location-copy,
-.signal-detail__tag-list {
+.signal-detail__tag-list,
+.signal-detail__section-copy {
   display: grid;
   gap: 0.75rem;
 }
@@ -710,6 +712,10 @@
   font-size: 1.1rem;
 }
 
+.signal-detail__section-copy {
+  gap: 0.3rem;
+}
+
 .signal-detail__facts-grid {
   margin: 0;
 }
@@ -738,6 +744,37 @@
 .signal-detail__comment-list {
   display: grid;
   gap: 0.9rem;
+}
+
+.signal-detail__comment-modal,
+.signal-detail__comment-modal-body,
+.signal-detail__comment-modal-header {
+  display: grid;
+  gap: 1rem;
+}
+
+.signal-detail__comment-modal {
+  width: min(100%, 38rem);
+}
+
+.signal-detail__comment-modal-header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.signal-detail__comment-field .label {
+  padding-inline: 0;
+}
+
+.signal-detail__comment-textarea {
+  min-height: 10rem;
+  resize: vertical;
+}
+
+.signal-detail__comment-validation {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
 }
 
 .signal-detail__image-grid {

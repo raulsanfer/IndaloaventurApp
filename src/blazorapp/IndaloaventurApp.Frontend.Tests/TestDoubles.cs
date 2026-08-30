@@ -227,6 +227,8 @@ internal sealed class RecordingSignalService : ISignalService
 
     public Func<Guid, CancellationToken, Task<ServiceResult<IReadOnlyList<SignalCommentItem>>>>? GetSignalCommentsHandler { get; init; }
 
+    public Func<CreateSignalCommentRequest, CancellationToken, Task<ServiceResult<Guid>>>? CreateSignalCommentHandler { get; init; }
+
     public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<SignalCategoryItem>>>>? GetSignalCategoriesHandler { get; init; }
 
     public Func<CreateSignalCategoryRequest, CancellationToken, Task<ServiceResult<int>>>? CreateSignalCategoryHandler { get; init; }
@@ -261,6 +263,12 @@ internal sealed class RecordingSignalService : ISignalService
     {
         return GetSignalCommentsHandler?.Invoke(signalId, cancellationToken)
             ?? Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(Array.Empty<SignalCommentItem>()));
+    }
+
+    public Task<ServiceResult<Guid>> CreateSignalCommentAsync(CreateSignalCommentRequest request, CancellationToken cancellationToken = default)
+    {
+        return CreateSignalCommentHandler?.Invoke(request, cancellationToken)
+            ?? Task.FromResult(ServiceResult<Guid>.Failure(new ServiceError("signals.comments_create_missing_handler", "Missing signal comment create handler")));
     }
 
     public Task<ServiceResult<IReadOnlyList<SignalCategoryItem>>> GetSignalCategoriesAsync(CancellationToken cancellationToken = default)
@@ -453,6 +461,7 @@ internal static class TestSessions
         "Bearer",
         3600,
         true,
+        new[] { "Member" },
         userId: Guid.Parse("5f099de7-2b37-4237-8e16-f48d31a56267"));
 
     public static readonly AuthSession AdminSession = new(

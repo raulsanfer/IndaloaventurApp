@@ -14,4 +14,4 @@
 
 - [x] 3.1 Anadir o actualizar tests frontend para cubrir visibilidad del boton `Editar` en signals propias y su ocultacion en signals ajenas.
 - [x] 3.2 Anadir o actualizar tests frontend para cubrir alcance de campos editables, guardado correcto y denegacion de edicion ajena.
-- [ ] 3.3 Verificar manualmente que un usuario solo puede editar sus propias signals desde el detalle y que solo cambia `Titulo`, `Descripcion` y `Estado`.
+- [x] 3.3 Verificar manualmente que un usuario solo puede editar sus propias signals desde el detalle y que solo cambia `Titulo`, `Descripcion` y `Estado`.

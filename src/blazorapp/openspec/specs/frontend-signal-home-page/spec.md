@@ -75,7 +75,7 @@ El sistema MUST renderizar las categorías como chips de una sola línea y MUST 
 - **AND** el sistema MUST mantener accesible la selección de cualquier categoría
 
 ### Requirement: SignalHome MUST presentar cada señal como una card de listado alineada con el diseño
-El sistema MUST mostrar cada señal dentro de una card visualmente separada, preparada para incluir imagen, categoría, fecha, texto principal y metadato destacado siguiendo el layout base del diseño suministrado.
+El sistema MUST mostrar cada señal dentro de una card visualmente separada, preparada para incluir imagen principal real, categoría, fecha, texto principal y metadato destacado siguiendo el layout base del diseño suministrado.
 
 #### Scenario: Render de una señal en el listado
 - **WHEN** una señal se muestra en la lista de `SignalHome`
@@ -84,9 +84,15 @@ El sistema MUST mostrar cada señal dentro de una card visualmente separada, pre
 - **AND** el sistema MUST mostrar una referencia temporal visible de la señal
 - **AND** el sistema MUST mostrar el contenido textual principal sin romper la composición de la card
 
+#### Scenario: Signal con imagen principal disponible
+- **WHEN** una señal del listado dispone de imagen principal utilizable
+- **THEN** el sistema MUST renderizar esa imagen real en la zona principal de media de la card
+- **AND** el sistema MUST no sustituirla por el placeholder por defecto
+
 #### Scenario: Campo visual opcional ausente
-- **WHEN** una señal no disponga de alguno de los campos visuales opcionales del diseño
+- **WHEN** una señal no disponga de imagen principal u otro campo visual opcional del diseño
 - **THEN** el sistema MUST conservar una card estable y legible
+- **AND** el sistema MUST usar el placeholder solo cuando la imagen real no esté disponible
 - **AND** el sistema MUST evitar huecos rotos o errores de renderizado por datos ausentes
 
 ### Requirement: SignalHome MUST usar DaisyUI como base de sus nuevos patrones visuales
@@ -126,4 +132,17 @@ El sistema MUST hacer accionable cada registro mostrado en `SignalHome` para que
 - **WHEN** una signal del listado no disponga de todos los campos visuales opcionales
 - **THEN** el sistema MUST seguir permitiendo la navegacion al detalle desde esa card
 - **AND** el sistema MUST mantener una superficie de interaccion comprensible
+
+### Requirement: SignalHome MUST renderizar el listado sin depender de binarios por cada signal
+El sistema MUST construir y mostrar el listado principal de `SignalHome` a partir de los metadatos de `signals` y las categorías de `signal-types`, y MUST tratar la preview de imagen de cada card como un elemento opcional que no bloquea el render principal.
+
+#### Scenario: Listado principal disponible con solo metadatos
+- **WHEN** `SignalHome` recibe correctamente el listado base de signals y las categorías visibles
+- **THEN** el sistema MUST renderizar las cards del listado sin esperar una carga binaria independiente por cada signal
+- **AND** el sistema MUST mantener operativos el acceso al detalle, la búsqueda y los filtros
+
+#### Scenario: Preview ausente o diferida
+- **WHEN** una signal no dispone de preview utilizable o la vista decide no resolver imágenes en el listado
+- **THEN** el sistema MUST mantener una card estable y navegable
+- **AND** el sistema MUST usar el fallback visual permitido sin marcar el listado completo como fallido
 

@@ -21,4 +21,4 @@
 
 - [x] 4.1 Añadir o actualizar tests frontend para el listado de signals cubriendo imagen principal real y fallback de placeholder.
 - [x] 4.2 Añadir o actualizar tests frontend para el detalle cubriendo la nueva estructura de tabs, comentarios fuera de tabs y etiquetas al final.
-- [ ] 4.3 Verificar manualmente en móvil o viewport estrecho, incluyendo `412px`, que `signal-detail__overview-grid` mantiene dos bloques por fila y que las tabs visibles caben sin desbordar la navegación principal.
+- [x] 4.3 Verificar manualmente en móvil o viewport estrecho, incluyendo `412px`, que `signal-detail__overview-grid` mantiene dos bloques por fila y que las tabs visibles caben sin desbordar la navegación principal.

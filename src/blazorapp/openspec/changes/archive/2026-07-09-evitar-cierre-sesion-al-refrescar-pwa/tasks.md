@@ -18,5 +18,5 @@
 ## 4. Verificaci�n
 
 - [x] 4.1 A�adir o actualizar tests de cliente para cubrir persistencia tras login, rehidrataci�n en refresh y limpieza al cerrar sesi�n.
-- [ ] 4.2 Verificar manualmente en navegador que `F5` y el refresco por gesto en m�vil/PWA no env�an al login mientras el token siga vigente.
+- [x] 4.2 Verificar manualmente en navegador que `F5` y el refresco por gesto en m�vil/PWA no env�an al login mientras el token siga vigente.
 - [x] 4.3 Verificar manualmente o con tests que una sesi�n expirada o ausente sigue redirigiendo correctamente al login tras finalizar la inicializaci�n.

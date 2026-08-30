@@ -371,6 +371,207 @@ public sealed class SignalViewsTests : BunitContext
     /// Covers scenario: signal detail view hides edit button for different user.
     /// </summary>
     [Fact]
+    public void SignalDetailView_ShowsCommentAction_ForAuthorizedMember()
+    {
+        var signalId = Guid.NewGuid();
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.MemberSession);
+
+        var signalService = new RecordingSignalService
+        {
+            GetSignalHandler = (id, _) => Task.FromResult(ServiceResult<SignalDetailItem>.Success(
+                BuildDetailItem(
+                    id,
+                    title: "Piedra desprendida",
+                    description: "Hay una piedra de gran tamano invadiendo parte del sendero.",
+                    ownerUserId: Guid.NewGuid()))),
+            GetSignalCommentsHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(Array.Empty<SignalCommentItem>()))
+        };
+
+        RegisterDetailServices(signalService, sessionService);
+
+        var cut = Render<SignalDetailView>(parameters => parameters.Add(x => x.SignalId, signalId));
+
+        cut.WaitForAssertion(() => Assert.Contains("signal_detail_comment_action", cut.Markup));
+    }
+
+    [Fact]
+    public void SignalDetailView_ShowsCommentAction_ForAdmin()
+    {
+        var signalId = Guid.NewGuid();
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+
+        var signalService = new RecordingSignalService
+        {
+            GetSignalHandler = (id, _) => Task.FromResult(ServiceResult<SignalDetailItem>.Success(
+                BuildDetailItem(
+                    id,
+                    title: "Piedra desprendida",
+                    description: "Hay una piedra de gran tamano invadiendo parte del sendero.",
+                    ownerUserId: TestSessions.MemberSession.UserId!.Value))),
+            GetSignalCommentsHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(Array.Empty<SignalCommentItem>()))
+        };
+
+        RegisterDetailServices(signalService, sessionService);
+
+        var cut = Render<SignalDetailView>(parameters => parameters.Add(x => x.SignalId, signalId));
+
+        cut.WaitForAssertion(() => Assert.Contains("signal_detail_comment_action", cut.Markup));
+    }
+
+    [Fact]
+    public void SignalDetailView_HidesCommentAction_ForUnauthorizedMemberClaim()
+    {
+        var signalId = Guid.NewGuid();
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(new IndaloaventurApp.SharedUI.Models.Auth.AuthSession(
+            "token",
+            "Bearer",
+            3600,
+            false,
+            new[] { "Member" },
+            Guid.NewGuid()));
+
+        var signalService = new RecordingSignalService
+        {
+            GetSignalHandler = (id, _) => Task.FromResult(ServiceResult<SignalDetailItem>.Success(
+                BuildDetailItem(
+                    id,
+                    title: "Piedra desprendida",
+                    description: "Hay una piedra de gran tamano invadiendo parte del sendero.",
+                    ownerUserId: Guid.NewGuid()))),
+            GetSignalCommentsHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(Array.Empty<SignalCommentItem>()))
+        };
+
+        RegisterDetailServices(signalService, sessionService);
+
+        var cut = Render<SignalDetailView>(parameters => parameters.Add(x => x.SignalId, signalId));
+
+        cut.WaitForAssertion(() => Assert.DoesNotContain("signal_detail_comment_action", cut.Markup));
+    }
+
+    [Fact]
+    public void SignalDetailView_OpensAndCancelsCommentModal()
+    {
+        var signalId = Guid.NewGuid();
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.MemberSession);
+
+        var signalService = new RecordingSignalService
+        {
+            GetSignalHandler = (id, _) => Task.FromResult(ServiceResult<SignalDetailItem>.Success(
+                BuildDetailItem(
+                    id,
+                    title: "Piedra desprendida",
+                    description: "Hay una piedra de gran tamano invadiendo parte del sendero.",
+                    ownerUserId: Guid.NewGuid()))),
+            GetSignalCommentsHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(Array.Empty<SignalCommentItem>()))
+        };
+
+        RegisterDetailServices(signalService, sessionService);
+
+        var cut = Render<SignalDetailView>(parameters => parameters.Add(x => x.SignalId, signalId));
+
+        cut.WaitForAssertion(() => Assert.Contains("signal_detail_comment_action", cut.Markup));
+        cut.Find(".signal-detail__comment-trigger").Click();
+        cut.WaitForAssertion(() => Assert.Contains("signal-comment-modal-title", cut.Markup));
+        cut.Find(".signal-detail__comment-actions .btn.btn-ghost").Click();
+        cut.WaitForAssertion(() => Assert.DoesNotContain("signal-comment-modal-title", cut.Markup));
+    }
+
+    [Fact]
+    public void SignalDetailView_DisablesCommentConfirm_WhenTextIsEmpty()
+    {
+        var signalId = Guid.NewGuid();
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.MemberSession);
+
+        var signalService = new RecordingSignalService
+        {
+            GetSignalHandler = (id, _) => Task.FromResult(ServiceResult<SignalDetailItem>.Success(
+                BuildDetailItem(
+                    id,
+                    title: "Piedra desprendida",
+                    description: "Hay una piedra de gran tamano invadiendo parte del sendero.",
+                    ownerUserId: Guid.NewGuid()))),
+            GetSignalCommentsHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(Array.Empty<SignalCommentItem>()))
+        };
+
+        RegisterDetailServices(signalService, sessionService);
+
+        var cut = Render<SignalDetailView>(parameters => parameters.Add(x => x.SignalId, signalId));
+
+        cut.WaitForAssertion(() => Assert.Contains("signal_detail_comment_action", cut.Markup));
+        cut.Find(".signal-detail__comment-trigger").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains("signal_detail_comment_text_required", cut.Markup);
+            Assert.True(cut.Find(".signal-detail__comment-actions .btn.btn-primary").HasAttribute("disabled"));
+        });
+    }
+
+    [Fact]
+    public void SignalDetailView_CreatesCommentAndRefreshesCommentsList()
+    {
+        var signalId = Guid.NewGuid();
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.MemberSession);
+        var commentsLoadCount = 0;
+        CreateSignalCommentRequest? capturedRequest = null;
+
+        var signalService = new RecordingSignalService
+        {
+            GetSignalHandler = (id, _) => Task.FromResult(ServiceResult<SignalDetailItem>.Success(
+                BuildDetailItem(
+                    id,
+                    title: "Piedra desprendida",
+                    description: "Hay una piedra de gran tamano invadiendo parte del sendero.",
+                    ownerUserId: Guid.NewGuid()))),
+            GetSignalCommentsHandler = (_, _) =>
+            {
+                commentsLoadCount++;
+                IReadOnlyList<SignalCommentItem> comments = commentsLoadCount == 1
+                    ? Array.Empty<SignalCommentItem>()
+                    : new[]
+                    {
+                        new SignalCommentItem(
+                            Guid.NewGuid(),
+                            new DateTime(2026, 7, 4, 11, 30, 0, DateTimeKind.Utc),
+                            "Comentario recargado tras el alta.")
+                    };
+
+                return Task.FromResult(ServiceResult<IReadOnlyList<SignalCommentItem>>.Success(comments));
+            },
+            CreateSignalCommentHandler = (request, _) =>
+            {
+                capturedRequest = request;
+                return Task.FromResult(ServiceResult<Guid>.Success(Guid.NewGuid()));
+            }
+        };
+
+        RegisterDetailServices(signalService, sessionService);
+
+        var cut = Render<SignalDetailView>(parameters => parameters.Add(x => x.SignalId, signalId));
+
+        cut.WaitForAssertion(() => Assert.Contains("signal_detail_comment_action", cut.Markup));
+        cut.Find(".signal-detail__comment-trigger").Click();
+        cut.Find("#signal-comment-text").Change("Nuevo comentario operativo");
+        cut.Find(".signal-detail__comment-actions .btn.btn-primary").Click();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.NotNull(capturedRequest);
+            Assert.Equal(signalId, capturedRequest!.SignalId);
+            Assert.Equal("Nuevo comentario operativo", capturedRequest.Text);
+            Assert.Contains("Comentario recargado tras el alta.", cut.Markup);
+            Assert.Contains("signal_detail_comment_success", cut.Markup);
+            Assert.DoesNotContain("signal-comment-modal-title", cut.Markup);
+        });
+    }
+
+    [Fact]
     public void SignalDetailView_HidesEditButton_ForDifferentUser()
     {
         var signalId = Guid.NewGuid();
