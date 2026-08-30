@@ -29,7 +29,7 @@ public sealed class PasswordRecoveryIntegrationTests(CustomWebApplicationFactory
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var payload = await response.Content.ReadFromJsonAsync<PasswordRecoveryPayload>();
         Assert.NotNull(payload);
-        Assert.Equal(NeutralMessage, payload!.Message);
+        Assert.Equal(NeutralMessage, payload.Message);
 
         var sentMessage = Assert.Single(_factory.EmailSender.Messages);
         Assert.Equal(email, sentMessage.To);
@@ -55,7 +55,7 @@ public sealed class PasswordRecoveryIntegrationTests(CustomWebApplicationFactory
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var payload = await response.Content.ReadFromJsonAsync<PasswordRecoveryPayload>();
         Assert.NotNull(payload);
-        Assert.Equal(NeutralMessage, payload!.Message);
+        Assert.Equal(NeutralMessage, payload.Message);
         Assert.Empty(_factory.EmailSender.Messages);
     }
 
@@ -84,7 +84,7 @@ public sealed class PasswordRecoveryIntegrationTests(CustomWebApplicationFactory
         Assert.Equal(HttpStatusCode.OK, resetResponse.StatusCode);
         var resetPayload = await resetResponse.Content.ReadFromJsonAsync<PasswordRecoveryPayload>();
         Assert.NotNull(resetPayload);
-        Assert.Equal(SuccessMessage, resetPayload!.Message);
+        Assert.Equal(SuccessMessage, resetPayload.Message);
 
         var oldLoginResponse = await _httpClient.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = oldPassword });
         Assert.Equal(HttpStatusCode.Unauthorized, oldLoginResponse.StatusCode);
@@ -111,7 +111,7 @@ public sealed class PasswordRecoveryIntegrationTests(CustomWebApplicationFactory
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetailsPayload>();
         Assert.NotNull(problem);
-        Assert.Contains("token", problem!.Detail, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("token", problem.Detail, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public sealed class PasswordRecoveryIntegrationTests(CustomWebApplicationFactory
         var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetailsPayload>();
         Assert.NotNull(problem);
         Assert.Contains(
-            problem!.Errors,
+            problem.Errors,
             error => string.Equals(error.ErrorMessage, "La confirmacion de la nueva contrasena no coincide.", StringComparison.Ordinal));
     }
 
@@ -157,7 +157,7 @@ public sealed class PasswordRecoveryIntegrationTests(CustomWebApplicationFactory
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetailsPayload>();
         Assert.NotNull(problem);
-        Assert.Contains("contrasena", problem!.Detail, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("contrasena", problem.Detail, StringComparison.OrdinalIgnoreCase);
     }
 
     private async Task RegisterAsync(string email, string password)

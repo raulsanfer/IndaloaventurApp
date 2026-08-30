@@ -33,7 +33,7 @@ public sealed class FichaSocioIntegrationTests(CustomWebApplicationFactory facto
 
         var payload = await getResponse.Content.ReadFromJsonAsync<FichaSocioPayload>();
         Assert.NotNull(payload);
-        Assert.Equal("87654321X", payload!.Dni);
+        Assert.Equal("87654321X", payload.Dni);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public sealed class FichaSocioIntegrationTests(CustomWebApplicationFactory facto
     {
         var createResponse = await _httpClient.PostAsJsonAsync("/api/cargos", new { Descripcion = descripcion });
         Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
-        return (await createResponse.Content.ReadFromJsonAsync<int>())!;
+        return (await createResponse.Content.ReadFromJsonAsync<int>());
     }
 
     private async Task<Guid> CreateAndGetMemberUserIdAsync(string? email = null)
