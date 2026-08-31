@@ -19,8 +19,14 @@ using IndaloaventurApp.Web.Client.Infrastructure.Session;
 using IndaloaventurApp.Web.Client.Infrastructure.WordPress;
 using Microsoft.Extensions.DependencyInjection;
 
+/// <summary>
+/// Registers frontend services and HTTP API clients used by shared UI components.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Adds the IndaloAventurApp frontend service graph to the dependency injection container.
+    /// </summary>
     public static IServiceCollection AddIndaloFrontendServices(this IServiceCollection services, string apiBaseUrl, string googleClientId)
     {
         services.AddScoped<ISessionService, SessionService>();
