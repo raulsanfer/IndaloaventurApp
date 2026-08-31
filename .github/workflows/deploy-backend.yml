@@ -25,9 +25,6 @@ jobs:
       - name: Publish
         run: dotnet publish src/backend/src/IndaloAventurApi.Api/IndaloAventurApi.Api.csproj -c Release -o ./publish-backend
 
-      # --------------------------------------------------------
-      # 1. Crear app_offline.htm
-      # --------------------------------------------------------
       - name: Create app_offline.htm
         shell: pwsh
         run: |
@@ -45,28 +42,26 @@ jobs:
           </html>
           "@ | Out-File -FilePath "./publish-backend/app_offline.htm" -Encoding utf8
 
-      # --------------------------------------------------------
-      # 2. Subir SOLO app_offline.htm
-      # --------------------------------------------------------
       - name: Put application offline
+        id: put_offline
         shell: pwsh
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           curl.exe `
+            --fail `
+            --show-error `
             --ftp-create-dirs `
-            --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" `
+            --user "$($env:FTP_USERNAME):$($env:FTP_PASSWORD)" `
             -T "./publish-backend/app_offline.htm" `
-            "ftp://${{ secrets.FTP_SERVER }}/app_offline.htm"
+            "ftp://$($env:FTP_SERVER)/app_offline.htm"
 
-      # --------------------------------------------------------
-      # 3. Esperar a que IIS descargue la aplicación
-      # --------------------------------------------------------
       - name: Wait for application shutdown
         shell: pwsh
         run: Start-Sleep -Seconds 10
 
-      # --------------------------------------------------------
-      # 4. Desplegar backend completo
-      # --------------------------------------------------------
       - name: Deploy FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
@@ -75,13 +70,17 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish-backend/
 
-      # --------------------------------------------------------
-      # 5. Quitar app_offline.htm para levantar la API
-      # --------------------------------------------------------
       - name: Bring application online
+        if: always() && steps.put_offline.outcome == 'success'
         shell: pwsh
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
         run: |
           curl.exe `
-            --user "${{ secrets.FTP_USERNAME }}:${{ secrets.FTP_PASSWORD }}" `
+            --fail `
+            --show-error `
+            --user "$($env:FTP_USERNAME):$($env:FTP_PASSWORD)" `
             --quote "DELE app_offline.htm" `
-            "ftp://${{ secrets.FTP_SERVER }}/"
+            "ftp://$($env:FTP_SERVER)/"
