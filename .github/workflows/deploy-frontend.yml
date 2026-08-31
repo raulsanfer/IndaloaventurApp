@@ -25,9 +25,6 @@ jobs:
       - name: Publish
         run: dotnet publish src/blazorapp/IndaloaventurApp.Web/IndaloaventurApp.Web/IndaloaventurApp.Web.csproj -c Release -o ./publish-frontend
 
-      # --------------------------------------------------------
-      # 1. Crear app_offline.htm
-      # --------------------------------------------------------
       - name: Create app_offline.htm
         shell: pwsh
         run: |
@@ -45,32 +42,26 @@ jobs:
           </html>
           "@ | Out-File -FilePath "./publish-frontend/app_offline.htm" -Encoding utf8
 
-      # --------------------------------------------------------
-      # 2. Subir SOLO app_offline.htm
-      #    Esto hace que IIS detenga la aplicación
-      # --------------------------------------------------------
       - name: Put application offline
+        id: put_offline
         shell: pwsh
+        env:
+          FTP_SERVER_APP: ${{ secrets.FTP_SERVER_APP }}
+          FTP_USERNAME_APP: ${{ secrets.FTP_USERNAME_APP }}
+          FTP_PASSWORD_APP: ${{ secrets.FTP_PASSWORD_APP }}
         run: |
           curl.exe `
+            --fail `
+            --show-error `
             --ftp-create-dirs `
-            --user "${{ secrets.FTP_USERNAME_APP }}:${{ secrets.FTP_PASSWORD_APP }}" `
+            --user "$($env:FTP_USERNAME_APP):$($env:FTP_PASSWORD_APP)" `
             -T "./publish-frontend/app_offline.htm" `
-            "ftp://${{ secrets.FTP_SERVER_APP }}/app_offline.htm"
+            "ftp://$($env:FTP_SERVER_APP)/app_offline.htm"
 
-      # --------------------------------------------------------
-      # 3. Dar tiempo a IIS para descargar la aplicación
-      # --------------------------------------------------------
       - name: Wait for application shutdown
         shell: pwsh
         run: Start-Sleep -Seconds 10
 
-      # --------------------------------------------------------
-      # 4. Desplegar aplicación
-      #
-      # app_offline.htm sigue dentro del publish,
-      # por lo que permanece activo durante todo el deploy.
-      # --------------------------------------------------------
       - name: Deploy FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
@@ -79,14 +70,17 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD_APP }}
           local-dir: ./publish-frontend/
 
-      # --------------------------------------------------------
-      # 5. Eliminar app_offline.htm
-      #    IIS volverá a arrancar la aplicación
-      # --------------------------------------------------------
       - name: Bring application online
+        if: always() && steps.put_offline.outcome == 'success'
         shell: pwsh
+        env:
+          FTP_SERVER_APP: ${{ secrets.FTP_SERVER_APP }}
+          FTP_USERNAME_APP: ${{ secrets.FTP_USERNAME_APP }}
+          FTP_PASSWORD_APP: ${{ secrets.FTP_PASSWORD_APP }}
         run: |
           curl.exe `
-            --user "${{ secrets.FTP_USERNAME_APP }}:${{ secrets.FTP_PASSWORD_APP }}" `
+            --fail `
+            --show-error `
+            --user "$($env:FTP_USERNAME_APP):$($env:FTP_PASSWORD_APP)" `
             --quote "DELE app_offline.htm" `
-            "ftp://${{ secrets.FTP_SERVER_APP }}/"
+            "ftp://$($env:FTP_SERVER_APP)/"
