@@ -1,0 +1,4 @@
+docs/_site/
+docs/api/**
+!docs/api/
+!docs/api/index.md
