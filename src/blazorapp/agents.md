@@ -8,6 +8,7 @@ You are an AI coding assistant operating in a repository that uses:
 - Treat `openspec/changes/<change-name>/` as the proposed/active change.
 - Only mark tasks complete when verification (tests) passes.
 - Keep changes small, deterministic, and test-backed.
+- Read and apply `security.md` before every planning, implementation, review, and validation task. Treat it as the repository security skill, based on OWASP Top 10 guidance.
 
 ## Workflow
 
@@ -23,15 +24,17 @@ When asked to plan or create specs:
 ### 2) Implement (Tasks -> Code)
 When asked to implement:
 1. Identify the active change folder under `openspec/changes/`.
-2. Implement tasks in order from `tasks.md`.
-3. Run tests frequently and fix failures.
-4. Update the checkbox status in `tasks.md` only when verified.
+2. Read `security.md` and identify the relevant security rules for the change.
+3. Implement tasks in order from `tasks.md`.
+4. Run tests frequently and fix failures.
+5. Update the checkbox status in `tasks.md` only when verified.
 
 ### 3) Validate (Acceptance criteria)
 When asked to validate:
 1. Map scenarios/acceptance criteria to tests/commands.
-2. Run the project test command (commonly `npm test`).
-3. Report which requirements are proven and what gaps remain.
+2. Check the applicable `security.md` rules and verify security-sensitive scenarios where relevant.
+3. Run the project test command (commonly `npm test`).
+4. Report which requirements are proven and what gaps remain.
 
 ### 4) Archive
 When asked to archive:
