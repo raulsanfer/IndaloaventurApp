@@ -31,6 +31,13 @@ public static class IdentityBootstrapper
         await EnsureRoleExistsAsync(roleManager, IdentityRoles.Admin);
         await EnsureRoleExistsAsync(roleManager, IdentityRoles.Member);
 
+        if (!adminOptions.Enabled)
+        {
+            return;
+        }
+
+        ValidateAdminSeedOptions(adminOptions);
+
         var adminUser = await userManager.FindByEmailAsync(adminOptions.Email);
         if (adminUser is null)
         {
@@ -62,6 +69,19 @@ public static class IdentityBootstrapper
         if (!await userManager.IsInRoleAsync(adminUser, IdentityRoles.Admin))
         {
             await userManager.AddToRoleAsync(adminUser, IdentityRoles.Admin);
+        }
+    }
+
+    private static void ValidateAdminSeedOptions(AdminSeedOptions adminOptions)
+    {
+        if (string.IsNullOrWhiteSpace(adminOptions.Email))
+        {
+            throw new InvalidOperationException("Admin seed is enabled but 'AdminSeed:Email' is not configured.");
+        }
+
+        if (string.IsNullOrWhiteSpace(adminOptions.Password))
+        {
+            throw new InvalidOperationException("Admin seed is enabled but 'AdminSeed:Password' is not configured.");
         }
     }
 

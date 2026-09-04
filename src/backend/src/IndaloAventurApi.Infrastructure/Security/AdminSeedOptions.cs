@@ -4,6 +4,7 @@ public sealed class AdminSeedOptions
 {
     public const string SectionName = "AdminSeed";
 
-    public string Email { get; init; } = "admin@indaloaventura.local";
-    public string Password { get; init; } = "Admin1234A";
+    public bool Enabled { get; init; }
+    public string Email { get; init; } = string.Empty;
+    public string Password { get; init; } = string.Empty;
 }

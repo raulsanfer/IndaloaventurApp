@@ -305,16 +305,7 @@ public sealed class LicenciasFederativasIntegrationTests(CustomWebApplicationFac
 
     private async Task AuthenticateAsAdminAsync()
     {
-        await EnsureRolesAndAdminAsync();
-
-        var loginResponse = await _httpClient.PostAsJsonAsync("/api/auth/login", new
-        {
-            Email = "admin@indaloaventura.local",
-            Password = "Admin1234A"
-        });
-
-        var payload = await loginResponse.Content.ReadFromJsonAsync<LoginPayload>();
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", payload!.AccessToken);
+        await _factory.AuthenticateAsAdminAsync(_httpClient);
     }
 
     private async Task<(Guid UserId, string Email, SolicitudLicenciaFederativaPayload Solicitud)> CreateSolicitudAsMemberAsync(string email, int temporada, int tarifaLicenciaFederativaId)
@@ -361,37 +352,7 @@ public sealed class LicenciasFederativasIntegrationTests(CustomWebApplicationFac
 
     private async Task EnsureRolesAndAdminAsync()
     {
-        using var scope = _services.CreateScope();
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Usuario>>();
-
-        if (!await roleManager.RoleExistsAsync(IdentityRoles.Admin))
-        {
-            await roleManager.CreateAsync(new IdentityRole<Guid>(IdentityRoles.Admin));
-        }
-
-        if (!await roleManager.RoleExistsAsync(IdentityRoles.Member))
-        {
-            await roleManager.CreateAsync(new IdentityRole<Guid>(IdentityRoles.Member));
-        }
-
-        var admin = await userManager.FindByEmailAsync("admin@indaloaventura.local");
-        if (admin is null)
-        {
-            admin = new Usuario
-            {
-                UserName = "admin@indaloaventura.local",
-                Email = "admin@indaloaventura.local",
-                EmailConfirmed = true,
-                IsMember = false
-            };
-            await userManager.CreateAsync(admin, "Admin1234A");
-        }
-
-        if (!await userManager.IsInRoleAsync(admin, IdentityRoles.Admin))
-        {
-            await userManager.AddToRoleAsync(admin, IdentityRoles.Admin);
-        }
+        await _factory.EnsureRolesAndAdminAsync();
     }
 
     private sealed record LoginPayload(string AccessToken, string TokenType, int ExpiresInSeconds, bool IsMember);

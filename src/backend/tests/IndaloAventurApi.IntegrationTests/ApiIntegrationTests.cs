@@ -792,50 +792,12 @@ public sealed class ApiIntegrationTests : IClassFixture<CustomWebApplicationFact
 
     private async Task AuthenticateAsAdminAsync()
     {
-        await EnsureRolesAndAdminAsync();
-
-        var loginResponse = await _httpClient.PostAsJsonAsync("/api/auth/login", new
-        {
-            Email = "admin@indaloaventura.local",
-            Password = "Admin1234A"
-        });
-
-        var payload = await loginResponse.Content.ReadFromJsonAsync<LoginPayload>();
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", payload!.AccessToken);
+        await _factory.AuthenticateAsAdminAsync(_httpClient);
     }
 
     private async Task EnsureRolesAndAdminAsync()
     {
-        using var scope = _factory.Services.CreateScope();
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Usuario>>();
-
-        if (!await roleManager.RoleExistsAsync(IdentityRoles.Admin))
-        {
-            await roleManager.CreateAsync(new IdentityRole<Guid>(IdentityRoles.Admin));
-        }
-        if (!await roleManager.RoleExistsAsync(IdentityRoles.Member))
-        {
-            await roleManager.CreateAsync(new IdentityRole<Guid>(IdentityRoles.Member));
-        }
-
-        var admin = await userManager.FindByEmailAsync("admin@indaloaventura.local");
-        if (admin is null)
-        {
-            admin = new Usuario
-            {
-                UserName = "admin@indaloaventura.local",
-                Email = "admin@indaloaventura.local",
-                EmailConfirmed = true,
-                IsMember = false
-            };
-            await userManager.CreateAsync(admin, "Admin1234A");
-        }
-
-        if (!await userManager.IsInRoleAsync(admin, IdentityRoles.Admin))
-        {
-            await userManager.AddToRoleAsync(admin, IdentityRoles.Admin);
-        }
+        await _factory.EnsureRolesAndAdminAsync();
     }
 
     private async Task SetUserMembershipAsync(string email, bool isMember)
@@ -880,6 +842,9 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
     public const string TestJwtAudience = "IndaloAventurApp.Tests";
     public const string TestJwtKey = "indaloaventurapi-tests-signing-key-1234567890";
 
+    public string TestAdminEmail { get; } = $"admin-{Guid.NewGuid():N}@club.test";
+    public string TestAdminPassword { get; } = CreateTestPassword();
+
     private readonly string _databaseName = $"indalo-api-tests-{Guid.NewGuid():N}";
     private readonly string _signalImageRoot = Path.Combine(Path.GetTempPath(), $"indalo-signal-images-{Guid.NewGuid():N}");
     private readonly FakeEmailSender _fakeEmailSender = new();
@@ -894,6 +859,8 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
 
     public void ResetWordPressService() => _fakeWordPressService.Reset();
 
+    private static string CreateTestPassword() => $"A1a{Guid.NewGuid():N}";
+
     protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
@@ -903,6 +870,9 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseSetting("Jwt:Audience", TestJwtAudience);
         builder.UseSetting("Jwt:Key", TestJwtKey);
         builder.UseSetting("Jwt:AccessTokenMinutes", "60");
+        builder.UseSetting("AdminSeed:Enabled", "true");
+        builder.UseSetting("AdminSeed:Email", TestAdminEmail);
+        builder.UseSetting("AdminSeed:Password", TestAdminPassword);
         builder.UseSetting("Testing:UseEnsureCreated", "true");
         builder.UseSetting("SignalImageStorage:RootPath", _signalImageRoot);
         builder.ConfigureServices(services =>
@@ -945,6 +915,64 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             services.AddSingleton(_fakeEmailSender);
             services.AddSingleton<IEmailSender>(_fakeEmailSender);
         });
+    }
+
+    public async Task AuthenticateAsAdminAsync(HttpClient httpClient)
+    {
+        await EnsureRolesAndAdminAsync();
+
+        var loginResponse = await httpClient.PostAsJsonAsync("/api/auth/login", new
+        {
+            Email = TestAdminEmail,
+            Password = TestAdminPassword
+        });
+
+        Assert.Equal(HttpStatusCode.OK, loginResponse.StatusCode);
+
+        var payload = await loginResponse.Content.ReadFromJsonAsync<FactoryLoginPayload>();
+        Assert.NotNull(payload);
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", payload!.AccessToken);
+    }
+
+    public async Task EnsureRolesAndAdminAsync()
+    {
+        using var scope = Services.CreateScope();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<Usuario>>();
+
+        if (!await roleManager.RoleExistsAsync(IdentityRoles.Admin))
+        {
+            var result = await roleManager.CreateAsync(new IdentityRole<Guid>(IdentityRoles.Admin));
+            Assert.True(result.Succeeded, string.Join("; ", result.Errors.Select(x => x.Description)));
+        }
+
+        if (!await roleManager.RoleExistsAsync(IdentityRoles.Member))
+        {
+            var result = await roleManager.CreateAsync(new IdentityRole<Guid>(IdentityRoles.Member));
+            Assert.True(result.Succeeded, string.Join("; ", result.Errors.Select(x => x.Description)));
+        }
+
+        var admin = await userManager.FindByEmailAsync(TestAdminEmail);
+        if (admin is null)
+        {
+            admin = new Usuario
+            {
+                UserName = TestAdminEmail,
+                Email = TestAdminEmail,
+                EmailConfirmed = true,
+                LockoutEnabled = true,
+                IsMember = false
+            };
+
+            var result = await userManager.CreateAsync(admin, TestAdminPassword);
+            Assert.True(result.Succeeded, string.Join("; ", result.Errors.Select(x => x.Description)));
+        }
+
+        if (!await userManager.IsInRoleAsync(admin, IdentityRoles.Admin))
+        {
+            var result = await userManager.AddToRoleAsync(admin, IdentityRoles.Admin);
+            Assert.True(result.Succeeded, string.Join("; ", result.Errors.Select(x => x.Description)));
+        }
     }
 
     protected override void Dispose(bool disposing)
@@ -1052,6 +1080,8 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             return connection;
         }
     }
+
+    private sealed record FactoryLoginPayload(string AccessToken);
 }
 
 public sealed class FakeEmailSender : IEmailSender
