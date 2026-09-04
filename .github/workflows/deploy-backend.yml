@@ -25,6 +25,43 @@ jobs:
       - name: Publish
         run: dotnet publish src/backend/src/IndaloAventurApi.Api/IndaloAventurApi.Api.csproj -c Release -o ./publish-backend
 
+      - name: Create app_offline.htm
+        shell: pwsh
+        run: |
+          @"
+          <!DOCTYPE html>
+          <html>
+          <head>
+              <meta charset="utf-8" />
+              <title>Mantenimiento</title>
+          </head>
+          <body>
+              <h1>API en mantenimiento</h1>
+              <p>Estamos actualizando el servicio. Inténtalo de nuevo en unos minutos.</p>
+          </body>
+          </html>
+          "@ | Out-File -FilePath "./publish-backend/app_offline.htm" -Encoding utf8
+
+      - name: Put application offline
+        id: put_offline
+        shell: pwsh
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          curl.exe `
+            --fail `
+            --show-error `
+            --ftp-create-dirs `
+            --user "$($env:FTP_USERNAME):$($env:FTP_PASSWORD)" `
+            -T "./publish-backend/app_offline.htm" `
+            "ftp://$($env:FTP_SERVER)/app_offline.htm"
+
+      - name: Wait for application shutdown
+        shell: pwsh
+        run: Start-Sleep -Seconds 10
+
       - name: Deploy FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
@@ -32,3 +69,18 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./publish-backend/
+
+      - name: Bring application online
+        if: always() && steps.put_offline.outcome == 'success'
+        shell: pwsh
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+        run: |
+          curl.exe `
+            --fail `
+            --show-error `
+            --user "$($env:FTP_USERNAME):$($env:FTP_PASSWORD)" `
+            --quote "DELE app_offline.htm" `
+            "ftp://$($env:FTP_SERVER)/"

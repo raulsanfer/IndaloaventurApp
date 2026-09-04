@@ -1,0 +1,16 @@
+- name: Autenticacion
+  href: auth.md
+- name: Club
+  href: club.md
+- name: Licencias federativas
+  href: licenses.md
+- name: Socios y perfil
+  href: members-profile.md
+- name: Signals
+  href: signals.md
+- name: Alertas alimentarias
+  href: food-alerts.md
+- name: Settings y admin
+  href: settings-admin.md
+- name: PWA y navegacion
+  href: pwa-navigation.md

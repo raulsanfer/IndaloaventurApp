@@ -1,0 +1,28 @@
+- name: Inicio
+  href: index.md
+- name: Desarrollo
+  href: development.md
+- name: Arquitectura
+  items:
+    - name: Vista general
+      href: architecture/overview.md
+    - name: Estructura del repositorio
+      href: architecture/project-structure.md
+    - name: Inyeccion de dependencias
+      href: architecture/dependency-injection.md
+    - name: Autenticacion y sesion
+      href: architecture/authentication-session.md
+    - name: Clientes HTTP
+      href: architecture/http-api-clients.md
+    - name: SharedUI y componentes
+      href: architecture/shared-ui.md
+    - name: Estilos
+      href: architecture/styling.md
+    - name: PWA y navegacion
+      href: architecture/pwa-navigation.md
+    - name: Testing
+      href: architecture/testing-strategy.md
+- name: Features
+  href: features/toc.yml
+- name: Referencia API
+  href: api/

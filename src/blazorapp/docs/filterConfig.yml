@@ -1,0 +1,5 @@
+apiRules:
+  - exclude:
+      uidRegex: ^IndaloaventurApp\.Frontend\.Tests
+  - include:
+      uidRegex: ^IndaloaventurApp\.
