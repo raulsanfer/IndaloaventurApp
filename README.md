@@ -7,6 +7,8 @@ La app permite centralizar la información de sus socios y ofrece un espacio dig
 
 La solución está formada por un frontend web y una API backend independientes. El frontend proporciona la experiencia de usuario y consume los servicios de la API, mientras que el backend gestiona la autenticación, la lógica de negocio, la persistencia y las integraciones externas.
 
+El despliegue se ha automatizado sobre el mismo hosting compartido de la web principal, configurando Github Actions para front y back que lanzan la publicación por FTP al hosting. 
+
 ## b. Stack tecnológico utilizado
 
 - **.NET 9** como plataforma común.
