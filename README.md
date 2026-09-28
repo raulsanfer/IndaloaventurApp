@@ -2,7 +2,8 @@
 
 ## a. Descripción general del proyecto
 
-IndaloAventurApp es una aplicación web para la gestión y comunicación del club IndaloAventura que nace en un primer momento como TFM del Master de Desarrollo con IA de BigSchool. La app permite centralizar la información de sus socios y ofrece un espacio digital para consultar recursos del club, gestionar datos personales y participar en la comunicación relacionada con las actividades de montaña.
+IndaloAventurApp es una aplicación web para la gestión y comunicación del club IndaloAventura que nace en un primer momento como TFM del Master de Desarrollo con IA de BigSchool. Ha sido realizada desde su concepción con IA y SDD bajo mi supervisión.
+La app permite centralizar la información de sus socios y ofrece un espacio digital para consultar recursos del club, gestionar datos personales y participar en la comunicación relacionada con las actividades de montaña.
 
 La solución está formada por un frontend web y una API backend independientes. El frontend proporciona la experiencia de usuario y consume los servicios de la API, mientras que el backend gestiona la autenticación, la lógica de negocio, la persistencia y las integraciones externas.
 
