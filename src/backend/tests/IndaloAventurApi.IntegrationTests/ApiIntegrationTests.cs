@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,7 +9,7 @@ using IndaloAventurApi.Application.Abstractions.Persistence;
 using IndaloAventurApi.Application.Abstractions.Security;
 using IndaloAventurApi.Application.Abstractions.WordPress;
 using IndaloAventurApi.Domain.FichasContacto;
-using IndaloAventurApi.Infrastructure.Persistence;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using IndaloAventurApi.Infrastructure.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -502,6 +502,121 @@ public sealed class ApiIntegrationTests : IClassFixture<CustomWebApplicationFact
             comments.OrderBy(x => x.FechaComentario),
             first => Assert.Equal("Paso estrecho pero transitable.", first.Texto),
             second => Assert.Equal("Mejor llevar precaucion.", second.Texto));
+    }
+
+    [Fact]
+    public async Task UserManagement_AdminCanChangeAnotherUsersPassword_AndInvalidateExistingToken()
+    {
+        await EnsureRolesAndAdminAsync();
+        await AuthenticateAsAdminAsync();
+
+        var email = $"managed-password-{Guid.NewGuid():N}@club.test";
+        const string previousPassword = "Test1234A";
+        const string newPassword = "Nueva123A";
+        var userId = await CreateManagedUserAsync(email);
+
+        _httpClient.DefaultRequestHeaders.Authorization = null;
+        var targetLogin = await _httpClient.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = previousPassword });
+        Assert.Equal(HttpStatusCode.OK, targetLogin.StatusCode);
+        var targetToken = (await targetLogin.Content.ReadFromJsonAsync<LoginPayload>())!.AccessToken;
+
+        await AuthenticateAsAdminAsync();
+        var changeResponse = await _httpClient.PutAsJsonAsync($"/api/users/{userId:D}/password", new { NewPassword = newPassword });
+        Assert.Equal(HttpStatusCode.NoContent, changeResponse.StatusCode);
+        Assert.Equal(0, changeResponse.Content.Headers.ContentLength ?? 0);
+
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", targetToken);
+        var oldTokenResponse = await _httpClient.GetAsync("/api/agenda-telefonica");
+        Assert.Equal(HttpStatusCode.Unauthorized, oldTokenResponse.StatusCode);
+
+        _httpClient.DefaultRequestHeaders.Authorization = null;
+        var oldPasswordLogin = await _httpClient.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = previousPassword });
+        Assert.Equal(HttpStatusCode.Unauthorized, oldPasswordLogin.StatusCode);
+
+        var newPasswordLogin = await _httpClient.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = newPassword });
+        Assert.Equal(HttpStatusCode.OK, newPasswordLogin.StatusCode);
+    }
+
+    [Fact]
+    public async Task UserManagement_PasswordChange_RejectsInvalidBodyAndPreservesPassword()
+    {
+        await EnsureRolesAndAdminAsync();
+        await AuthenticateAsAdminAsync();
+
+        var email = $"managed-password-invalid-{Guid.NewGuid():N}@club.test";
+        const string password = "Test1234A";
+        var userId = await CreateManagedUserAsync(email);
+
+        var invalidResponse = await _httpClient.PutAsJsonAsync($"/api/users/{userId:D}/password", new { NewPassword = "invalid!" });
+        Assert.Equal(HttpStatusCode.BadRequest, invalidResponse.StatusCode);
+
+        var extraPropertyResponse = await _httpClient.PutAsJsonAsync($"/api/users/{userId:D}/password", new { NewPassword = "Nueva123A", Unexpected = "ignored" });
+        Assert.Equal(HttpStatusCode.BadRequest, extraPropertyResponse.StatusCode);
+
+        _httpClient.DefaultRequestHeaders.Authorization = null;
+        var unchangedPasswordLogin = await _httpClient.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = password });
+        Assert.Equal(HttpStatusCode.OK, unchangedPasswordLogin.StatusCode);
+    }
+
+    [Fact]
+    public async Task UserManagement_AdminCanChangeOwnPassword()
+    {
+        await EnsureRolesAndAdminAsync();
+        await AuthenticateAsAdminAsync();
+
+        var email = $"managed-self-password-{Guid.NewGuid():N}@club.test";
+        const string previousPassword = "Test1234A";
+        const string newPassword = "Propia123A";
+        var createResponse = await _httpClient.PostAsJsonAsync("/api/users", new
+        {
+            Email = email,
+            Password = previousPassword,
+            Roles = new[] { "Admin" }
+        });
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        var userId = await createResponse.Content.ReadFromJsonAsync<Guid>();
+
+        _httpClient.DefaultRequestHeaders.Authorization = null;
+        var ownLogin = await _httpClient.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = previousPassword });
+        Assert.Equal(HttpStatusCode.OK, ownLogin.StatusCode);
+        var ownToken = (await ownLogin.Content.ReadFromJsonAsync<LoginPayload>())!.AccessToken;
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ownToken);
+
+        var changeResponse = await _httpClient.PutAsJsonAsync($"/api/users/{userId:D}/password", new { NewPassword = newPassword });
+        Assert.Equal(HttpStatusCode.NoContent, changeResponse.StatusCode);
+
+        _httpClient.DefaultRequestHeaders.Authorization = null;
+        var oldPasswordLogin = await _httpClient.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = previousPassword });
+        Assert.Equal(HttpStatusCode.Unauthorized, oldPasswordLogin.StatusCode);
+        var newPasswordLogin = await _httpClient.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = newPassword });
+        Assert.Equal(HttpStatusCode.OK, newPasswordLogin.StatusCode);
+    }
+
+    [Fact]
+    public async Task UserManagement_PasswordChange_RequiresAdminAndLimitsRepeatedAttempts()
+    {
+        await EnsureRolesAndAdminAsync();
+        var userId = Guid.NewGuid();
+
+        var anonymousResponse = await _httpClient.PutAsJsonAsync($"/api/users/{userId:D}/password", new { NewPassword = "Nueva123A" });
+        Assert.Equal(HttpStatusCode.Unauthorized, anonymousResponse.StatusCode);
+
+        await AuthenticateAsMemberAsync();
+        var memberResponse = await _httpClient.PutAsJsonAsync($"/api/users/{userId:D}/password", new { NewPassword = "Nueva123A" });
+        Assert.Equal(HttpStatusCode.Forbidden, memberResponse.StatusCode);
+
+        await AuthenticateAsAdminAsync();
+        var missingUserResponse = await _httpClient.PutAsJsonAsync($"/api/users/{Guid.NewGuid():D}/password", new { NewPassword = "Nueva123A" });
+        Assert.Equal(HttpStatusCode.NotFound, missingUserResponse.StatusCode);
+
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"/api/users/{userId:D}/password", new { NewPassword = "invalid!" });
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        var limitedResponse = await _httpClient.PutAsJsonAsync($"/api/users/{userId:D}/password", new { NewPassword = "invalid!" });
+        Assert.Equal(HttpStatusCode.TooManyRequests, limitedResponse.StatusCode);
     }
 
     [Fact]

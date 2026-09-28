@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System.Data;
 
-namespace IndaloAventurApi.Infrastructure.Persistence;
+namespace IndaloAventurApi.Infrastructure.Persistence.Querying;
 
 public sealed class SqlQueryConnectionFactory(IConfiguration configuration) : IQueryConnectionFactory
 {

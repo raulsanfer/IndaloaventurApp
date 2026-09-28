@@ -57,6 +57,7 @@ public static class ApiAuthorizationMatrix
         new("GET", "/api/users", ApiAccessClassification.Admin, "Policy: Admin", "Listado de usuarios gestionados."),
         new("POST", "/api/users", ApiAccessClassification.Admin, "Policy: Admin", "Alta de usuario administrada."),
         new("PUT", "/api/users/{userId:guid}", ApiAccessClassification.Admin, "Policy: Admin", "Edicion de usuario administrada."),
+        new("PUT", "/api/users/{userId:guid}/password", ApiAccessClassification.Admin, "Policy: AdminWithRecentAuthentication + rate limit", "Cambio de contrasena administrativo."),
         new("POST", "/api/users/{userId:guid}/deactivate", ApiAccessClassification.Admin, "Policy: Admin", "Desactivacion logica."),
         new("POST", "/api/users/{userId:guid}/reactivate", ApiAccessClassification.Admin, "Policy: Admin", "Reactivacion logica."),
 

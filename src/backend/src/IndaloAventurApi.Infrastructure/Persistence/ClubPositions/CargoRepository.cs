@@ -1,5 +1,6 @@
 using IndaloAventurApi.Application.Abstractions.ClubPositions;
 using IndaloAventurApi.Domain.ClubPositions;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using Microsoft.EntityFrameworkCore;
 
 namespace IndaloAventurApi.Infrastructure.Persistence.ClubPositions;

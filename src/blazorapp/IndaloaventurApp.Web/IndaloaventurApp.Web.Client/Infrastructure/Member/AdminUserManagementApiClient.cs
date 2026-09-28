@@ -253,6 +253,57 @@ public sealed class AdminUserManagementApiClient(HttpClient httpClient, ISession
         }
     }
 
+    public async Task<ServiceResult<bool>> ChangeUserPasswordAsync(Guid userId, AdminUserPasswordChangeRequest request, CancellationToken cancellationToken = default)
+    {
+        if (!IsValidPassword(request.NewPassword))
+        {
+            return ServiceResult<bool>.Failure(new ServiceError("users.password_validation", "La contraseña no cumple el formato permitido."));
+        }
+
+        try
+        {
+            using var message = CreateAuthorizedRequest(HttpMethod.Put, $"{UsersEndpoint}/{userId}/password");
+            message.Content = JsonContent.Create(new ChangeUserPasswordApiRequest(request.NewPassword));
+
+            using var response = await httpClient.SendAsync(message, cancellationToken);
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("auth.session_invalid", "Sesión inválida."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("users.forbidden", "Acceso denegado."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("users.not_found", "No se encontró el usuario solicitado."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("users.password_validation", "La contraseña no cumple el formato permitido."));
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("users.password_change_unavailable", "No se pudo cambiar la contraseña."));
+            }
+
+            return ServiceResult<bool>.Success(true);
+        }
+        catch (HttpRequestException)
+        {
+            return ServiceResult<bool>.Failure(new ServiceError("users.password_change_unavailable", "No se pudo cambiar la contraseña."));
+        }
+        catch (TaskCanceledException)
+        {
+            return ServiceResult<bool>.Failure(new ServiceError("users.password_change_timeout", "Tiempo de espera agotado."));
+        }
+    }
+
     public async Task<ServiceResult<bool>> DeactivateUserAsync(Guid userId, CancellationToken cancellationToken = default)
         => await ChangeUserStateAsync(userId, "deactivate", cancellationToken);
 
@@ -384,6 +435,11 @@ public sealed class AdminUserManagementApiClient(HttpClient httpClient, ISession
         return $"{digits:D8}A";
     }
 
+    private static bool IsValidPassword(string? password)
+        => !string.IsNullOrEmpty(password)
+            && password.Length <= 20
+            && password.All(character => character is >= 'A' and <= 'Z' or >= 'a' and <= 'z' or >= '0' and <= '9');
+
     private sealed record ManagedUserDto(Guid UserId, string? Email, bool IsMember, bool? IsActive, string[]? Roles);
 
     private sealed record MemberFileDto(
@@ -421,4 +477,6 @@ public sealed class AdminUserManagementApiClient(HttpClient httpClient, ISession
         bool AceptaPoliticaPrivacidad,
         bool AceptaUsoImagenes,
         bool AceptaCobroCuenta);
+
+    private sealed record ChangeUserPasswordApiRequest(string NewPassword);
 }

@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using IndaloAventurApi.Domain.LicenciasFederativas;
-using IndaloAventurApi.Infrastructure.Persistence;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using IndaloAventurApi.Infrastructure.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;

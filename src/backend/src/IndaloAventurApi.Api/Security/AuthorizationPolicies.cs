@@ -18,6 +18,10 @@ public static class AuthorizationPolicies
     /// </summary>
     public const string Admin = "Admin";
     /// <summary>
+    /// Politica para administradores con autenticacion reciente.
+    /// </summary>
+    public const string AdminWithRecentAuthentication = "AdminWithRecentAuthentication";
+    /// <summary>
     /// Politica para usuarios con rol de miembro tecnico o administrador.
     /// </summary>
     public const string MemberOrAdmin = "MemberOrAdmin";
@@ -36,6 +40,22 @@ public static class AuthorizationPolicies
         {
             options.AddPolicy(Authenticated, policy => policy.RequireAuthenticatedUser());
             options.AddPolicy(Admin, policy => policy.RequireRole(IdentityRoles.Admin));
+            options.AddPolicy(AdminWithRecentAuthentication, policy =>
+            {
+                policy.RequireRole(IdentityRoles.Admin);
+                policy.RequireAssertion(context =>
+                {
+                    var value = context.User.FindFirst(AuthClaimNames.AuthenticationTime)?.Value;
+                    if (!long.TryParse(value, out var unixTime))
+                    {
+                        return false;
+                    }
+
+                    var authenticationTime = DateTimeOffset.FromUnixTimeSeconds(unixTime);
+                    var elapsed = DateTimeOffset.UtcNow - authenticationTime;
+                    return elapsed >= TimeSpan.Zero && elapsed <= TimeSpan.FromMinutes(5);
+                });
+            });
             options.AddPolicy(MemberOrAdmin, policy => policy.RequireRole(IdentityRoles.Admin, IdentityRoles.Member));
             options.AddPolicy(ClubMember, policy =>
             {

@@ -3,7 +3,7 @@ using IndaloAventurApi.Domain.ClubPositions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace IndaloAventurApi.Infrastructure.Persistence.Configurations;
+namespace IndaloAventurApi.Infrastructure.Persistence.FichasSocio;
 
 public sealed class FichaSocioConfiguration : IEntityTypeConfiguration<FichaSocio>
 {

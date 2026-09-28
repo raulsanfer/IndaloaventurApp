@@ -270,6 +270,42 @@ public sealed class AdminUserManagementApiClientTests
         Assert.True(result.Value);
     }
 
+    /// <summary>
+    /// Covers scenario: administrative password change uses its dedicated endpoint and payload.
+    /// </summary>
+    [Fact]
+    public async Task ChangeUserPasswordAsync_PutsDedicatedPayload()
+    {
+        var userId = Guid.NewGuid();
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+
+        var handler = new StubHttpMessageHandler(async request =>
+        {
+            Assert.Equal(HttpMethod.Put, request.Method);
+            Assert.Equal($"/api/users/{userId}/password", request.RequestUri?.AbsolutePath);
+
+            var rawJson = await request.Content!.ReadAsStringAsync();
+            using var payload = JsonDocument.Parse(rawJson);
+            Assert.Equal("Clave123", payload.RootElement.GetProperty("newPassword").GetString());
+            Assert.Single(payload.RootElement.EnumerateObject());
+
+            return new HttpResponseMessage(HttpStatusCode.NoContent);
+        });
+
+        using var httpClient = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://localhost")
+        };
+
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        var result = await sut.ChangeUserPasswordAsync(userId, new AdminUserPasswordChangeRequest("Clave123"));
+
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Value);
+    }
+
     private sealed record UpdateMemberFileApiPayload(
         int? CargoId,
         string? Nombre,

@@ -482,6 +482,23 @@
   <data name="settings_admin_member_file_deactivate_success" xml:space="preserve"><value>La cuenta del usuario se ha desactivado correctamente.</value></data>
   <data name="settings_admin_member_file_reactivate_success" xml:space="preserve"><value>La cuenta del usuario se ha reactivado correctamente.</value></data>
   <data name="settings_admin_member_file_state_change_error" xml:space="preserve"><value>No pudimos cambiar el estado de la cuenta del usuario.</value></data>
+  <data name="settings_admin_password_action" xml:space="preserve"><value>Cambiar contraseña</value></data>
+  <data name="settings_admin_password_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de cambio administrativo de contraseña</value></data>
+  <data name="settings_admin_password_title" xml:space="preserve"><value>Cambiar contraseña</value></data>
+  <data name="settings_admin_password_summary" xml:space="preserve"><value>Define una nueva contraseña para la cuenta seleccionada.</value></data>
+  <data name="settings_admin_password_loading" xml:space="preserve"><value>Cargando usuario...</value></data>
+  <data name="settings_admin_password_form_title" xml:space="preserve"><value>Nueva contraseña</value></data>
+  <data name="settings_admin_password_target_label" xml:space="preserve"><value>Usuario</value></data>
+  <data name="settings_admin_password_new_label" xml:space="preserve"><value>Nueva contraseña</value></data>
+  <data name="settings_admin_password_hint" xml:space="preserve"><value>Hasta 20 caracteres alfanuméricos.</value></data>
+  <data name="settings_admin_password_cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="settings_admin_password_submit" xml:space="preserve"><value>Enviar</value></data>
+  <data name="settings_admin_password_load_error" xml:space="preserve"><value>No pudimos cargar el usuario seleccionado.</value></data>
+  <data name="settings_admin_password_not_found" xml:space="preserve"><value>No hemos encontrado el usuario solicitado.</value></data>
+  <data name="settings_admin_password_validation_error" xml:space="preserve"><value>La nueva contraseña no cumple el formato permitido.</value></data>
+  <data name="settings_admin_password_forbidden_error" xml:space="preserve"><value>No tienes permisos para cambiar esta contraseña.</value></data>
+  <data name="settings_admin_password_submit_error" xml:space="preserve"><value>No pudimos cambiar la contraseña. Inténtalo de nuevo.</value></data>
+  <data name="settings_admin_password_submit_success" xml:space="preserve"><value>La contraseña se ha actualizado correctamente.</value></data>
   <data name="settings_signals_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de administración de signals</value></data>
   <data name="settings_signals_title" xml:space="preserve"><value>Administración de Signals</value></data>
   <data name="settings_signals_summary" xml:space="preserve"><value>Accede a las herramientas privadas del dominio Signals y prepara futuras gestiones administrativas.</value></data>

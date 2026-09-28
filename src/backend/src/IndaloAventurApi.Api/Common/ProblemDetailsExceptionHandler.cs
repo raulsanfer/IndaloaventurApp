@@ -25,6 +25,7 @@ public sealed class ProblemDetailsExceptionHandler(
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
         logger.LogError(exception, "La solicitud ha fallado");
+        AuditAdministrativePasswordChangeFailure(httpContext);
         var problemDetails = new ProblemDetails
         {
             Instance = httpContext.Request.Path
@@ -71,5 +72,17 @@ public sealed class ProblemDetailsExceptionHandler(
             HttpContext = httpContext,
             ProblemDetails = problemDetails
         });
+    }
+
+    private void AuditAdministrativePasswordChangeFailure(HttpContext httpContext)
+    {
+        if (!httpContext.Request.Path.StartsWithSegments("/api/users") || httpContext.Request.Path.Value?.EndsWith("/password", StringComparison.OrdinalIgnoreCase) != true)
+        {
+            return;
+        }
+
+        var actorId = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "desconocido";
+        var targetUserId = httpContext.Request.RouteValues["userId"]?.ToString() ?? "desconocido";
+        logger.LogWarning("Cambio de contrasena administrativo rechazado. ActorId={ActorId} TargetUserId={TargetUserId} StatusCode={StatusCode} CorrelationId={CorrelationId}", actorId, targetUserId, StatusCodes.Status400BadRequest, httpContext.TraceIdentifier);
     }
 }

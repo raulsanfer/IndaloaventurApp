@@ -1,5 +1,6 @@
 ﻿using IndaloAventurApi.Application.Abstractions.Identity;
 using IndaloAventurApi.Application.Features.Users.CreateManagedUser;
+using IndaloAventurApi.Application.Features.Users.ChangeManagedUserPassword;
 using IndaloAventurApi.Application.Features.Users.DeactivateManagedUser;
 using IndaloAventurApi.Application.Features.Users.ListManagedUsers;
 using IndaloAventurApi.Application.Features.Users.ReactivateManagedUser;
@@ -175,6 +176,20 @@ public sealed class UserManagementHandlersTests
         Assert.Contains("no se puede reactivar", exception.Message);
     }
 
+    [Fact]
+    public async Task ChangeManagedUserPassword_ShouldReturnIdentityOutcome()
+    {
+        var userId = Guid.NewGuid();
+        var identityService = new FakeIdentityService();
+        var handler = new ChangeManagedUserPasswordCommandHandler(identityService);
+
+        var result = await handler.Handle(new ChangeManagedUserPasswordCommand(userId, "Nueva123A"), CancellationToken.None);
+
+        Assert.Equal(PasswordChangeOutcome.Succeeded, result);
+        Assert.Equal(userId, identityService.LastPasswordResetUserId);
+        Assert.Equal("Nueva123A", identityService.LastPasswordResetValue);
+    }
+
     private sealed class FakeIdentityService : IIdentityService
     {
         public (bool Succeeded, Guid UserId, IEnumerable<string> Errors) CreateUserResult { get; init; } = (true, Guid.NewGuid(), Array.Empty<string>());
@@ -183,6 +198,8 @@ public sealed class UserManagementHandlersTests
         public (bool Succeeded, IEnumerable<string> Errors) UpdateUserResult { get; init; } = (true, Array.Empty<string>());
         public (bool Succeeded, IEnumerable<string> Errors) DeactivateUserResult { get; init; } = (true, Array.Empty<string>());
         public (bool Succeeded, IEnumerable<string> Errors) ReactivateUserResult { get; init; } = (true, Array.Empty<string>());
+        public Guid LastPasswordResetUserId { get; private set; }
+        public string? LastPasswordResetValue { get; private set; }
 
         public Task<(bool Succeeded, IEnumerable<string> Errors)> RegisterAsync(string email, string password, CancellationToken cancellationToken)
             => Task.FromResult((true, Array.Empty<string>() as IEnumerable<string>));
@@ -194,6 +211,9 @@ public sealed class UserManagementHandlersTests
             => Task.FromResult((true, (Guid?)Guid.NewGuid(), (string?)"social@club.test", Array.Empty<string>() as IEnumerable<string>, false, Array.Empty<string>() as IEnumerable<string>));
 
         public Task<bool> IsUserActiveAsync(Guid userId, CancellationToken cancellationToken)
+            => Task.FromResult(true);
+
+        public Task<bool> IsSecurityStampValidAsync(Guid userId, string securityStamp, CancellationToken cancellationToken)
             => Task.FromResult(true);
 
         public Task<(bool Succeeded, Guid UserId, IEnumerable<string> Errors)> CreateUserAsync(string email, string password, IEnumerable<string> roles, CancellationToken cancellationToken)
@@ -216,6 +236,13 @@ public sealed class UserManagementHandlersTests
 
         public Task<(bool Succeeded, IEnumerable<string> Errors)> ReactivateUserAsync(Guid userId, CancellationToken cancellationToken)
             => Task.FromResult(ReactivateUserResult);
+
+        public Task<PasswordChangeResult> ResetPasswordByAdministratorAsync(Guid userId, string newPassword, CancellationToken cancellationToken)
+        {
+            LastPasswordResetUserId = userId;
+            LastPasswordResetValue = newPassword;
+            return Task.FromResult(PasswordChangeResult.Succeeded);
+        }
 
         public Task<string?> GeneratePasswordResetTokenAsync(string email, CancellationToken cancellationToken)
             => Task.FromResult<string?>(null);

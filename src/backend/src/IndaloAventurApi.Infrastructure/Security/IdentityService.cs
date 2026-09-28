@@ -121,6 +121,17 @@ public sealed class IdentityService(
         return !await userManager.IsLockedOutAsync(user);
     }
 
+    public async Task<bool> IsSecurityStampValidAsync(Guid userId, string securityStamp, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(securityStamp))
+        {
+            return false;
+        }
+
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        return user is not null && string.Equals(user.SecurityStamp, securityStamp, StringComparison.Ordinal);
+    }
+
     public async Task<(bool Succeeded, Guid UserId, IEnumerable<string> Errors)> CreateUserAsync(string email, string password, IEnumerable<string> roles, CancellationToken cancellationToken)
     {
         var user = new Usuario { UserName = email, Email = email, LockoutEnabled = true, IsMember = false };
@@ -252,6 +263,19 @@ public sealed class IdentityService(
         return result.Succeeded
             ? (true, [])
             : (false, result.Errors.Select(x => x.Description));
+    }
+
+    public async Task<PasswordChangeResult> ResetPasswordByAdministratorAsync(Guid userId, string newPassword, CancellationToken cancellationToken)
+    {
+        var user = await userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            return PasswordChangeResult.UserNotFound;
+        }
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await userManager.ResetPasswordAsync(user, token, newPassword);
+        return result.Succeeded ? PasswordChangeResult.Succeeded : PasswordChangeResult.Rejected;
     }
 
     public async Task<string?> GeneratePasswordResetTokenAsync(string email, CancellationToken cancellationToken)

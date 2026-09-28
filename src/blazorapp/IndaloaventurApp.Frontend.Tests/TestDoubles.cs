@@ -358,6 +358,8 @@ internal sealed class RecordingAdminUserManagementService : IAdminUserManagement
 
     public Func<Guid, UpdateMemberSelfProfileRequest, CancellationToken, Task<ServiceResult<MemberSelfProfile>>>? UpdateMemberFileHandler { get; init; }
 
+    public Func<Guid, AdminUserPasswordChangeRequest, CancellationToken, Task<ServiceResult<bool>>>? ChangeUserPasswordHandler { get; init; }
+
     public Func<Guid, CancellationToken, Task<ServiceResult<bool>>>? DeactivateUserHandler { get; init; }
 
     public Func<Guid, CancellationToken, Task<ServiceResult<bool>>>? ReactivateUserHandler { get; init; }
@@ -390,6 +392,12 @@ internal sealed class RecordingAdminUserManagementService : IAdminUserManagement
     {
         return UpdateMemberFileHandler?.Invoke(userId, request, cancellationToken)
             ?? Task.FromResult(ServiceResult<MemberSelfProfile>.Failure(new ServiceError("profile.unavailable", "Missing admin update member file handler")));
+    }
+
+    public Task<ServiceResult<bool>> ChangeUserPasswordAsync(Guid userId, AdminUserPasswordChangeRequest request, CancellationToken cancellationToken = default)
+    {
+        return ChangeUserPasswordHandler?.Invoke(userId, request, cancellationToken)
+            ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("users.unavailable", "Missing admin password change handler")));
     }
 
     public Task<ServiceResult<bool>> DeactivateUserAsync(Guid userId, CancellationToken cancellationToken = default)

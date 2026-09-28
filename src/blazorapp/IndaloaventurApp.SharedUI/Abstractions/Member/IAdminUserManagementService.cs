@@ -34,6 +34,11 @@ public interface IAdminUserManagementService
     Task<ServiceResult<MemberSelfProfile>> UpdateMemberFileAsync(Guid userId, UpdateMemberSelfProfileRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Changes the password of a managed user through the dedicated administrative endpoint.
+    /// </summary>
+    Task<ServiceResult<bool>> ChangeUserPasswordAsync(Guid userId, AdminUserPasswordChangeRequest request, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Deactivates a managed user account.
     /// </summary>
     Task<ServiceResult<bool>> DeactivateUserAsync(Guid userId, CancellationToken cancellationToken = default);

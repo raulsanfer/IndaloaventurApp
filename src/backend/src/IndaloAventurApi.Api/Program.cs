@@ -1,14 +1,17 @@
 using System.Reflection;
 using System.Text;
+using System.Threading.RateLimiting;
 using IndaloAventurApi.Api.Common;
 using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application;
 using IndaloAventurApi.Application.Abstractions.Identity;
+using IndaloAventurApi.Application.Abstractions.Security;
 using IndaloAventurApi.Infrastructure;
 using IndaloAventurApi.Infrastructure.Media;
 using IndaloAventurApi.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +19,54 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
 builder.Services.AddControllers();
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        if (context.HttpContext.Request.Path.StartsWithSegments("/api/users") && context.HttpContext.Request.Path.Value?.EndsWith("/password", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            var actorId = context.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "desconocido";
+            var targetUserId = context.HttpContext.Request.RouteValues["userId"]?.ToString() ?? "desconocido";
+            var logger = context.HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("PasswordChangeAudit");
+            logger.LogWarning("Cambio de contrasena administrativo rechazado. ActorId={ActorId} TargetUserId={TargetUserId} StatusCode={StatusCode} CorrelationId={CorrelationId}", actorId, targetUserId, StatusCodes.Status400BadRequest, context.HttpContext.TraceIdentifier);
+        }
+
+        return new BadRequestObjectResult(new ProblemDetails
+        {
+            Status = StatusCodes.Status400BadRequest,
+            Title = "Solicitud no valida",
+            Detail = "Los datos enviados no son validos.",
+            Instance = context.HttpContext.Request.Path
+        });
+    };
+});
+builder.Services.AddRateLimiter(options =>
+{
+    options.OnRejected = (context, _) =>
+    {
+        var httpContext = context.HttpContext;
+        var actorId = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "anonimo";
+        var targetUserId = httpContext.Request.RouteValues["userId"]?.ToString() ?? "desconocido";
+        var logger = httpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("PasswordChangeAudit");
+        logger.LogWarning("Cambio de contrasena administrativo limitado. ActorId={ActorId} TargetUserId={TargetUserId} StatusCode={StatusCode} CorrelationId={CorrelationId}", actorId, targetUserId, StatusCodes.Status429TooManyRequests, httpContext.TraceIdentifier);
+        httpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        return ValueTask.CompletedTask;
+    };
+    options.AddPolicy(ApiRateLimitPolicies.AdministrativePasswordChange, httpContext =>
+    {
+        var actorId = httpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "anonimo";
+        var targetUserId = httpContext.Request.RouteValues["userId"]?.ToString() ?? "desconocido";
+        return RateLimitPartition.GetFixedWindowLimiter(
+            $"{actorId}:{targetUserId}",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -79,6 +130,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 {
                     context.HttpContext.Items["AuthFailureDetail"] = "El usuario esta inactivo.";
                     context.Fail("El usuario esta inactivo.");
+                    return;
+                }
+
+                var securityStamp = context.Principal?.FindFirst(AuthClaimNames.SecurityStamp)?.Value;
+                if (!await identityService.IsSecurityStampValidAsync(userId, securityStamp ?? string.Empty, context.HttpContext.RequestAborted))
+                {
+                    context.HttpContext.Items["AuthFailureDetail"] = "La sesion ya no es valida.";
+                    context.Fail("La sesion ya no es valida.");
                 }
             },
             OnChallenge = async context =>
@@ -147,6 +206,7 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors("FrontendDevCors");
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 app.MapControllers();
 

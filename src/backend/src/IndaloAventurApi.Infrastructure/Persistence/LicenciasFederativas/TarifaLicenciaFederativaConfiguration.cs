@@ -2,7 +2,7 @@ using IndaloAventurApi.Domain.LicenciasFederativas;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace IndaloAventurApi.Infrastructure.Persistence.Configurations;
+namespace IndaloAventurApi.Infrastructure.Persistence.LicenciasFederativas;
 
 public sealed class TarifaLicenciaFederativaConfiguration : IEntityTypeConfiguration<TarifaLicenciaFederativa>
 {

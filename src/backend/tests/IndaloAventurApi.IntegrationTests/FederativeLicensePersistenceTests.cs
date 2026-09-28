@@ -1,5 +1,5 @@
 using IndaloAventurApi.Domain.LicenciasFederativas;
-using IndaloAventurApi.Infrastructure.Persistence;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using IndaloAventurApi.Infrastructure.Persistence.LicenciasFederativas;
 using Microsoft.EntityFrameworkCore;
 

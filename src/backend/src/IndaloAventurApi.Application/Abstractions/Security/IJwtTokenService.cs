@@ -2,5 +2,5 @@ namespace IndaloAventurApi.Application.Abstractions.Security;
 
 public interface IJwtTokenService
 {
-    string CreateToken(Guid userId, string email, IEnumerable<string> roles, bool isMember);
+    Task<string> CreateTokenAsync(Guid userId, string email, IEnumerable<string> roles, bool isMember, CancellationToken cancellationToken);
 }

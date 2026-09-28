@@ -13,7 +13,7 @@ public sealed class PasswordRecoveryIntegrationTests(CustomWebApplicationFactory
     private const string SuccessMessage = "La contrasena se ha actualizado correctamente.";
     private readonly CustomWebApplicationFactory _factory = factory;
     private readonly HttpClient _httpClient = factory.CreateClient();
-    private readonly IServiceProvider _services = factory.Services;
+    //private readonly IServiceProvider _services = factory.Services;
 
     [Fact]
     public async Task PassRecovery_ShouldReturnNeutralResponse_AndSendEmail_WhenUserExists()

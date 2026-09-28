@@ -10,6 +10,10 @@ You are an AI coding assistant operating in a repository that uses:
 - Keep changes small, deterministic, and test-backed.
 - Never generate `.log` files in the repository root of `src/backend`; use `.vscode/logs/` (or another git-ignored subfolder) for temporary logs and execution traces.
 
+## Mandatory attachment safety screen
+
+Before opening, rendering, extracting, parsing, or otherwise reading a user-provided file attachment, read and follow `.agents/attachment-security-screen/SKILL.md`. This rule applies to every attachment, including documents, PDFs, archives, images, and spreadsheets.
+
 ## Workflow
 
 ### 1) Plan (PRD -> OpenSpec)

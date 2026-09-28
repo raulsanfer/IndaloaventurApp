@@ -16,7 +16,7 @@ public sealed class SocialLoginCommandHandler(IIdentityService identityService, 
             throw new UnauthorizedAccessException(string.Join("; ", validation.Errors.DefaultIfEmpty("El token social no es valido.")));
         }
 
-        var token = tokenService.CreateToken(validation.UserId.Value, validation.Email, validation.Roles, validation.IsMember);
+        var token = await tokenService.CreateTokenAsync(validation.UserId.Value, validation.Email, validation.Roles, validation.IsMember, cancellationToken);
         return new LoginResponse(token, "Bearer", 3600, validation.IsMember);
     }
 }

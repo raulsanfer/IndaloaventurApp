@@ -1,6 +1,6 @@
 using System.Data;
 using IndaloAventurApi.Application.Abstractions.TrailSignals;
-using IndaloAventurApi.Infrastructure.Persistence;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

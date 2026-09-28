@@ -1,5 +1,6 @@
 using IndaloAventurApi.Application.Abstractions.LicenciasFederativas;
 using IndaloAventurApi.Domain.LicenciasFederativas;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using Microsoft.EntityFrameworkCore;
 
 namespace IndaloAventurApi.Infrastructure.Persistence.LicenciasFederativas;

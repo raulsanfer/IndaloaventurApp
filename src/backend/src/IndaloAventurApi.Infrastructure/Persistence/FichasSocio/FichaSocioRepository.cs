@@ -1,5 +1,6 @@
 using IndaloAventurApi.Application.Abstractions.FichasSocio;
 using IndaloAventurApi.Domain.FichasSocio;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using Microsoft.EntityFrameworkCore;
 
 namespace IndaloAventurApi.Infrastructure.Persistence.FichasSocio;

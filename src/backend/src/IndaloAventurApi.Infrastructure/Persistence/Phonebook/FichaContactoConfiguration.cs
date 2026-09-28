@@ -3,7 +3,7 @@ using IndaloAventurApi.Domain.FichasContacto.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace IndaloAventurApi.Infrastructure.Persistence.Configurations;
+namespace IndaloAventurApi.Infrastructure.Persistence.Phonebook;
 
 public sealed class FichaContactoConfiguration : IEntityTypeConfiguration<FichaContacto>
 {

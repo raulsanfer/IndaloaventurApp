@@ -3,7 +3,7 @@ using IndaloAventurApi.Infrastructure.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace IndaloAventurApi.Infrastructure.Persistence.Configurations;
+namespace IndaloAventurApi.Infrastructure.Persistence.ClubPositions;
 
 public sealed class CargoConfiguration : IEntityTypeConfiguration<Cargo>
 {

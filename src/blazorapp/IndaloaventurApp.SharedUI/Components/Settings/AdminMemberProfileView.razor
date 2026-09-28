@@ -203,6 +203,9 @@
                     </section>
 
                     <div class="settings-admin-member-file__actions">
+                        <a class="btn btn-outline" href="@($"/configuracion/usuarios/{UserId}/contrasena")">
+                            @L["settings_admin_password_action"]
+                        </a>
                         <button type="submit" class="btn btn-primary settings-admin-member-file__save" disabled="@IsSubmitting">
                             @L["member_file_save"]
                         </button>

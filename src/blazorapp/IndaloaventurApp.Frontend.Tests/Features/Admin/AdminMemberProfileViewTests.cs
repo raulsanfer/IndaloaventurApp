@@ -78,6 +78,7 @@ public sealed class AdminMemberProfileViewTests : BunitContext
             Assert.DoesNotContain("roles", cut.Markup, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("settings_users_active_badge", cut.Markup);
             Assert.Contains("settings_admin_member_file_cargo_empty_option", cut.Markup);
+            Assert.Contains($"/configuracion/usuarios/{userId}/contrasena", cut.Markup);
         });
 
         cut.Find("#admin-member-cargo-id").Change("5");

@@ -1,5 +1,6 @@
 using IndaloAventurApi.Application.Abstractions.Phonebook;
 using IndaloAventurApi.Domain.FichasContacto;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using Microsoft.EntityFrameworkCore;
 
 namespace IndaloAventurApi.Infrastructure.Persistence.Phonebook;

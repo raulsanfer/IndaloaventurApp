@@ -15,7 +15,7 @@ public sealed class LoginQueryHandler(IIdentityService identityService, IJwtToke
             throw new UnauthorizedAccessException("Credenciales invalidas.");
         }
 
-        var token = tokenService.CreateToken(validation.UserId.Value, request.Email, validation.Roles, validation.IsMember);
+        var token = await tokenService.CreateTokenAsync(validation.UserId.Value, request.Email, validation.Roles, validation.IsMember, cancellationToken);
         return new LoginResponse(token, "Bearer", 3600, validation.IsMember);
     }
 }

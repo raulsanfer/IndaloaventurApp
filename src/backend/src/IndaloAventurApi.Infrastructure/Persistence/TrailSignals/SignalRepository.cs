@@ -1,5 +1,6 @@
 using IndaloAventurApi.Application.Abstractions.TrailSignals;
 using IndaloAventurApi.Domain.TrailSignals;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using Microsoft.EntityFrameworkCore;
 
 namespace IndaloAventurApi.Infrastructure.Persistence.TrailSignals;

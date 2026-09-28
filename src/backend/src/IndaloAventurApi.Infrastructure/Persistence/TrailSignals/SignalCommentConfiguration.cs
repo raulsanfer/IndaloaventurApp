@@ -2,7 +2,7 @@ using IndaloAventurApi.Domain.TrailSignals;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace IndaloAventurApi.Infrastructure.Persistence.Configurations;
+namespace IndaloAventurApi.Infrastructure.Persistence.TrailSignals;
 
 public sealed class SignalCommentConfiguration : IEntityTypeConfiguration<SignalComment>
 {

@@ -11,7 +11,7 @@ public static class IdentityBootstrapper
     public static async Task InitializeIdentityAsync(this IServiceProvider serviceProvider, CancellationToken cancellationToken = default)
     {
         using var scope = serviceProvider.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<Persistence.ApplicationDbContext>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<Persistence.DbContext.ApplicationDbContext>();
         var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
         var useEnsureCreated = configuration.GetValue<bool>("Testing:UseEnsureCreated");
 

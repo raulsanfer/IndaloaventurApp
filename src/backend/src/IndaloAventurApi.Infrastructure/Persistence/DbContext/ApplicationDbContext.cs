@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace IndaloAventurApi.Infrastructure.Persistence;
+namespace IndaloAventurApi.Infrastructure.Persistence.DbContext;
 
 public sealed class ApplicationDbContext : IdentityDbContext<Usuario, IdentityRole<Guid>, Guid>, IApplicationDbContext
 {

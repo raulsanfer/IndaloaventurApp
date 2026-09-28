@@ -74,6 +74,9 @@ public sealed class AuthHandlersTests
         public Task<bool> IsUserActiveAsync(Guid userId, CancellationToken cancellationToken)
             => Task.FromResult(true);
 
+        public Task<bool> IsSecurityStampValidAsync(Guid userId, string securityStamp, CancellationToken cancellationToken)
+            => Task.FromResult(true);
+
         public Task<(bool Succeeded, Guid UserId, IEnumerable<string> Errors)> CreateUserAsync(string email, string password, IEnumerable<string> roles, CancellationToken cancellationToken)
             => Task.FromResult((true, Guid.NewGuid(), Array.Empty<string>() as IEnumerable<string>));
 
@@ -92,6 +95,9 @@ public sealed class AuthHandlersTests
         public Task<(bool Succeeded, IEnumerable<string> Errors)> ReactivateUserAsync(Guid userId, CancellationToken cancellationToken)
             => Task.FromResult((true, Array.Empty<string>() as IEnumerable<string>));
 
+        public Task<PasswordChangeResult> ResetPasswordByAdministratorAsync(Guid userId, string newPassword, CancellationToken cancellationToken)
+            => Task.FromResult(PasswordChangeResult.Succeeded);
+
         public Task<string?> GeneratePasswordResetTokenAsync(string email, CancellationToken cancellationToken)
             => Task.FromResult<string?>(null);
 
@@ -103,10 +109,10 @@ public sealed class AuthHandlersTests
     {
         public bool LastIsMember { get; private set; }
 
-        public string CreateToken(Guid userId, string email, IEnumerable<string> roles, bool isMember)
+        public Task<string> CreateTokenAsync(Guid userId, string email, IEnumerable<string> roles, bool isMember, CancellationToken cancellationToken)
         {
             LastIsMember = isMember;
-            return "fake-token";
+            return Task.FromResult("fake-token");
         }
     }
 }
