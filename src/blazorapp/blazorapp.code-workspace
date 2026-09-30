@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "IndaloAventurApi.Api",
+			"path": "../backend/src/IndaloAventurApi.Api"
+		}
+	],
+	"settings": {}
+}

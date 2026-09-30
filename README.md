@@ -9,6 +9,8 @@ La solución está formada por un frontend web y una API backend independientes.
 
 El despliegue se ha automatizado sobre el mismo hosting compartido de la web principal, configurando Github Actions para front y back que lanzan la publicación por FTP al hosting. 
 
+Información detallada sobre la aplicación se puede encontrar en la carpeta blazorapp/docs/index.md mediante DocFx 
+
 ## b. Stack tecnológico utilizado
 
 - **.NET 9** como plataforma común.
