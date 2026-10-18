@@ -56,8 +56,8 @@ public sealed class GetAdminSolicitudesLicenciaFederativaQueryHandler(IQueryConn
             : row.Estado.ToString();
 
         return new AdminSolicitudLicenciaFederativaDto(
-            row.Id,
-            row.UserId,
+            ParseGuid(row.Id),
+            ParseGuid(row.UserId),
             row.UserEmail,
             row.Temporada,
             estado,
@@ -71,18 +71,28 @@ public sealed class GetAdminSolicitudesLicenciaFederativaQueryHandler(IQueryConn
             row.PrecioIndependiente);
     }
 
-    private sealed record AdminSolicitudLicenciaFederativaRow(
-        Guid Id,
-        Guid UserId,
-        string UserEmail,
-        int Temporada,
-        int Estado,
-        DateTime FechaCreacionUtc,
-        int TarifaLicenciaFederativaId,
-        string Licencia,
-        string Categoria,
-        string Territorio,
-        bool MediaTemporada,
-        decimal PrecioClub,
-        decimal? PrecioIndependiente);
+    private static Guid ParseGuid(object value) => value switch
+    {
+        Guid guid => guid,
+        string text => Guid.Parse(text),
+        byte[] bytes => new Guid(bytes),
+        _ => throw new InvalidOperationException("El identificador de la solicitud no tiene un formato valido.")
+    };
+
+    private sealed class AdminSolicitudLicenciaFederativaRow
+    {
+        public object Id { get; set; } = default!;
+        public object UserId { get; set; } = default!;
+        public string UserEmail { get; set; } = string.Empty;
+        public int Temporada { get; set; }
+        public int Estado { get; set; }
+        public DateTime FechaCreacionUtc { get; set; }
+        public int TarifaLicenciaFederativaId { get; set; }
+        public string Licencia { get; set; } = string.Empty;
+        public string Categoria { get; set; } = string.Empty;
+        public string Territorio { get; set; } = string.Empty;
+        public bool MediaTemporada { get; set; }
+        public decimal PrecioClub { get; set; }
+        public decimal? PrecioIndependiente { get; set; }
+    }
 }

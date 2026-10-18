@@ -45,7 +45,7 @@ public sealed class GetMiSolicitudLicenciaFederativaQueryHandler(IQueryConnectio
             : row.Estado.ToString();
 
         return new SolicitudLicenciaFederativaDto(
-            row.Id,
+            ParseGuid(row.Id),
             row.Temporada,
             estado,
             row.FechaCreacionUtc,
@@ -58,16 +58,26 @@ public sealed class GetMiSolicitudLicenciaFederativaQueryHandler(IQueryConnectio
             row.PrecioIndependiente);
     }
 
-    private sealed record SolicitudLicenciaFederativaRow(
-        Guid Id,
-        int Temporada,
-        int Estado,
-        DateTime FechaCreacionUtc,
-        int TarifaLicenciaFederativaId,
-        string Licencia,
-        string Categoria,
-        string Territorio,
-        bool MediaTemporada,
-        decimal PrecioClub,
-        decimal? PrecioIndependiente);
+    private static Guid ParseGuid(object value) => value switch
+    {
+        Guid guid => guid,
+        string text => Guid.Parse(text),
+        byte[] bytes => new Guid(bytes),
+        _ => throw new InvalidOperationException("El identificador de la solicitud no tiene un formato valido.")
+    };
+
+    private sealed class SolicitudLicenciaFederativaRow
+    {
+        public object Id { get; set; } = default!;
+        public int Temporada { get; set; }
+        public int Estado { get; set; }
+        public DateTime FechaCreacionUtc { get; set; }
+        public int TarifaLicenciaFederativaId { get; set; }
+        public string Licencia { get; set; } = string.Empty;
+        public string Categoria { get; set; } = string.Empty;
+        public string Territorio { get; set; } = string.Empty;
+        public bool MediaTemporada { get; set; }
+        public decimal PrecioClub { get; set; }
+        public decimal? PrecioIndependiente { get; set; }
+    }
 }

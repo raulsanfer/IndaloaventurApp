@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -10,11 +11,14 @@ public sealed class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Ap
     {
         var basePath = Directory.GetCurrentDirectory();
         var apiProjectPath = Path.GetFullPath(Path.Combine(basePath, "..", "IndaloAventurApi.Api"));
+        var apiAssembly = Assembly.Load("IndaloAventurApi.Api");
 
         var configuration = new ConfigurationBuilder()
             .SetBasePath(apiProjectPath)
             .AddJsonFile("appsettings.json", optional: false)
             .AddJsonFile("appsettings.Development.json", optional: true)
+            .AddUserSecrets(apiAssembly, optional: true)
+            .AddEnvironmentVariables()
             .Build();
 
         var connectionString = configuration.GetConnectionString("api_ContextConnection")

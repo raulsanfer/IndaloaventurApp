@@ -14,8 +14,9 @@ using IndaloAventurApi.Infrastructure.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -960,13 +961,12 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
     public string TestAdminEmail { get; } = $"admin-{Guid.NewGuid():N}@club.test";
     public string TestAdminPassword { get; } = CreateTestPassword();
 
-    private readonly string _databaseName = $"indalo-api-tests-{Guid.NewGuid():N}";
+    private readonly string _databasePath = Path.Combine(Path.GetTempPath(), $"indalo-api-tests-{Guid.NewGuid():N}.db");
     private readonly string _signalImageRoot = Path.Combine(Path.GetTempPath(), $"indalo-signal-images-{Guid.NewGuid():N}");
     private readonly FakeEmailSender _fakeEmailSender = new();
     private readonly FakeWordPressService _fakeWordPressService = new();
 
-    private string ConnectionString =>
-        $"Server=(localdb)\\MSSQLLocalDB;Database={_databaseName};Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True";
+    private string ConnectionString => $"Data Source={_databasePath}";
 
     public FakeEmailSender EmailSender => _fakeEmailSender;
     public int? LastWordPressListPageSize => _fakeWordPressService.LastPageSize;
@@ -979,6 +979,7 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
     protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
     {
         builder.UseEnvironment("Development");
+        builder.ConfigureLogging(logging => logging.ClearProviders());
         builder.UseSetting("ConnectionStrings:api_ContextConnection", ConnectionString);
         builder.UseSetting("ConnectionStrings:DefaultConnection", ConnectionString);
         builder.UseSetting("Jwt:Issuer", TestJwtIssuer);
@@ -988,6 +989,7 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseSetting("AdminSeed:Enabled", "true");
         builder.UseSetting("AdminSeed:Email", TestAdminEmail);
         builder.UseSetting("AdminSeed:Password", TestAdminPassword);
+        builder.UseSetting("Email:FederativeLicenseRequestsTo", "club@indaloaventura.com");
         builder.UseSetting("Testing:UseEnsureCreated", "true");
         builder.UseSetting("SignalImageStorage:RootPath", _signalImageRoot);
         builder.ConfigureServices(services =>
@@ -1005,9 +1007,9 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             }
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(ConnectionString));
+                options.UseSqlite(ConnectionString));
 
-            services.AddScoped<IQueryConnectionFactory>(_ => new SqlServerQueryConnectionFactory(ConnectionString));
+            services.AddScoped<IQueryConnectionFactory>(_ => new SqliteQueryConnectionFactory(ConnectionString));
 
             var socialValidatorDescriptor = services.SingleOrDefault(d => d.ServiceType == typeof(ISocialTokenValidator));
             if (socialValidatorDescriptor is not null)
@@ -1106,18 +1108,9 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 Directory.Delete(_signalImageRoot, recursive: true);
             }
 
-            using var connection = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=master;Trusted_Connection=True;TrustServerCertificate=True");
-            connection.Open();
-
-            using var command = connection.CreateCommand();
-            command.CommandText = $"""
-                IF DB_ID(N'{_databaseName}') IS NOT NULL
-                BEGIN
-                    ALTER DATABASE [{_databaseName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-                    DROP DATABASE [{_databaseName}];
-                END
-                """;
-            command.ExecuteNonQuery();
+            File.Delete(_databasePath);
+            File.Delete($"{_databasePath}-shm");
+            File.Delete($"{_databasePath}-wal");
         }
         catch
         {
@@ -1186,11 +1179,11 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
         }
     }
 
-    private sealed class SqlServerQueryConnectionFactory(string connectionString) : IQueryConnectionFactory
+    private sealed class SqliteQueryConnectionFactory(string connectionString) : IQueryConnectionFactory
     {
         public async Task<System.Data.IDbConnection> CreateOpenConnectionAsync(CancellationToken cancellationToken)
         {
-            var connection = new SqlConnection(connectionString);
+            var connection = new SqliteConnection(connectionString);
             await connection.OpenAsync(cancellationToken);
             return connection;
         }

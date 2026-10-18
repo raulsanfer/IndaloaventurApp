@@ -129,7 +129,7 @@ public sealed class LicenciasFederativasIntegrationTests(CustomWebApplicationFac
         Assert.Contains(email, sentMessage.PlainTextBody, StringComparison.Ordinal);
 
         var listResponse = await _httpClient.GetAsync("/api/licencias-federativas/me/solicitudes");
-        Assert.Equal(HttpStatusCode.OK, listResponse.StatusCode);
+        Assert.True(listResponse.IsSuccessStatusCode, await listResponse.Content.ReadAsStringAsync());
         var list = await listResponse.Content.ReadFromJsonAsync<IReadOnlyCollection<SolicitudLicenciaFederativaPayload>>();
         Assert.NotNull(list);
         Assert.Contains(list!, x => x.Id == created.Id && x.Categoria == "Mayores" && x.PrecioClub == 45m && !x.MediaTemporada);

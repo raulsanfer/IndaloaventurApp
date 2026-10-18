@@ -27,6 +27,18 @@ public static class ApiAuthorizationMatrix
         new("PUT", "/api/cargos/{id:int}", ApiAccessClassification.Admin, "Policy: Admin", "Edicion de cargos."),
         new("DELETE", "/api/cargos/{id:int}", ApiAccessClassification.Admin, "Policy: Admin", "Borrado de cargos."),
 
+        new("GET", "/api/inventario-categorias", ApiAccessClassification.Authenticated, "Policy: Authenticated", "Lectura del arbol para cualquier usuario autenticado."),
+        new("GET", "/api/inventario-categorias/{id:int}", ApiAccessClassification.Authenticated, "Policy: Authenticated", "Detalle para cualquier usuario autenticado."),
+        new("POST", "/api/inventario-categorias", ApiAccessClassification.Admin, "Policy: Admin", "Alta de categoria solo administracion."),
+        new("PUT", "/api/inventario-categorias/{id:int}", ApiAccessClassification.Admin, "Policy: Admin", "Edicion de categoria solo administracion."),
+        new("DELETE", "/api/inventario-categorias/{id:int}", ApiAccessClassification.Admin, "Policy: Admin", "Borrado de categoria solo administracion."),
+
+        new("GET", "/api/inventario-estados", ApiAccessClassification.Authenticated, "Policy: Authenticated", "Lectura para cualquier usuario autenticado."),
+        new("GET", "/api/inventario-estados/{id:int}", ApiAccessClassification.Authenticated, "Policy: Authenticated", "Detalle para cualquier usuario autenticado."),
+        new("POST", "/api/inventario-estados", ApiAccessClassification.Admin, "Policy: Admin", "Alta de estado solo administracion."),
+        new("PUT", "/api/inventario-estados/{id:int}", ApiAccessClassification.Admin, "Policy: Admin", "Edicion de estado solo administracion."),
+        new("DELETE", "/api/inventario-estados/{id:int}", ApiAccessClassification.Admin, "Policy: Admin", "Borrado de estado solo administracion."),
+
         new("POST", "/api/fichas-socio/{userId:guid}", ApiAccessClassification.Admin, "Policy: Admin", "Alta de ficha para un tercero."),
         new("GET", "/api/fichas-socio/me", ApiAccessClassification.Authenticated, "Policy: Authenticated", "Autoservicio del titular."),
         new("GET", "/api/fichas-socio/{userId:guid}", ApiAccessClassification.OwnerOrAdmin, "Handler: OwnerOrAdmin", "Consulta de ficha propia o por administracion."),
