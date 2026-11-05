@@ -1,0 +1,12 @@
+@page "/configuracion/reservas-material"
+@using IndaloaventurApp.SharedUI.Components.Settings
+@using IndaloaventurApp.SharedUI.Components.Shell
+
+<PageTitle>Reservas de material</PageTitle>
+
+@if (CanManageReservations)
+{
+    <AuthenticatedShell ActiveHref="/mi-cuenta">
+        <MaterialReservationsManagementView />
+    </AuthenticatedShell>
+}

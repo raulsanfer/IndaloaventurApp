@@ -20,6 +20,20 @@
             <span class="mi-club-option-card__chevron" aria-hidden="true">&gt;</span>
         </a>
 
+        @if (CanAccessMaterialReservations)
+        {
+            <a class="mi-club-option-card" href="/mi-club/reservas-material">
+                <span class="mi-club-option-card__icon" aria-hidden="true">
+                    <i class="bi bi-backpack4-fill"></i>
+                </span>
+                <span class="mi-club-option-card__body">
+                    <span class="mi-club-option-card__title">@L["member_material_reservations_title"]</span>
+                    <span class="mi-club-option-card__description">@L["member_material_reservations_description"]</span>
+                </span>
+                <span class="mi-club-option-card__chevron" aria-hidden="true">&gt;</span>
+            </a>
+        }
+
         @if (CanAccessFederativeLicenses)
         {
             <a class="mi-club-option-card" href="/mi-club/licencias-federativas">

@@ -161,13 +161,13 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CategoriaPadreId", "NombreNormalizado")
-                        .IsUnique()
-                        .HasFilter("[CategoriaPadreId] IS NOT NULL");
-
                     b.HasIndex("NombreNormalizado")
                         .IsUnique()
                         .HasFilter("[CategoriaPadreId] IS NULL");
+
+                    b.HasIndex("CategoriaPadreId", "NombreNormalizado")
+                        .IsUnique()
+                        .HasFilter("[CategoriaPadreId] IS NOT NULL");
 
                     b.ToTable("InventarioCategorias", (string)null);
                 });
@@ -196,6 +196,129 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("InventarioEstados", (string)null);
+                });
+
+            modelBuilder.Entity("IndaloAventurApi.Domain.Inventario.InventarioMaterial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Activo")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("AdquiridoDonado")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoriaId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Descripcion")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("EstadoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("FechaAdquisicion")
+                        .HasColumnType("date");
+
+                    b.Property<string>("MarcaModelo")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("NumeroSerie")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("NumeroSerieNormalizado")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("Observaciones")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoriaId");
+
+                    b.HasIndex("EstadoId");
+
+                    b.HasIndex("NumeroSerieNormalizado")
+                        .IsUnique()
+                        .HasFilter("[NumeroSerieNormalizado] IS NOT NULL");
+
+                    b.ToTable("InventarioMateriales", (string)null);
+                });
+
+            modelBuilder.Entity("IndaloAventurApi.Domain.Inventario.ReservasMaterial.ReservaMaterial", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("CantidadSolicitada")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ConcurrencyToken")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("ConfirmacionDevolucionAdmin")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ConfirmacionDevolucionSocio")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly?>("FechaDevolucionEfectiva")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("FechaDevolucionEstimada")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("FechaRetirada")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("FechaRetiradaPrevista")
+                        .HasColumnType("date");
+
+                    b.Property<DateTime>("FechaSolicitudUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("InventarioMaterialId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ObservacionAdministracion")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("Observaciones")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InventarioMaterialId", "Estado");
+
+                    b.HasIndex("UserId", "FechaSolicitudUtc");
+
+                    b.ToTable("ReservasMaterial", (string)null);
                 });
 
             modelBuilder.Entity("IndaloAventurApi.Domain.LicenciasFederativas.SolicitudLicenciaFederativa", b =>
@@ -1260,6 +1383,36 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("CategoriaPadreId")
                         .OnDelete(DeleteBehavior.Restrict);
+                });
+
+            modelBuilder.Entity("IndaloAventurApi.Domain.Inventario.InventarioMaterial", b =>
+                {
+                    b.HasOne("IndaloAventurApi.Domain.Inventario.InventarioCategoria", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IndaloAventurApi.Domain.Inventario.InventarioEstado", null)
+                        .WithMany()
+                        .HasForeignKey("EstadoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("IndaloAventurApi.Domain.Inventario.ReservasMaterial.ReservaMaterial", b =>
+                {
+                    b.HasOne("IndaloAventurApi.Domain.Inventario.InventarioMaterial", null)
+                        .WithMany()
+                        .HasForeignKey("InventarioMaterialId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("IndaloAventurApi.Infrastructure.Security.Usuario", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("IndaloAventurApi.Domain.LicenciasFederativas.SolicitudLicenciaFederativa", b =>

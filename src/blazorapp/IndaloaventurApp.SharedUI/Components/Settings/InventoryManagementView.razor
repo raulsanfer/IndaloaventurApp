@@ -1,0 +1,372 @@
+@using IndaloaventurApp.SharedUI.Resources
+
+<section class="inventory-management">
+    <header class="inventory-management__header">
+        <nav class="breadcrumbs text-sm" aria-label="@L["inventory_breadcrumb_label"]">
+            <ul>
+                <li><a href="/mi-cuenta">@L["shell_nav_my_account"]</a></li>
+                <li><a href="/configuracion">@L["settings_title"]</a></li>
+                <li aria-current="page">@L["settings_admin_inventory_title"]</li>
+            </ul>
+        </nav>
+
+        <div class="inventory-management__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="inventory-management__hero-topline">
+                    <p class="inventory-management__eyebrow">@L["settings_admin_title"]</p>
+                    <span class="badge badge-outline">@L["settings_admin_inventory_title"]</span>
+                </div>
+                <h1>@L["settings_admin_inventory_title"]</h1>
+            </div>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessage))
+    {
+        <div class="alert alert-success inventory-management__status" role="status">
+            <span>@StatusMessage</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="alert alert-error inventory-management__status" role="alert">
+            <span>@ErrorMessage</span>
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="alert alert-info inventory-management__feedback">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["inventory_loading"]</span>
+        </div>
+    }
+    else
+    {
+        <div class="tabs tabs-box inventory-management__tabs" role="tablist" aria-label="@L["settings_admin_inventory_title"]">
+            <button type="button" class="tab @(ActiveTab == InventoryTab.Materials ? "tab-active" : string.Empty)" role="tab" aria-selected="@(ActiveTab == InventoryTab.Materials ? "true" : "false")" aria-controls="inventory-materials-panel" id="inventory-materials-tab" tabindex="@(ActiveTab == InventoryTab.Materials ? "0" : "-1")" @onclick="() => SelectTab(InventoryTab.Materials)">@L["inventory_tab_materials"]</button>
+            <button type="button" class="tab @(ActiveTab == InventoryTab.Categories ? "tab-active" : string.Empty)" role="tab" aria-selected="@(ActiveTab == InventoryTab.Categories ? "true" : "false")" aria-controls="inventory-categories-panel" id="inventory-categories-tab" tabindex="@(ActiveTab == InventoryTab.Categories ? "0" : "-1")" @onclick="() => SelectTab(InventoryTab.Categories)">@L["inventory_tab_categories"]</button>
+            <button type="button" class="tab @(ActiveTab == InventoryTab.Statuses ? "tab-active" : string.Empty)" role="tab" aria-selected="@(ActiveTab == InventoryTab.Statuses ? "true" : "false")" aria-controls="inventory-statuses-panel" id="inventory-statuses-tab" tabindex="@(ActiveTab == InventoryTab.Statuses ? "0" : "-1")" @onclick="() => SelectTab(InventoryTab.Statuses)">@L["inventory_tab_statuses"]</button>
+        </div>
+
+        @if (ActiveTab == InventoryTab.Materials)
+        {
+            <section id="inventory-materials-panel" class="inventory-management__panel" role="tabpanel" aria-labelledby="inventory-materials-tab" tabindex="0">
+                <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm inventory-management__card">
+                    <legend class="fieldset-legend inventory-management__legend">@L[IsEditingMaterial ? "inventory_edit_material" : "inventory_new_material"]</legend>
+                    <div class="card-body">
+                        <EditForm Model="MaterialEditor" OnSubmit="SaveMaterialAsync" class="inventory-management__form">
+                            <div class="inventory-management__grid">
+                                <label class="form-control inventory-management__field" for="inventory-material-description">
+                                    <span class="label"><span class="label-text">@L["inventory_description"]</span></span>
+                                    <InputText id="inventory-material-description" class="input input-bordered" @bind-Value="MaterialEditor.Description" />
+                                    @foreach (var error in GetFieldErrors(MaterialErrors, nameof(MaterialEditor.Description)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+
+                                <label class="form-control inventory-management__field" for="inventory-material-brand-model">
+                                    <span class="label"><span class="label-text">@L["inventory_brand_model"]</span></span>
+                                    <InputText id="inventory-material-brand-model" class="input input-bordered" @bind-Value="MaterialEditor.BrandModel" />
+                                    @foreach (var error in GetFieldErrors(MaterialErrors, nameof(MaterialEditor.BrandModel)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+
+                                <label class="form-control inventory-management__field" for="inventory-material-quantity">
+                                    <span class="label"><span class="label-text">@L["inventory_quantity"]</span></span>
+                                    <InputNumber id="inventory-material-quantity" class="input input-bordered" @bind-Value="MaterialEditor.Quantity" />
+                                    @foreach (var error in GetFieldErrors(MaterialErrors, nameof(MaterialEditor.Quantity)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+
+                                <label class="form-control inventory-management__field" for="inventory-material-category">
+                                    <span class="label"><span class="label-text">@L["inventory_category"]</span></span>
+                                    <InputSelect id="inventory-material-category" class="select select-bordered" @bind-Value="MaterialEditor.CategoryId">
+                                        <option value="">@L["inventory_select_category"]</option>
+                                        @foreach (var category in MaterialCategoryOptions)
+                                        {
+                                            <option value="@category.Id">@category.Label</option>
+                                        }
+                                    </InputSelect>
+                                    @foreach (var error in GetFieldErrors(MaterialErrors, nameof(MaterialEditor.CategoryId)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+
+                                <label class="form-control inventory-management__field" for="inventory-material-status">
+                                    <span class="label"><span class="label-text">@L["inventory_status"]</span></span>
+                                    <InputSelect id="inventory-material-status" class="select select-bordered" @bind-Value="MaterialEditor.StatusId">
+                                        <option value="">@L["inventory_select_status"]</option>
+                                        @foreach (var status in Statuses)
+                                        {
+                                            <option value="@status.Id">@status.Name</option>
+                                        }
+                                    </InputSelect>
+                                    @foreach (var error in GetFieldErrors(MaterialErrors, nameof(MaterialEditor.StatusId)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+
+                                <label class="form-control inventory-management__field" for="inventory-material-acquisition-date">
+                                    <span class="label"><span class="label-text">@L["inventory_acquisition_date"]</span></span>
+                                    <InputDate id="inventory-material-acquisition-date" class="input input-bordered" @bind-Value="MaterialEditor.AcquisitionDate" />
+                                    @foreach (var error in GetFieldErrors(MaterialErrors, nameof(MaterialEditor.AcquisitionDate)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+
+                                <label class="form-control inventory-management__field" for="inventory-material-acquisition-or-donation">
+                                    <span class="label"><span class="label-text">@L["inventory_acquisition_or_donation"]</span></span>
+                                    <InputText id="inventory-material-acquisition-or-donation" class="input input-bordered" @bind-Value="MaterialEditor.AcquisitionOrDonation" />
+                                    @foreach (var error in GetFieldErrors(MaterialErrors, nameof(MaterialEditor.AcquisitionOrDonation)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+
+                                <label class="form-control inventory-management__field" for="inventory-material-serial-number">
+                                    <span class="label"><span class="label-text">@L["inventory_serial_number"]</span></span>
+                                    <InputText id="inventory-material-serial-number" class="input input-bordered" @bind-Value="MaterialEditor.SerialNumber" />
+                                    @foreach (var error in GetFieldErrors(MaterialErrors, nameof(MaterialEditor.SerialNumber)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+
+                                <label class="form-control inventory-management__field inventory-management__field--wide" for="inventory-material-notes">
+                                    <span class="label"><span class="label-text">@L["inventory_notes"]</span></span>
+                                    <InputTextArea id="inventory-material-notes" class="textarea textarea-bordered" @bind-Value="MaterialEditor.Notes" />
+                                    @foreach (var error in GetFieldErrors(MaterialErrors, nameof(MaterialEditor.Notes)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+                            </div>
+
+                            <div class="inventory-management__actions">
+                                <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">@L["inventory_save"]</button>
+                                @if (IsEditingMaterial)
+                                {
+                                    <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="BeginCreateMaterial">@L["inventory_cancel"]</button>
+                                }
+                            </div>
+                        </EditForm>
+                    </div>
+                </fieldset>
+
+                <section class="card border border-base-200 bg-base-100 shadow-sm inventory-management__card" aria-labelledby="inventory-materials-title">
+                    <div class="card-body">
+                        <div class="inventory-management__section-head">
+                            <h2 id="inventory-materials-title">@L["inventory_tab_materials"]</h2>
+                            @if (IsEditingMaterial)
+                            {
+                                <button type="button" class="btn btn-outline" @onclick="BeginCreateMaterial">@L["inventory_new_material"]</button>
+                            }
+                        </div>
+                        @if (Materials.Count == 0)
+                        {
+                            <div class="alert alert-info inventory-management__feedback"><span>@L["inventory_empty_materials"]</span></div>
+                        }
+                        else
+                        {
+                            <div class="overflow-x-auto">
+                                <table class="table table-zebra inventory-management__table">
+                                    <thead><tr><th>@L["inventory_description"]</th><th>@L["inventory_quantity"]</th><th>@L["inventory_category"]</th><th>@L["inventory_status"]</th><th><span class="sr-only">@L["inventory_actions"]</span></th></tr></thead>
+                                    <tbody>
+                                        @foreach (var material in Materials)
+                                        {
+                                            <tr>
+                                                <td>@material.Description</td>
+                                                <td>@material.Quantity</td>
+                                                <td>@GetMaterialCategoryLabel(material)</td>
+                                                <td>@material.StatusName</td>
+                                                <td class="inventory-management__row-actions">
+                                                    <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEditMaterial(material)">@L["inventory_edit"]</button>
+                                                    <button type="button" class="btn btn-sm btn-error btn-outline" @onclick="() => RequestDeletion(PendingDeleteKind.Material, material.Id, material.Description, false)">@L["inventory_delete"]</button>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </section>
+        }
+        else if (ActiveTab == InventoryTab.Categories)
+        {
+            <section id="inventory-categories-panel" class="inventory-management__panel" role="tabpanel" aria-labelledby="inventory-categories-tab" tabindex="0">
+                <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm inventory-management__card">
+                    <legend class="fieldset-legend inventory-management__legend">@L[IsEditingCategory ? "inventory_edit_category" : "inventory_new_category"]</legend>
+                    <div class="card-body">
+                        <EditForm Model="CategoryEditor" OnSubmit="SaveCategoryAsync" class="inventory-management__form">
+                            <div class="inventory-management__grid">
+                                <label class="form-control inventory-management__field" for="inventory-category-name">
+                                    <span class="label"><span class="label-text">@L["inventory_name"]</span></span>
+                                    <InputText id="inventory-category-name" class="input input-bordered" @bind-Value="CategoryEditor.Name" />
+                                    @foreach (var error in GetFieldErrors(CategoryErrors, nameof(CategoryEditor.Name)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+                                <label class="form-control inventory-management__field" for="inventory-category-parent">
+                                    <span class="label"><span class="label-text">@L["inventory_parent_category"]</span></span>
+                                    <InputSelect id="inventory-category-parent" class="select select-bordered" @bind-Value="CategoryEditor.ParentCategoryId" disabled="@EditingCategoryHasChildren">
+                                        <option value="">@L["inventory_no_parent_category"]</option>
+                                        @foreach (var category in AvailableParentCategories)
+                                        {
+                                            <option value="@category.Id">@category.Name</option>
+                                        }
+                                    </InputSelect>
+                                    @foreach (var error in GetFieldErrors(CategoryErrors, nameof(CategoryEditor.ParentCategoryId)))
+                                    {
+                                        <span class="label-text-alt text-error">@error</span>
+                                    }
+                                </label>
+                            </div>
+                            <div class="inventory-management__actions">
+                                <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">@L["inventory_save"]</button>
+                                @if (IsEditingCategory)
+                                {
+                                    <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="BeginCreateCategory">@L["inventory_cancel"]</button>
+                                }
+                            </div>
+                        </EditForm>
+                    </div>
+                </fieldset>
+
+                <section class="card border border-base-200 bg-base-100 shadow-sm inventory-management__card" aria-labelledby="inventory-categories-title">
+                    <div class="card-body">
+                        <div class="inventory-management__section-head">
+                            <h2 id="inventory-categories-title">@L["inventory_tab_categories"]</h2>
+                            @if (IsEditingCategory)
+                            {
+                                <button type="button" class="btn btn-outline" @onclick="BeginCreateCategory">@L["inventory_new_category"]</button>
+                            }
+                        </div>
+                        @if (Categories.Count == 0)
+                        {
+                            <div class="alert alert-info inventory-management__feedback"><span>@L["inventory_empty_categories"]</span></div>
+                        }
+                        else
+                        {
+                            <ul class="list rounded-box border border-base-200 bg-base-100 inventory-management__list">
+                                @foreach (var category in Categories)
+                                {
+                                    <li class="list-row inventory-management__list-row">
+                                        <div class="inventory-management__list-copy"><strong>@category.Name</strong></div>
+                                        <div class="inventory-management__row-actions">
+                                            <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEditCategory(category)">@L["inventory_edit"]</button>
+                                            <button type="button" class="btn btn-sm btn-error btn-outline" @onclick="() => RequestDeletion(PendingDeleteKind.Category, category.Id, category.Name, category.Subcategories.Count > 0 || IsCategoryUsedByMaterial(category.Id))">@L["inventory_delete"]</button>
+                                        </div>
+                                    </li>
+                                    @foreach (var subcategory in category.Subcategories)
+                                    {
+                                        <li class="list-row inventory-management__list-row inventory-management__list-row--child">
+                                            <div class="inventory-management__list-copy"><strong>@subcategory.Name</strong></div>
+                                            <div class="inventory-management__row-actions">
+                                                <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEditCategory(subcategory)">@L["inventory_edit"]</button>
+                                                <button type="button" class="btn btn-sm btn-error btn-outline" @onclick="() => RequestDeletion(PendingDeleteKind.Category, subcategory.Id, subcategory.Name, IsCategoryUsedByMaterial(subcategory.Id))">@L["inventory_delete"]</button>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        }
+                    </div>
+                </section>
+            </section>
+        }
+        else
+        {
+            <section id="inventory-statuses-panel" class="inventory-management__panel" role="tabpanel" aria-labelledby="inventory-statuses-tab" tabindex="0">
+                <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm inventory-management__card">
+                    <legend class="fieldset-legend inventory-management__legend">@L[IsEditingStatus ? "inventory_edit_status" : "inventory_new_status"]</legend>
+                    <div class="card-body">
+                        <EditForm Model="StatusEditor" OnSubmit="SaveStatusAsync" class="inventory-management__form">
+                            <label class="form-control inventory-management__field" for="inventory-status-name">
+                                <span class="label"><span class="label-text">@L["inventory_name"]</span></span>
+                                <InputText id="inventory-status-name" class="input input-bordered" @bind-Value="StatusEditor.Name" />
+                                @foreach (var error in GetFieldErrors(StatusErrors, nameof(StatusEditor.Name)))
+                                {
+                                    <span class="label-text-alt text-error">@error</span>
+                                }
+                            </label>
+                            <div class="inventory-management__actions">
+                                <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">@L["inventory_save"]</button>
+                                @if (IsEditingStatus)
+                                {
+                                    <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="BeginCreateStatus">@L["inventory_cancel"]</button>
+                                }
+                            </div>
+                        </EditForm>
+                    </div>
+                </fieldset>
+
+                <section class="card border border-base-200 bg-base-100 shadow-sm inventory-management__card" aria-labelledby="inventory-statuses-title">
+                    <div class="card-body">
+                        <div class="inventory-management__section-head">
+                            <h2 id="inventory-statuses-title">@L["inventory_tab_statuses"]</h2>
+                            @if (IsEditingStatus)
+                            {
+                                <button type="button" class="btn btn-outline" @onclick="BeginCreateStatus">@L["inventory_new_status"]</button>
+                            }
+                        </div>
+                        @if (Statuses.Count == 0)
+                        {
+                            <div class="alert alert-info inventory-management__feedback"><span>@L["inventory_empty_statuses"]</span></div>
+                        }
+                        else
+                        {
+                            <ul class="list rounded-box border border-base-200 bg-base-100 inventory-management__list">
+                                @foreach (var status in Statuses)
+                                {
+                                    <li class="list-row inventory-management__list-row">
+                                        <div class="inventory-management__list-copy"><strong>@status.Name</strong></div>
+                                        <div class="inventory-management__row-actions">
+                                            <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEditStatus(status)">@L["inventory_edit"]</button>
+                                            <button type="button" class="btn btn-sm btn-error btn-outline" @onclick="() => RequestDeletion(PendingDeleteKind.Status, status.Id, status.Name, IsStatusUsedByMaterial(status.Id))">@L["inventory_delete"]</button>
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </section>
+            </section>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(LoadErrorMessage))
+        {
+            <button type="button" class="btn btn-outline inventory-management__retry" @onclick="ReloadAsync">@L["inventory_retry"]</button>
+        }
+    }
+
+    @if (PendingDeletion is not null)
+    {
+        <dialog class="modal modal-middle inventory-management__confirm" open aria-modal="true" aria-labelledby="inventory-delete-title">
+            <div class="modal-box">
+                <h2 id="inventory-delete-title">@L["inventory_confirm_delete"]</h2>
+                <p>@string.Format(L["inventory_delete_confirmation"], PendingDeletion.Name)</p>
+                @if (PendingDeletion.HasKnownDependents)
+                {
+                    <p class="text-warning">@L["inventory_delete_dependency_warning"]</p>
+                }
+                <div class="modal-action">
+                    <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="CancelDeletion">@L["inventory_cancel"]</button>
+                    <button type="button" class="btn btn-error" disabled="@IsSubmitting" @onclick="ConfirmDeletionAsync">@L["inventory_delete"]</button>
+                </div>
+            </div>
+        </dialog>
+    }
+</section>

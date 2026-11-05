@@ -4,6 +4,7 @@ using IndaloaventurApp.SharedUI.Abstractions.Auth;
 using IndaloaventurApp.SharedUI.Abstractions.Cargos;
 using IndaloaventurApp.SharedUI.Abstractions.Licenses;
 using IndaloaventurApp.SharedUI.Abstractions.Member;
+using IndaloaventurApp.SharedUI.Abstractions.Inventory;
 using IndaloaventurApp.SharedUI.Abstractions.Phonebook;
 using IndaloaventurApp.SharedUI.Abstractions.Signals;
 using IndaloaventurApp.SharedUI.Abstractions.Session;
@@ -12,6 +13,7 @@ using IndaloaventurApp.SharedUI.Models.Auth;
 using IndaloaventurApp.Web.Client.Infrastructure.Auth;
 using IndaloaventurApp.Web.Client.Infrastructure.Cargos;
 using IndaloaventurApp.Web.Client.Infrastructure.Licenses;
+using IndaloaventurApp.Web.Client.Infrastructure.Inventory;
 using IndaloaventurApp.Web.Client.Infrastructure.Member;
 using IndaloaventurApp.Web.Client.Infrastructure.Phonebook;
 using IndaloaventurApp.Web.Client.Infrastructure.Signals;
@@ -73,6 +75,21 @@ public static class ServiceCollectionExtensions
             client.Timeout = TimeSpan.FromSeconds(20);
         });
         services.AddHttpClient<ICargoAdminService, CargoAdminApiClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(20);
+        });
+        services.AddHttpClient<IInventoryService, InventoryApiClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(20);
+        });
+        services.AddHttpClient<IInventoryReservationAdminService, InventoryReservationAdminApiClient>(client =>
+        {
+            client.BaseAddress = new Uri(apiBaseUrl);
+            client.Timeout = TimeSpan.FromSeconds(20);
+        });
+        services.AddHttpClient<IMemberMaterialReservationService, MemberMaterialReservationApiClient>(client =>
         {
             client.BaseAddress = new Uri(apiBaseUrl);
             client.Timeout = TimeSpan.FromSeconds(20);

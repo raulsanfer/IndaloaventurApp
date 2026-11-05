@@ -1,0 +1,72 @@
+@using IndaloaventurApp.SharedUI.Models.Inventory
+
+<section class="member-material-reservations">
+    <header class="member-material-reservations__header">
+        <nav class="breadcrumbs text-sm" aria-label="@L["member_material_reservations_breadcrumb_label"]">
+            <ul>
+                <li><a href="/mi-club">@L["mi_club_back"]</a></li>
+                <li aria-current="page">@L["member_material_reservations_title"]</li>
+            </ul>
+        </nav>
+        <div>
+            <p class="member-material-reservations__eyebrow">@L["mi_club_eyebrow"]</p>
+            <h1>@L["member_material_reservations_title"]</h1>
+            <p>@L["member_material_reservations_intro"]</p>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="alert alert-error member-material-reservations__feedback" role="alert"><span>@ErrorMessage</span></div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="alert alert-info member-material-reservations__feedback" aria-live="polite">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["member_material_reservations_loading"]</span>
+        </div>
+    }
+    else if (IsForbidden)
+    {
+        <div class="alert alert-warning member-material-reservations__feedback" role="alert"><span>@L["member_material_reservations_forbidden"]</span></div>
+    }
+    else if (Reservations.Count == 0)
+    {
+        <div class="alert alert-info member-material-reservations__feedback"><span>@L["member_material_reservations_empty"]</span></div>
+    }
+    else
+    {
+        <div class="member-material-reservations__list" role="list" aria-label="@L["member_material_reservations_title"]">
+            @foreach (var reservation in Reservations)
+            {
+                <a class="card card-sm border border-base-200 bg-base-100 shadow-sm member-material-reservations__card" role="listitem" href="@DetailHref(reservation.Id)">
+                    <div class="card-body">
+                        <div class="member-material-reservations__card-head">
+                            <h2 class="card-title">@reservation.MaterialDescription</h2>
+                            <span class="badge @GetStatusBadgeClass(reservation.Status)">@GetStatusLabel(reservation.Status)</span>
+                        </div>
+                        <p class="member-material-reservations__quantity">@string.Format(L["member_material_reservations_units"], reservation.RequestedQuantity)</p>
+                        <dl class="member-material-reservations__dates">
+                            <div>
+                                <dt>@L["member_material_reservations_request_date"]</dt>
+                                <dd>@FormatRequestDate(reservation.RequestedAtUtc)</dd>
+                            </div>
+                            <div>
+                                <dt>@L["member_material_reservations_pickup_date"]</dt>
+                                <dd>@FormatDate(reservation.ScheduledPickupDate)</dd>
+                            </div>
+                        </dl>
+                    </div>
+                </a>
+            }
+        </div>
+    }
+
+    @if (!IsForbidden)
+    {
+        <a class="btn btn-primary btn-circle member-material-reservations__create-button" href="/mi-club/reservas-material/nueva" aria-label="@L["member_material_reservations_new"]" title="@L["member_material_reservations_new"]">
+            <span aria-hidden="true">+</span>
+        </a>
+    }
+</section>

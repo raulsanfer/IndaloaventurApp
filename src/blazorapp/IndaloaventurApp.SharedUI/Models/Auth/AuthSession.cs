@@ -49,6 +49,14 @@ public sealed record AuthSession
         return IsMember && IsInRole("Member");
     }
 
+    /// <summary>
+    /// Gets whether this session can access reservations owned by the current member.
+    /// </summary>
+    public bool CanAccessOwnMaterialReservations()
+    {
+        return IsMember && IsInRole("Member");
+    }
+
     public bool CanAdministerFederativeLicenses()
     {
         return IsInRole("Admin");

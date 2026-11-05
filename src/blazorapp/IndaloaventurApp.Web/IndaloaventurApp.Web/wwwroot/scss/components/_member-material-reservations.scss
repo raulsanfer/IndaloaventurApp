@@ -1,0 +1,230 @@
+.member-material-reservations {
+  display: grid;
+  gap: 20px;
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding-bottom: 84px;
+}
+
+.member-material-reservations__header {
+  display: grid;
+  gap: 10px;
+}
+
+.member-material-reservations__header h1,
+.member-material-reservations__card-title {
+  margin: 0;
+  color: #4a311e;
+}
+
+.member-material-reservations__header h1 {
+  font-size: clamp(1.75rem, 5vw, 2.45rem);
+  line-height: 1.1;
+}
+
+.member-material-reservations__header p:not(.member-material-reservations__eyebrow) {
+  margin: 0;
+  color: var(--color-text-muted);
+  max-width: 60ch;
+}
+
+.member-material-reservations__eyebrow {
+  margin: 0;
+  color: var(--color-primary-dark);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.member-material-reservations__list {
+  display: grid;
+  gap: 14px;
+}
+
+.member-material-reservations__card {
+  color: inherit;
+  transition: border-color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+}
+
+.member-material-reservations__card:hover,
+.member-material-reservations__card:focus-visible {
+  border-color: #dfbda3;
+  box-shadow: 0 14px 28px rgba(60, 35, 19, 0.12);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.member-material-reservations__card .card-body,
+.member-material-reservations__detail-card .card-body,
+.member-material-reservations__form .card-body {
+  display: grid;
+  gap: 16px;
+}
+
+.member-material-reservations__card-head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.member-material-reservations__card-head .card-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.member-material-reservations__quantity,
+.member-material-reservations__hint {
+  margin: 0;
+  color: #6f6054;
+}
+
+.member-material-reservations__dates,
+.member-material-reservations__detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.member-material-reservations__dates div,
+.member-material-reservations__detail-grid div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #efdfd2;
+  border-radius: 14px;
+  background: #fffdf8;
+}
+
+.member-material-reservations__dates dt,
+.member-material-reservations__detail-grid dt {
+  color: #8a6e5b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.member-material-reservations__dates dd,
+.member-material-reservations__detail-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.member-material-reservations__notes {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border-left: 4px solid #f0c49c;
+  background: #fffaf5;
+}
+
+.member-material-reservations__notes h2,
+.member-material-reservations__notes p {
+  margin: 0;
+}
+
+.member-material-reservations__notes p {
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.member-material-reservations__actions,
+.member-material-reservations__form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.member-material-reservations__form-dates {
+  display: grid;
+  gap: 14px;
+}
+
+.member-material-reservations__form .form-control {
+  gap: 6px;
+}
+
+.member-material-reservations__form .label {
+  padding: 0;
+}
+
+.member-material-reservations__form .select,
+.member-material-reservations__form .input,
+.member-material-reservations__form .textarea {
+  width: 100%;
+}
+
+.member-material-reservations__feedback {
+  margin: 0;
+  justify-content: flex-start;
+}
+
+.member-material-reservations__availability {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  align-items: start;
+}
+
+.member-material-reservations__availability-note {
+  color: #6f6054;
+  font-size: 0.82rem;
+}
+
+.member-material-reservations__create-button {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  z-index: 20;
+  min-width: 3.5rem;
+  min-height: 3.5rem;
+  border-radius: 999px;
+  box-shadow: 0 12px 24px rgba(60, 35, 19, 0.28);
+  font-size: 1.75rem;
+}
+
+.member-material-reservations__modal .modal-box {
+  display: grid;
+  gap: 16px;
+}
+
+.member-material-reservations__modal .modal-box > p {
+  margin: 0;
+  color: #6f6054;
+}
+
+@media (min-width: 640px) {
+  .member-material-reservations__form-dates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .member-material-reservations {
+    width: min(100%, 820px);
+  }
+
+  .member-material-reservations__detail-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .member-material-reservations__create-button {
+    right: max(32px, calc((100vw - 820px) / 2));
+  }
+}
+
+@media (max-width: 420px) {
+  .member-material-reservations__dates,
+  .member-material-reservations__detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .member-material-reservations__actions .btn,
+  .member-material-reservations__form-actions .btn {
+    flex: 1 1 100%;
+  }
+}

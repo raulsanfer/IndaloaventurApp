@@ -8,7 +8,7 @@ La composicion de servicios esta centralizada para que los componentes dependan 
 
 - `ISessionService` con `SessionService`;
 - `GoogleAuthOptions`;
-- clientes HTTP tipados para autenticacion, perfiles, usuarios admin, WordPress, agenda telefonica, signals, licencias federativas y cargos.
+- clientes HTTP tipados para autenticacion, perfiles, usuarios admin, WordPress, agenda telefonica, signals, licencias federativas, cargos, inventario, reservas administrativas y reservas propias de material.
 
 Cada cliente HTTP recibe `BaseAddress` desde configuracion y un timeout de 20 segundos.
 

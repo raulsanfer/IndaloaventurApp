@@ -1,0 +1,12 @@
+@page "/configuracion/inventario"
+@using IndaloaventurApp.SharedUI.Components.Settings
+@using IndaloaventurApp.SharedUI.Components.Shell
+
+<PageTitle>Inventario</PageTitle>
+
+@if (CanManageInventory)
+{
+    <AuthenticatedShell ActiveHref="/mi-cuenta">
+        <InventoryManagementView />
+    </AuthenticatedShell>
+}

@@ -2,7 +2,7 @@
 
 ## Proposito
 
-Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licencias federativas y categorias de signals.
+Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licencias federativas, categorias de signals y reservas de material.
 
 ## Componentes y paginas
 
@@ -16,6 +16,8 @@ Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licenci
 - `IndaloaventurApp.SharedUI/Components/Settings/CargoManagementView.razor`: gestion de cargos.
 - `IndaloaventurApp.Web.Client/Pages/SettingsSignalsPage.razor`: ruta `/configuracion/signals`.
 - `IndaloaventurApp.SharedUI/Components/Settings/SignalSettingsHubView.razor`: hub admin de signals.
+- `IndaloaventurApp.Web.Client/Pages/SettingsMaterialReservationsPage.razor`: ruta `/configuracion/reservas-material` protegida para Admin.
+- `IndaloaventurApp.SharedUI/Components/Settings/MaterialReservationsManagementView.razor`: listado, detalle y decisiones administrativas de reservas de material.
 
 ## Servicios y contratos
 
@@ -23,10 +25,13 @@ Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licenci
 - `ICargoAdminService`
 - `IAdminFederativeLicenseService`
 - `ISignalService`
+- `IInventoryReservationAdminService`
 - `AdminUserManagementApiClient`
 - `CargoAdminApiClient`
 - `AdminFederativeLicenseApiClient`
+- `InventoryReservationAdminApiClient`
 - `ManagedUserItem`, `AdminUserPasswordChangeRequest`, `CargoItem`, `CreateCargoRequest`, `UpdateCargoRequest`
+- `MaterialReservation`, `MaterialReservationStatus`, `RegisterAdminMaterialReservationPickupRequest`, `CancelAdminMaterialReservationRequest`, `ConfirmAdminMaterialReservationReturnRequest`
 
 ## Estados
 
@@ -36,6 +41,9 @@ Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licenci
 - cambio de contraseña mediante `PUT /api/users/{userId}/password`, reservado a Admin y sin exponer secretos en la UI;
 - creacion, edicion y borrado de cargos;
 - gestion de categorias de signals;
+- consulta de reservas de material con datos de socio solo en la ruta Admin;
+- retirada y cancelacion para reservas solicitadas, y confirmacion administrativa de devolucion o cancelacion para reservas retiradas;
+- recarga de listado y detalle despues de cada respuesta correcta, sin actualizar estados de forma optimista;
 - errores de permisos, validacion o conectividad.
 
 ## Tests relacionados
@@ -46,5 +54,8 @@ Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licenci
 - `IndaloaventurApp.Frontend.Tests/Features/Admin/CargoManagementViewTests.cs`
 - `IndaloaventurApp.Frontend.Tests/Features/Admin/CargoAdminApiClientTests.cs`
 - `IndaloaventurApp.Frontend.Tests/Features/Settings/SettingsViewTests.cs`
+- `IndaloaventurApp.Frontend.Tests/Features/Inventory/SettingsMaterialReservationsPageTests.cs`
+- `IndaloaventurApp.Frontend.Tests/Features/Inventory/MaterialReservationsManagementViewTests.cs`
+- `IndaloaventurApp.Frontend.Tests/Features/Inventory/InventoryReservationAdminApiClientTests.cs`
 
 Ver tambien [Autenticacion y sesion](../architecture/authentication-session.md).

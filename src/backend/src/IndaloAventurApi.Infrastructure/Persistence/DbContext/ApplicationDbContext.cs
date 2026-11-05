@@ -4,6 +4,7 @@ using IndaloAventurApi.Domain.FichasContacto;
 using IndaloAventurApi.Domain.FichasSocio;
 using IndaloAventurApi.Domain.LicenciasFederativas;
 using IndaloAventurApi.Domain.Inventario;
+using IndaloAventurApi.Domain.Inventario.ReservasMaterial;
 using IndaloAventurApi.Domain.TrailSignals;
 using IndaloAventurApi.Infrastructure.Security;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -26,6 +27,8 @@ public sealed class ApplicationDbContext : IdentityDbContext<Usuario, IdentityRo
     public DbSet<SignalComment> SignalComments => Set<SignalComment>();
     public DbSet<InventarioCategoria> InventarioCategorias => Set<InventarioCategoria>();
     public DbSet<InventarioEstado> InventarioEstados => Set<InventarioEstado>();
+    public DbSet<InventarioMaterial> InventarioMateriales => Set<InventarioMaterial>();
+    public DbSet<ReservaMaterial> ReservasMaterial => Set<ReservaMaterial>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

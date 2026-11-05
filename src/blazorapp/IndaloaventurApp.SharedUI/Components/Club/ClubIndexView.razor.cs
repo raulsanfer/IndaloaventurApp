@@ -15,4 +15,7 @@ public partial class ClubIndexView
 
     protected bool CanAccessFederativeLicenses =>
         SessionService.CurrentSession?.CanAccessOwnFederativeLicenses() == true;
+
+    protected bool CanAccessMaterialReservations =>
+        SessionService.CurrentSession?.CanAccessOwnMaterialReservations() == true;
 }

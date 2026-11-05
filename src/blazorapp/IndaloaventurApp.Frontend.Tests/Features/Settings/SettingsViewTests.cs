@@ -31,6 +31,8 @@ public sealed class SettingsViewTests : BunitContext
         Assert.DoesNotContain("/configuracion/usuarios", cut.Markup);
         Assert.DoesNotContain("/configuracion/licencias-federativas", cut.Markup);
         Assert.DoesNotContain("/configuracion/signals", cut.Markup);
+        Assert.DoesNotContain("/configuracion/inventario", cut.Markup);
+        Assert.DoesNotContain("/configuracion/reservas-material", cut.Markup);
         Assert.DoesNotContain("settings_admin_title", cut.Markup);
     }
 
@@ -52,6 +54,8 @@ public sealed class SettingsViewTests : BunitContext
         Assert.Contains("/configuracion/usuarios", cut.Markup);
         Assert.Contains("/configuracion/licencias-federativas", cut.Markup);
         Assert.Contains("/configuracion/signals", cut.Markup);
+        Assert.Contains("/configuracion/inventario", cut.Markup);
+        Assert.Contains("/configuracion/reservas-material", cut.Markup);
         Assert.DoesNotContain("settings_summary", cut.Markup);
         Assert.DoesNotContain("settings_admin_description", cut.Markup);
         Assert.DoesNotContain("settings_admin_cargos_description", cut.Markup);

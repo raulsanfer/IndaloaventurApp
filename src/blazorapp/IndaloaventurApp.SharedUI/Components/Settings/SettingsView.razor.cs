@@ -23,4 +23,10 @@ public partial class SettingsView
 
     [Parameter]
     public string SignalsManagementHref { get; set; } = "/configuracion/signals";
+
+    [Parameter]
+    public string InventoryManagementHref { get; set; } = "/configuracion/inventario";
+
+    [Parameter]
+    public string MaterialReservationsManagementHref { get; set; } = "/configuracion/reservas-material";
 }

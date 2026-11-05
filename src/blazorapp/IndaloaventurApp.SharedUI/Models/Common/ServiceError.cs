@@ -5,4 +5,8 @@
 /// </summary>
 /// <param name="Code">Stable machine-readable error code.</param>
 /// <param name="Message">Fallback human-readable error message.</param>
-public sealed record ServiceError(string Code, string Message);
+/// <param name="ValidationErrors">Optional field-level errors returned by the service.</param>
+public sealed record ServiceError(
+    string Code,
+    string Message,
+    IReadOnlyList<ServiceValidationError>? ValidationErrors = null);

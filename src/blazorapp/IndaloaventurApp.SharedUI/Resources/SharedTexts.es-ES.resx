@@ -537,4 +537,162 @@
   <data name="settings_signal_categories_delete_success" xml:space="preserve"><value>La categoría se ha eliminado correctamente.</value></data>
   <data name="settings_signal_categories_icon_format" xml:space="preserve"><value>Icono: {0}</value></data>
   <data name="settings_signal_categories_icon_empty" xml:space="preserve"><value>Sin icono</value></data>
+  <data name="settings_admin_inventory_title" xml:space="preserve"><value>Inventario</value></data>
+  <data name="inventory_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de inventario</value></data>
+  <data name="inventory_loading" xml:space="preserve"><value>Cargando inventario...</value></data>
+  <data name="inventory_retry" xml:space="preserve"><value>Reintentar</value></data>
+  <data name="inventory_tab_materials" xml:space="preserve"><value>Inventario</value></data>
+  <data name="inventory_tab_categories" xml:space="preserve"><value>Categorías</value></data>
+  <data name="inventory_tab_statuses" xml:space="preserve"><value>Estados</value></data>
+  <data name="inventory_new_material" xml:space="preserve"><value>Nuevo material</value></data>
+  <data name="inventory_edit_material" xml:space="preserve"><value>Editar material</value></data>
+  <data name="inventory_new_category" xml:space="preserve"><value>Nueva categoría</value></data>
+  <data name="inventory_edit_category" xml:space="preserve"><value>Editar categoría</value></data>
+  <data name="inventory_new_status" xml:space="preserve"><value>Nuevo estado</value></data>
+  <data name="inventory_edit_status" xml:space="preserve"><value>Editar estado</value></data>
+  <data name="inventory_name" xml:space="preserve"><value>Nombre</value></data>
+  <data name="inventory_description" xml:space="preserve"><value>Descripción</value></data>
+  <data name="inventory_brand_model" xml:space="preserve"><value>Marca o modelo</value></data>
+  <data name="inventory_quantity" xml:space="preserve"><value>Cantidad</value></data>
+  <data name="inventory_category" xml:space="preserve"><value>Categoría</value></data>
+  <data name="inventory_parent_category" xml:space="preserve"><value>Categoría padre</value></data>
+  <data name="inventory_no_parent_category" xml:space="preserve"><value>Sin categoría padre</value></data>
+  <data name="inventory_select_category" xml:space="preserve"><value>Selecciona una categoría</value></data>
+  <data name="inventory_status" xml:space="preserve"><value>Estado</value></data>
+  <data name="inventory_select_status" xml:space="preserve"><value>Selecciona un estado</value></data>
+  <data name="inventory_acquisition_date" xml:space="preserve"><value>Fecha de adquisición</value></data>
+  <data name="inventory_acquisition_or_donation" xml:space="preserve"><value>Adquirido o donado</value></data>
+  <data name="inventory_notes" xml:space="preserve"><value>Observaciones</value></data>
+  <data name="inventory_serial_number" xml:space="preserve"><value>Número de serie</value></data>
+  <data name="inventory_save" xml:space="preserve"><value>Guardar</value></data>
+  <data name="inventory_cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="inventory_edit" xml:space="preserve"><value>Editar</value></data>
+  <data name="inventory_delete" xml:space="preserve"><value>Borrar</value></data>
+  <data name="inventory_actions" xml:space="preserve"><value>Acciones</value></data>
+  <data name="inventory_empty_materials" xml:space="preserve"><value>No hay material registrado.</value></data>
+  <data name="inventory_empty_categories" xml:space="preserve"><value>No hay categorías registradas.</value></data>
+  <data name="inventory_empty_statuses" xml:space="preserve"><value>No hay estados registrados.</value></data>
+  <data name="inventory_confirm_delete" xml:space="preserve"><value>Confirmar borrado</value></data>
+  <data name="inventory_delete_confirmation" xml:space="preserve"><value>¿Quieres borrar «{0}»?</value></data>
+  <data name="inventory_delete_dependency_warning" xml:space="preserve"><value>Este registro puede tener dependencias. La confirmación final corresponde al servidor.</value></data>
+  <data name="inventory_category_created" xml:space="preserve"><value>Categoría creada correctamente.</value></data>
+  <data name="inventory_category_updated" xml:space="preserve"><value>Categoría actualizada correctamente.</value></data>
+  <data name="inventory_category_deleted" xml:space="preserve"><value>Categoría eliminada correctamente.</value></data>
+  <data name="inventory_status_created" xml:space="preserve"><value>Estado creado correctamente.</value></data>
+  <data name="inventory_status_updated" xml:space="preserve"><value>Estado actualizado correctamente.</value></data>
+  <data name="inventory_status_deleted" xml:space="preserve"><value>Estado eliminado correctamente.</value></data>
+  <data name="inventory_material_created" xml:space="preserve"><value>Material creado correctamente.</value></data>
+  <data name="inventory_material_updated" xml:space="preserve"><value>Material actualizado correctamente.</value></data>
+  <data name="inventory_material_deleted" xml:space="preserve"><value>Material eliminado correctamente.</value></data>
+  <data name="inventory_required_field" xml:space="preserve"><value>Este campo es obligatorio.</value></data>
+  <data name="inventory_maximum_length" xml:space="preserve"><value>El valor no puede superar {0} caracteres.</value></data>
+  <data name="inventory_invalid_characters" xml:space="preserve"><value>El valor contiene caracteres no permitidos.</value></data>
+  <data name="inventory_invalid_parent_category" xml:space="preserve"><value>La categoría padre seleccionada ya no está disponible.</value></data>
+  <data name="inventory_duplicate_category_name" xml:space="preserve"><value>Ya existe una categoría con este nombre bajo la misma categoría padre.</value></data>
+  <data name="inventory_duplicate_status_name" xml:space="preserve"><value>Ya existe un estado con este nombre.</value></data>
+  <data name="inventory_quantity_invalid" xml:space="preserve"><value>La cantidad debe ser un número entero mayor que cero.</value></data>
+  <data name="inventory_category_invalid" xml:space="preserve"><value>Selecciona una categoría disponible.</value></data>
+  <data name="inventory_status_invalid" xml:space="preserve"><value>Selecciona un estado disponible.</value></data>
+  <data name="inventory_acquisition_date_invalid" xml:space="preserve"><value>La fecha de adquisición no puede ser futura.</value></data>
+  <data name="inventory_serial_number_quantity_invalid" xml:space="preserve"><value>Un número de serie requiere una cantidad de uno.</value></data>
+  <data name="inventory_duplicate_serial_number" xml:space="preserve"><value>Ya existe un material con este número de serie.</value></data>
+  <data name="inventory_load_error" xml:space="preserve"><value>No pudimos cargar el inventario.</value></data>
+  <data name="inventory_operation_error" xml:space="preserve"><value>No pudimos completar la operación de inventario.</value></data>
+  <data name="settings_admin_material_reservations_title" xml:space="preserve"><value>Reservas de material</value></data>
+  <data name="material_reservations_breadcrumb_label" xml:space="preserve"><value>Migas de pan de reservas de material</value></data>
+  <data name="material_reservations_intro" xml:space="preserve"><value>Consulta las solicitudes y registra las decisiones de entrega, devolución o cancelación.</value></data>
+  <data name="material_reservations_loading" xml:space="preserve"><value>Cargando reservas de material...</value></data>
+  <data name="material_reservations_loading_detail" xml:space="preserve"><value>Cargando detalle de la reserva...</value></data>
+  <data name="material_reservations_forbidden" xml:space="preserve"><value>No tienes permisos para gestionar reservas de material.</value></data>
+  <data name="material_reservations_list_kicker" xml:space="preserve"><value>Solicitudes</value></data>
+  <data name="material_reservations_list_title" xml:space="preserve"><value>Reservas</value></data>
+  <data name="material_reservations_reload" xml:space="preserve"><value>Actualizar</value></data>
+  <data name="material_reservations_empty" xml:space="preserve"><value>No hay reservas de material.</value></data>
+  <data name="material_reservations_units" xml:space="preserve"><value>{0} unidades</value></data>
+  <data name="material_reservations_pickup_short" xml:space="preserve"><value>Retirada</value></data>
+  <data name="material_reservations_return_short" xml:space="preserve"><value>Devolución</value></data>
+  <data name="material_reservations_detail_kicker" xml:space="preserve"><value>Detalle de reserva</value></data>
+  <data name="material_reservations_request_date" xml:space="preserve"><value>Solicitud</value></data>
+  <data name="material_reservations_pickup_planned" xml:space="preserve"><value>Retirada prevista</value></data>
+  <data name="material_reservations_return_estimated" xml:space="preserve"><value>Devolución estimada</value></data>
+  <data name="material_reservations_member" xml:space="preserve"><value>Socio</value></data>
+  <data name="material_reservations_member_email" xml:space="preserve"><value>Correo electrónico</value></data>
+  <data name="material_reservations_requested_quantity" xml:space="preserve"><value>Unidades solicitadas</value></data>
+  <data name="material_reservations_pickup_actual" xml:space="preserve"><value>Retirada efectiva</value></data>
+  <data name="material_reservations_return_actual" xml:space="preserve"><value>Devolución efectiva</value></data>
+  <data name="material_reservations_member_return_confirmation" xml:space="preserve"><value>Confirmación del socio</value></data>
+  <data name="material_reservations_admin_return_confirmation" xml:space="preserve"><value>Confirmación de Administración</value></data>
+  <data name="material_reservations_available_quantity" xml:space="preserve"><value>Disponibilidad actual</value></data>
+  <data name="material_reservations_notes" xml:space="preserve"><value>Observaciones</value></data>
+  <data name="material_reservations_member_notes" xml:space="preserve"><value>Observaciones del socio</value></data>
+  <data name="material_reservations_administration_note" xml:space="preserve"><value>Observación de Administración</value></data>
+  <data name="material_reservations_actions" xml:space="preserve"><value>Acciones</value></data>
+  <data name="material_reservations_final_state" xml:space="preserve"><value>Esta reserva está finalizada y no admite más decisiones.</value></data>
+  <data name="material_reservations_select_prompt" xml:space="preserve"><value>Selecciona una reserva para consultar su detalle.</value></data>
+  <data name="material_reservations_not_available" xml:space="preserve"><value>No disponible</value></data>
+  <data name="material_reservations_status_requested" xml:space="preserve"><value>Solicitada</value></data>
+  <data name="material_reservations_status_picked_up" xml:space="preserve"><value>Retirada</value></data>
+  <data name="material_reservations_status_returned" xml:space="preserve"><value>Entregada</value></data>
+  <data name="material_reservations_status_cancelled" xml:space="preserve"><value>Cancelada</value></data>
+  <data name="material_reservations_status_unknown" xml:space="preserve"><value>Estado no reconocido</value></data>
+  <data name="material_reservations_confirmed" xml:space="preserve"><value>Confirmada</value></data>
+  <data name="material_reservations_pending" xml:space="preserve"><value>Pendiente</value></data>
+  <data name="material_reservations_register_pickup" xml:space="preserve"><value>Registrar retirada</value></data>
+  <data name="material_reservations_confirm_return" xml:space="preserve"><value>Confirmar devolución</value></data>
+  <data name="material_reservations_cancel" xml:space="preserve"><value>Cancelar reserva</value></data>
+  <data name="material_reservations_pickup_confirmation" xml:space="preserve"><value>Confirma la fecha en que se entregó el material al socio.</value></data>
+  <data name="material_reservations_cancellation_confirmation" xml:space="preserve"><value>La cancelación es una decisión irreversible. Revisa los datos antes de confirmarla.</value></data>
+  <data name="material_reservations_return_confirmation" xml:space="preserve"><value>Confirma la fecha efectiva de devolución del material al club.</value></data>
+  <data name="material_reservations_confirm_pickup" xml:space="preserve"><value>Confirmar retirada</value></data>
+  <data name="material_reservations_confirm_cancellation" xml:space="preserve"><value>Confirmar cancelación</value></data>
+  <data name="material_reservations_cancellation_note_required" xml:space="preserve"><value>La observación es obligatoria para una reserva ya retirada.</value></data>
+  <data name="material_reservations_cancellation_note_optional" xml:space="preserve"><value>La observación es opcional para una reserva solicitada.</value></data>
+  <data name="material_reservations_required_field" xml:space="preserve"><value>Este campo es obligatorio.</value></data>
+  <data name="material_reservations_return_before_pickup" xml:space="preserve"><value>La devolución no puede ser anterior a la retirada efectiva.</value></data>
+  <data name="material_reservations_back" xml:space="preserve"><value>Volver</value></data>
+  <data name="material_reservations_close" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="material_reservations_action_updated" xml:space="preserve"><value>La reserva se ha actualizado con la información confirmada por el servidor.</value></data>
+  <data name="material_reservations_operation_error" xml:space="preserve"><value>No pudimos completar la operación de reserva.</value></data>
+  <data name="material_reservations_load_error" xml:space="preserve"><value>No pudimos cargar las reservas de material.</value></data>
+  <data name="material_reservations_not_found" xml:space="preserve"><value>La reserva ya no está disponible.</value></data>
+  <data name="member_material_reservations_title" xml:space="preserve"><value>Reservas de material</value></data>
+  <data name="member_material_reservations_description" xml:space="preserve"><value>Consulta y solicita material para tus actividades.</value></data>
+  <data name="member_material_reservations_breadcrumb_label" xml:space="preserve"><value>Navegación de reservas de material</value></data>
+  <data name="member_material_reservations_intro" xml:space="preserve"><value>Consulta tus solicitudes de material y crea una nueva cuando la necesites.</value></data>
+  <data name="member_material_reservations_loading" xml:space="preserve"><value>Cargando tus reservas de material...</value></data>
+  <data name="member_material_reservations_loading_detail" xml:space="preserve"><value>Cargando el detalle de la reserva...</value></data>
+  <data name="member_material_reservations_loading_materials" xml:space="preserve"><value>Cargando materiales disponibles para solicitar...</value></data>
+  <data name="member_material_reservations_forbidden" xml:space="preserve"><value>No tienes permisos de socio para gestionar reservas de material.</value></data>
+  <data name="member_material_reservations_empty" xml:space="preserve"><value>Aún no has realizado ninguna solicitud de material.</value></data>
+  <data name="member_material_reservations_units" xml:space="preserve"><value>{0} unidades</value></data>
+  <data name="member_material_reservations_request_date" xml:space="preserve"><value>Fecha de solicitud</value></data>
+  <data name="member_material_reservations_pickup_date" xml:space="preserve"><value>Recogida prevista</value></data>
+  <data name="member_material_reservations_return_estimated" xml:space="preserve"><value>Devolución estimada</value></data>
+  <data name="member_material_reservations_requested_quantity" xml:space="preserve"><value>Material solicitado</value></data>
+  <data name="member_material_reservations_detail_title" xml:space="preserve"><value>Detalle de la solicitud</value></data>
+  <data name="member_material_reservations_notes" xml:space="preserve"><value>Observaciones</value></data>
+  <data name="member_material_reservations_notes_optional" xml:space="preserve"><value>Observaciones (opcional)</value></data>
+  <data name="member_material_reservations_replace_hint" xml:space="preserve"><value>Si necesitas cambiar la solicitud, cancélala y crea una nueva.</value></data>
+  <data name="member_material_reservations_read_only" xml:space="preserve"><value>Esta reserva está en solo lectura.</value></data>
+  <data name="member_material_reservations_new" xml:space="preserve"><value>Nueva solicitud</value></data>
+  <data name="member_material_reservations_new_intro" xml:space="preserve"><value>Indica el material y las fechas previstas. La disponibilidad final la confirma el club.</value></data>
+  <data name="member_material_reservations_material" xml:space="preserve"><value>Material</value></data>
+  <data name="member_material_reservations_select_material" xml:space="preserve"><value>Selecciona un material</value></data>
+  <data name="member_material_reservations_available_units" xml:space="preserve"><value>Unidades disponibles ahora: {0}</value></data>
+  <data name="member_material_reservations_availability_disclaimer" xml:space="preserve"><value>Es una estimación informativa; se volverá a validar al enviar la solicitud.</value></data>
+  <data name="member_material_reservations_submit" xml:space="preserve"><value>Enviar solicitud</value></data>
+  <data name="member_material_reservations_back" xml:space="preserve"><value>Volver</value></data>
+  <data name="member_material_reservations_close" xml:space="preserve"><value>Cerrar</value></data>
+  <data name="member_material_reservations_cancel" xml:space="preserve"><value>Cancelar solicitud</value></data>
+  <data name="member_material_reservations_confirm_return" xml:space="preserve"><value>Confirmar devolución</value></data>
+  <data name="member_material_reservations_cancel_confirmation" xml:space="preserve"><value>La cancelación es irreversible. Revisa la solicitud antes de confirmarla.</value></data>
+  <data name="member_material_reservations_return_confirmation" xml:space="preserve"><value>Confirma que ya has devuelto el material al club. Esta confirmación no se puede deshacer.</value></data>
+  <data name="member_material_reservations_confirm_cancellation" xml:space="preserve"><value>Confirmar cancelación</value></data>
+  <data name="member_material_reservations_status_requested" xml:space="preserve"><value>Solicitada</value></data>
+  <data name="member_material_reservations_status_picked_up" xml:space="preserve"><value>Retirada</value></data>
+  <data name="member_material_reservations_status_returned" xml:space="preserve"><value>Entregada</value></data>
+  <data name="member_material_reservations_status_cancelled" xml:space="preserve"><value>Cancelada</value></data>
+  <data name="member_material_reservations_status_unknown" xml:space="preserve"><value>Estado no reconocido</value></data>
+  <data name="member_material_reservations_load_error" xml:space="preserve"><value>No pudimos cargar tus reservas de material.</value></data>
+  <data name="member_material_reservations_operation_error" xml:space="preserve"><value>No pudimos completar la operación de reserva.</value></data>
 </root>

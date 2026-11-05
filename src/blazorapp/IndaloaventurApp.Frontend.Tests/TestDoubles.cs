@@ -9,6 +9,7 @@ using Bunit;
 using IndaloaventurApp.SharedUI.Abstractions.Auth;
 using IndaloaventurApp.SharedUI.Abstractions.Cargos;
 using IndaloaventurApp.SharedUI.Abstractions.FoodAlerts;
+using IndaloaventurApp.SharedUI.Abstractions.Inventory;
 using IndaloaventurApp.SharedUI.Abstractions.Licenses;
 using IndaloaventurApp.SharedUI.Abstractions.Member;
 using IndaloaventurApp.SharedUI.Abstractions.Signals;
@@ -18,6 +19,7 @@ using IndaloaventurApp.SharedUI.Models.Auth;
 using IndaloaventurApp.SharedUI.Models.Cargos;
 using IndaloaventurApp.SharedUI.Models.Common;
 using IndaloaventurApp.SharedUI.Models.FoodAlerts;
+using IndaloaventurApp.SharedUI.Models.Inventory;
 using IndaloaventurApp.SharedUI.Models.Signals;
 using IndaloaventurApp.SharedUI.Models.Member;
 using IndaloaventurApp.SharedUI.Models.Licenses;
@@ -445,6 +447,209 @@ internal sealed class RecordingCargoAdminService : ICargoAdminService
     {
         return DeleteCargoHandler?.Invoke(id, cancellationToken)
             ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("cargos.unavailable", "Missing delete handler")));
+    }
+}
+
+internal sealed class RecordingInventoryService : IInventoryService
+{
+    public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<InventoryCategory>>>>? GetCategoriesHandler { get; init; }
+
+    public Func<CreateInventoryCategoryRequest, CancellationToken, Task<ServiceResult<int>>>? CreateCategoryHandler { get; init; }
+
+    public Func<UpdateInventoryCategoryRequest, CancellationToken, Task<ServiceResult<bool>>>? UpdateCategoryHandler { get; init; }
+
+    public Func<int, CancellationToken, Task<ServiceResult<bool>>>? DeleteCategoryHandler { get; init; }
+
+    public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<InventoryStatus>>>>? GetStatusesHandler { get; init; }
+
+    public Func<CreateInventoryStatusRequest, CancellationToken, Task<ServiceResult<int>>>? CreateStatusHandler { get; init; }
+
+    public Func<UpdateInventoryStatusRequest, CancellationToken, Task<ServiceResult<bool>>>? UpdateStatusHandler { get; init; }
+
+    public Func<int, CancellationToken, Task<ServiceResult<bool>>>? DeleteStatusHandler { get; init; }
+
+    public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<InventoryMaterial>>>>? GetMaterialsHandler { get; init; }
+
+    public Func<SaveInventoryMaterialRequest, CancellationToken, Task<ServiceResult<int>>>? CreateMaterialHandler { get; init; }
+
+    public Func<UpdateInventoryMaterialRequest, CancellationToken, Task<ServiceResult<bool>>>? UpdateMaterialHandler { get; init; }
+
+    public Func<int, CancellationToken, Task<ServiceResult<bool>>>? DeleteMaterialHandler { get; init; }
+
+    public Task<ServiceResult<IReadOnlyList<InventoryCategory>>> GetCategoriesAsync(CancellationToken cancellationToken = default)
+        => GetCategoriesHandler?.Invoke(cancellationToken)
+           ?? Task.FromResult(ServiceResult<IReadOnlyList<InventoryCategory>>.Success(Array.Empty<InventoryCategory>()));
+
+    public Task<ServiceResult<int>> CreateCategoryAsync(CreateInventoryCategoryRequest request, CancellationToken cancellationToken = default)
+        => CreateCategoryHandler?.Invoke(request, cancellationToken)
+           ?? Task.FromResult(ServiceResult<int>.Failure(new ServiceError("inventory.unavailable", "Missing category create handler")));
+
+    public Task<ServiceResult<bool>> UpdateCategoryAsync(UpdateInventoryCategoryRequest request, CancellationToken cancellationToken = default)
+        => UpdateCategoryHandler?.Invoke(request, cancellationToken)
+           ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("inventory.unavailable", "Missing category update handler")));
+
+    public Task<ServiceResult<bool>> DeleteCategoryAsync(int id, CancellationToken cancellationToken = default)
+        => DeleteCategoryHandler?.Invoke(id, cancellationToken)
+           ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("inventory.unavailable", "Missing category delete handler")));
+
+    public Task<ServiceResult<IReadOnlyList<InventoryStatus>>> GetStatusesAsync(CancellationToken cancellationToken = default)
+        => GetStatusesHandler?.Invoke(cancellationToken)
+           ?? Task.FromResult(ServiceResult<IReadOnlyList<InventoryStatus>>.Success(Array.Empty<InventoryStatus>()));
+
+    public Task<ServiceResult<int>> CreateStatusAsync(CreateInventoryStatusRequest request, CancellationToken cancellationToken = default)
+        => CreateStatusHandler?.Invoke(request, cancellationToken)
+           ?? Task.FromResult(ServiceResult<int>.Failure(new ServiceError("inventory.unavailable", "Missing status create handler")));
+
+    public Task<ServiceResult<bool>> UpdateStatusAsync(UpdateInventoryStatusRequest request, CancellationToken cancellationToken = default)
+        => UpdateStatusHandler?.Invoke(request, cancellationToken)
+           ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("inventory.unavailable", "Missing status update handler")));
+
+    public Task<ServiceResult<bool>> DeleteStatusAsync(int id, CancellationToken cancellationToken = default)
+        => DeleteStatusHandler?.Invoke(id, cancellationToken)
+           ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("inventory.unavailable", "Missing status delete handler")));
+
+    public Task<ServiceResult<IReadOnlyList<InventoryMaterial>>> GetMaterialsAsync(CancellationToken cancellationToken = default)
+        => GetMaterialsHandler?.Invoke(cancellationToken)
+           ?? Task.FromResult(ServiceResult<IReadOnlyList<InventoryMaterial>>.Success(Array.Empty<InventoryMaterial>()));
+
+    public Task<ServiceResult<int>> CreateMaterialAsync(SaveInventoryMaterialRequest request, CancellationToken cancellationToken = default)
+        => CreateMaterialHandler?.Invoke(request, cancellationToken)
+           ?? Task.FromResult(ServiceResult<int>.Failure(new ServiceError("inventory.unavailable", "Missing material create handler")));
+
+    public Task<ServiceResult<bool>> UpdateMaterialAsync(UpdateInventoryMaterialRequest request, CancellationToken cancellationToken = default)
+        => UpdateMaterialHandler?.Invoke(request, cancellationToken)
+           ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("inventory.unavailable", "Missing material update handler")));
+
+    public Task<ServiceResult<bool>> DeleteMaterialAsync(int id, CancellationToken cancellationToken = default)
+        => DeleteMaterialHandler?.Invoke(id, cancellationToken)
+           ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("inventory.unavailable", "Missing material delete handler")));
+}
+
+internal sealed class RecordingInventoryReservationAdminService : IInventoryReservationAdminService
+{
+    public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<MaterialReservation>>>>? GetReservationsHandler { get; init; }
+
+    public Func<Guid, CancellationToken, Task<ServiceResult<MaterialReservation>>>? GetReservationHandler { get; init; }
+
+    public Func<Guid, RegisterAdminMaterialReservationPickupRequest, CancellationToken, Task<ServiceResult<bool>>>? RegisterPickupHandler { get; init; }
+
+    public Func<Guid, CancelAdminMaterialReservationRequest, CancellationToken, Task<ServiceResult<bool>>>? CancelReservationHandler { get; init; }
+
+    public Func<Guid, ConfirmAdminMaterialReservationReturnRequest, CancellationToken, Task<ServiceResult<bool>>>? ConfirmReturnHandler { get; init; }
+
+    public RegisterAdminMaterialReservationPickupRequest? LastPickupRequest { get; private set; }
+
+    public CancelAdminMaterialReservationRequest? LastCancellationRequest { get; private set; }
+
+    public ConfirmAdminMaterialReservationReturnRequest? LastReturnConfirmationRequest { get; private set; }
+
+    public Task<ServiceResult<IReadOnlyList<MaterialReservation>>> GetReservationsAsync(CancellationToken cancellationToken = default)
+        => GetReservationsHandler?.Invoke(cancellationToken)
+           ?? Task.FromResult(ServiceResult<IReadOnlyList<MaterialReservation>>.Success(Array.Empty<MaterialReservation>()));
+
+    public Task<ServiceResult<MaterialReservation>> GetReservationAsync(Guid reservationId, CancellationToken cancellationToken = default)
+        => GetReservationHandler?.Invoke(reservationId, cancellationToken)
+           ?? Task.FromResult(ServiceResult<MaterialReservation>.Failure(new ServiceError("reservations.not_found", "Missing reservation detail handler")));
+
+    public Task<ServiceResult<bool>> RegisterPickupAsync(
+        Guid reservationId,
+        RegisterAdminMaterialReservationPickupRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        LastPickupRequest = request;
+        return RegisterPickupHandler?.Invoke(reservationId, request, cancellationToken)
+            ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("reservations.unavailable", "Missing pickup handler")));
+    }
+
+    public Task<ServiceResult<bool>> CancelReservationAsync(
+        Guid reservationId,
+        CancelAdminMaterialReservationRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        LastCancellationRequest = request;
+        return CancelReservationHandler?.Invoke(reservationId, request, cancellationToken)
+            ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("reservations.unavailable", "Missing cancellation handler")));
+    }
+
+    public Task<ServiceResult<bool>> ConfirmReturnAsync(
+        Guid reservationId,
+        ConfirmAdminMaterialReservationReturnRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        LastReturnConfirmationRequest = request;
+        return ConfirmReturnHandler?.Invoke(reservationId, request, cancellationToken)
+            ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("reservations.unavailable", "Missing return confirmation handler")));
+    }
+}
+
+internal sealed class RecordingMemberMaterialReservationService : IMemberMaterialReservationService
+{
+    public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<MaterialReservation>>>>? GetMyReservationsHandler { get; init; }
+
+    public Func<Guid, CancellationToken, Task<ServiceResult<MaterialReservation>>>? GetMyReservationHandler { get; init; }
+
+    public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<ReservableInventoryMaterial>>>>? GetReservableMaterialsHandler { get; init; }
+
+    public Func<CreateMemberMaterialReservationRequest, CancellationToken, Task<ServiceResult<MaterialReservation>>>? CreateReservationHandler { get; init; }
+
+    public Func<Guid, CancellationToken, Task<ServiceResult<bool>>>? CancelReservationHandler { get; init; }
+
+    public Func<Guid, CancellationToken, Task<ServiceResult<bool>>>? ConfirmReturnHandler { get; init; }
+
+    public CreateMemberMaterialReservationRequest? LastCreateRequest { get; private set; }
+
+    public int GetMyReservationsCallCount { get; private set; }
+
+    public int GetMyReservationCallCount { get; private set; }
+
+    public int GetReservableMaterialsCallCount { get; private set; }
+
+    public int CancelCallCount { get; private set; }
+
+    public int ConfirmReturnCallCount { get; private set; }
+
+    public Task<ServiceResult<IReadOnlyList<MaterialReservation>>> GetMyReservationsAsync(CancellationToken cancellationToken = default)
+    {
+        GetMyReservationsCallCount++;
+        return GetMyReservationsHandler?.Invoke(cancellationToken)
+            ?? Task.FromResult(ServiceResult<IReadOnlyList<MaterialReservation>>.Success(Array.Empty<MaterialReservation>()));
+    }
+
+    public Task<ServiceResult<MaterialReservation>> GetMyReservationAsync(Guid reservationId, CancellationToken cancellationToken = default)
+    {
+        GetMyReservationCallCount++;
+        return GetMyReservationHandler?.Invoke(reservationId, cancellationToken)
+            ?? Task.FromResult(ServiceResult<MaterialReservation>.Failure(new ServiceError("reservations.not_found", "Missing member reservation handler")));
+    }
+
+    public Task<ServiceResult<IReadOnlyList<ReservableInventoryMaterial>>> GetReservableMaterialsAsync(CancellationToken cancellationToken = default)
+    {
+        GetReservableMaterialsCallCount++;
+        return GetReservableMaterialsHandler?.Invoke(cancellationToken)
+            ?? Task.FromResult(ServiceResult<IReadOnlyList<ReservableInventoryMaterial>>.Success(Array.Empty<ReservableInventoryMaterial>()));
+    }
+
+    public Task<ServiceResult<MaterialReservation>> CreateReservationAsync(
+        CreateMemberMaterialReservationRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        LastCreateRequest = request;
+        return CreateReservationHandler?.Invoke(request, cancellationToken)
+            ?? Task.FromResult(ServiceResult<MaterialReservation>.Failure(new ServiceError("reservations.unavailable", "Missing member reservation create handler")));
+    }
+
+    public Task<ServiceResult<bool>> CancelReservationAsync(Guid reservationId, CancellationToken cancellationToken = default)
+    {
+        CancelCallCount++;
+        return CancelReservationHandler?.Invoke(reservationId, cancellationToken)
+            ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("reservations.unavailable", "Missing member reservation cancellation handler")));
+    }
+
+    public Task<ServiceResult<bool>> ConfirmReturnAsync(Guid reservationId, CancellationToken cancellationToken = default)
+    {
+        ConfirmReturnCallCount++;
+        return ConfirmReturnHandler?.Invoke(reservationId, cancellationToken)
+            ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("reservations.unavailable", "Missing member reservation return handler")));
     }
 }
 

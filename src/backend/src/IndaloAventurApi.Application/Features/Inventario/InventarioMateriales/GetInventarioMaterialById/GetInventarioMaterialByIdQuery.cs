@@ -1,0 +1,3 @@
+using IndaloAventurApi.Application.Abstractions.Cqrs; using IndaloAventurApi.Application.Abstractions.Inventario;
+namespace IndaloAventurApi.Application.Features.Inventario.InventarioMateriales.GetInventarioMaterialById;
+public sealed record GetInventarioMaterialByIdQuery(int Id):IQuery<InventarioMaterialDto>;

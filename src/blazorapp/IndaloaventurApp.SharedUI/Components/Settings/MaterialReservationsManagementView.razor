@@ -1,0 +1,256 @@
+@using IndaloaventurApp.SharedUI.Resources
+@using IndaloaventurApp.SharedUI.Models.Inventory
+
+<section class="material-reservations">
+    <header class="material-reservations__header">
+        <nav class="breadcrumbs text-sm" aria-label="@L["material_reservations_breadcrumb_label"]">
+            <ul>
+                <li><a href="/mi-cuenta">@L["shell_nav_my_account"]</a></li>
+                <li><a href="/configuracion">@L["settings_title"]</a></li>
+                <li aria-current="page">@L["settings_admin_material_reservations_title"]</li>
+            </ul>
+        </nav>
+
+        <div class="material-reservations__hero card border border-base-200 bg-base-100 shadow-sm">
+            <div class="card-body">
+                <div class="material-reservations__hero-topline">
+                    <p class="material-reservations__eyebrow">@L["settings_admin_title"]</p>
+                    <span class="badge badge-outline">@L["settings_admin_material_reservations_title"]</span>
+                </div>
+                <h1>@L["settings_admin_material_reservations_title"]</h1>
+                <p>@L["material_reservations_intro"]</p>
+            </div>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(StatusMessage))
+    {
+        <div class="alert alert-success material-reservations__status" role="status">
+            <span>@StatusMessage</span>
+        </div>
+    }
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="alert alert-error material-reservations__status" role="alert">
+            <span>@ErrorMessage</span>
+        </div>
+    }
+
+    @if (IsForbidden)
+    {
+        <div class="alert alert-warning material-reservations__status" role="alert">
+            <span>@L["material_reservations_forbidden"]</span>
+        </div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="alert alert-info material-reservations__feedback" aria-live="polite">
+            <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+            <span>@L["material_reservations_loading"]</span>
+        </div>
+    }
+    else
+    {
+        <div class="material-reservations__layout">
+            <section class="card border border-base-200 bg-base-100 shadow-sm material-reservations__list-card" aria-labelledby="material-reservations-list-title">
+                <div class="card-body">
+                    <div class="material-reservations__section-head">
+                        <div>
+                            <p class="material-reservations__section-kicker">@L["material_reservations_list_kicker"]</p>
+                            <h2 id="material-reservations-list-title">@L["material_reservations_list_title"]</h2>
+                        </div>
+                        @if (!IsForbidden)
+                        {
+                            <button type="button" class="btn btn-sm btn-outline" disabled="@IsDetailLoading" @onclick="ReloadAsync">@L["material_reservations_reload"]</button>
+                        }
+                    </div>
+
+                    @if (Reservations.Count == 0)
+                    {
+                        <div class="alert alert-info material-reservations__feedback"><span>@L["material_reservations_empty"]</span></div>
+                    }
+                    else
+                    {
+                        <ul class="list rounded-box border border-base-200 material-reservations__list" aria-label="@L["material_reservations_list_title"]">
+                            @foreach (var reservation in Reservations)
+                            {
+                                <li class="material-reservations__list-item">
+                                    <button id="material-reservation-@reservation.Id" type="button" class="material-reservations__list-button @(SelectedReservationId == reservation.Id ? "material-reservations__list-button--active" : string.Empty)" aria-pressed="@(SelectedReservationId == reservation.Id ? "true" : "false")" @onclick="() => SelectReservationAsync(reservation.Id)">
+                                        <span class="material-reservations__list-main">
+                                            <strong>@reservation.MaterialDescription</strong>
+                                            <span>@string.Format(L["material_reservations_units"], reservation.RequestedQuantity)</span>
+                                        </span>
+                                        <span class="material-reservations__list-meta">
+                                            <span class="badge @GetStatusBadgeClass(reservation.Status)">@GetStatusLabel(reservation.Status)</span>
+                                            <span>@L["material_reservations_pickup_short"]: @FormatDate(reservation.ScheduledPickupDate)</span>
+                                            <span>@L["material_reservations_return_short"]: @FormatDate(reservation.EstimatedReturnDate)</span>
+                                        </span>
+                                    </button>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </section>
+
+            <section class="material-reservations__detail" aria-live="polite" aria-busy="@IsDetailLoading">
+                @if (IsDetailLoading)
+                {
+                    <div class="card border border-base-200 bg-base-100 shadow-sm material-reservations__detail-card">
+                        <div class="card-body">
+                            <div class="alert alert-info material-reservations__feedback">
+                                <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
+                                <span>@L["material_reservations_loading_detail"]</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else if (SelectedReservation is null)
+                {
+                    <div class="card border border-base-200 bg-base-100 shadow-sm material-reservations__detail-card">
+                        <div class="card-body">
+                            <div class="alert alert-info material-reservations__feedback"><span>@L["material_reservations_select_prompt"]</span></div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <article class="card border border-base-200 bg-base-100 shadow-sm material-reservations__detail-card" aria-labelledby="material-reservation-detail-title">
+                        <div class="card-body">
+                            <div class="material-reservations__section-head">
+                                <div>
+                                    <p class="material-reservations__section-kicker">@L["material_reservations_detail_kicker"]</p>
+                                    <h2 id="material-reservation-detail-title">@SelectedReservation.MaterialDescription</h2>
+                                </div>
+                                <span class="badge badge-lg @GetStatusBadgeClass(SelectedReservation.Status)">@GetStatusLabel(SelectedReservation.Status)</span>
+                            </div>
+
+                            <div class="material-reservations__priority-grid">
+                                <div class="material-reservations__priority-item">
+                                    <span>@L["material_reservations_request_date"]</span>
+                                    <strong>@FormatRequestDate(SelectedReservation.RequestedAtUtc)</strong>
+                                </div>
+                                <div class="material-reservations__priority-item">
+                                    <span>@L["material_reservations_pickup_planned"]</span>
+                                    <strong>@FormatDate(SelectedReservation.ScheduledPickupDate)</strong>
+                                </div>
+                                <div class="material-reservations__priority-item">
+                                    <span>@L["material_reservations_return_estimated"]</span>
+                                    <strong>@FormatDate(SelectedReservation.EstimatedReturnDate)</strong>
+                                </div>
+                            </div>
+
+                            <dl class="material-reservations__details-grid">
+                                <div><dt>@L["material_reservations_member"]</dt><dd>@(SelectedReservation.Member?.FullName ?? L["material_reservations_not_available"])</dd></div>
+                                <div><dt>@L["material_reservations_member_email"]</dt><dd>@(SelectedReservation.Member?.Email ?? L["material_reservations_not_available"])</dd></div>
+                                <div><dt>@L["material_reservations_requested_quantity"]</dt><dd>@SelectedReservation.RequestedQuantity</dd></div>
+                                <div><dt>@L["material_reservations_pickup_actual"]</dt><dd>@FormatDate(SelectedReservation.PickupDate)</dd></div>
+                                <div><dt>@L["material_reservations_return_actual"]</dt><dd>@FormatDate(SelectedReservation.ActualReturnDate)</dd></div>
+                                <div><dt>@L["material_reservations_member_return_confirmation"]</dt><dd>@FormatConfirmation(SelectedReservation.MemberReturnConfirmed)</dd></div>
+                                <div><dt>@L["material_reservations_admin_return_confirmation"]</dt><dd>@FormatConfirmation(SelectedReservation.AdministrationReturnConfirmed)</dd></div>
+                                @if (SelectedReservation.Availability is not null)
+                                {
+                                    <div><dt>@L["material_reservations_available_quantity"]</dt><dd>@SelectedReservation.Availability.AvailableQuantity / @SelectedReservation.Availability.TotalQuantity</dd></div>
+                                }
+                            </dl>
+
+                            @if (!string.IsNullOrWhiteSpace(SelectedReservation.MemberNotes) || !string.IsNullOrWhiteSpace(SelectedReservation.AdministrationNote))
+                            {
+                                <section class="material-reservations__notes" aria-label="@L["material_reservations_notes"]">
+                                    @if (!string.IsNullOrWhiteSpace(SelectedReservation.MemberNotes))
+                                    {
+                                        <div><h3>@L["material_reservations_member_notes"]</h3><p>@SelectedReservation.MemberNotes</p></div>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(SelectedReservation.AdministrationNote))
+                                    {
+                                        <div><h3>@L["material_reservations_administration_note"]</h3><p>@SelectedReservation.AdministrationNote</p></div>
+                                    }
+                                </section>
+                            }
+
+                            @if (!IsForbidden && (CanRegisterPickup || CanConfirmReturn || CanCancelReservation))
+                            {
+                                <div class="material-reservations__actions" aria-label="@L["material_reservations_actions"]">
+                                    @if (CanRegisterPickup)
+                                    {
+                                        <button type="button" class="btn btn-primary" @onclick="BeginPickup">@L["material_reservations_register_pickup"]</button>
+                                    }
+                                    @if (CanConfirmReturn)
+                                    {
+                                        <button type="button" class="btn btn-primary" @onclick="BeginReturnConfirmation">@L["material_reservations_confirm_return"]</button>
+                                    }
+                                    @if (CanCancelReservation)
+                                    {
+                                        <button type="button" class="btn btn-error btn-outline" @onclick="BeginCancellation">@L["material_reservations_cancel"]</button>
+                                    }
+                                </div>
+                            }
+                            else if (SelectedReservation.Status is MaterialReservationStatus.Returned or MaterialReservationStatus.Cancelled)
+                            {
+                                <div class="alert alert-info material-reservations__feedback"><span>@L["material_reservations_final_state"]</span></div>
+                            }
+                        </div>
+                    </article>
+                }
+            </section>
+        </div>
+    }
+
+    @if (PendingAction != ReservationAction.None && SelectedReservation is not null)
+    {
+        <div class="modal modal-open material-reservations__modal" role="dialog" aria-modal="true" aria-labelledby="material-reservation-action-title">
+            <div class="modal-box">
+                <div class="material-reservations__section-head">
+                    <h2 id="material-reservation-action-title">@GetActionTitle()</h2>
+                    <button type="button" class="btn btn-sm btn-circle btn-ghost" aria-label="@L["material_reservations_close"]" disabled="@IsSubmitting" @onclick="DismissAction">×</button>
+                </div>
+                <p>@GetActionDescription()</p>
+
+                <EditForm Model="ActionEditor" OnSubmit="SubmitPendingActionAsync" class="material-reservations__form">
+                    @if (PendingAction == ReservationAction.Pickup)
+                    {
+                        <label class="form-control material-reservations__field" for="material-reservation-pickup-date">
+                            <span class="label"><span class="label-text">@L["material_reservations_pickup_actual"]</span></span>
+                            <InputDate id="material-reservation-pickup-date" class="input input-bordered" @bind-Value="ActionEditor.PickupDate" />
+                            @foreach (var error in GetFieldErrors(nameof(ActionEditor.PickupDate)))
+                            {
+                                <span class="label-text-alt text-error">@error</span>
+                            }
+                        </label>
+                    }
+                    else if (PendingAction == ReservationAction.ReturnConfirmation)
+                    {
+                        <label class="form-control material-reservations__field" for="material-reservation-return-date">
+                            <span class="label"><span class="label-text">@L["material_reservations_return_actual"]</span></span>
+                            <InputDate id="material-reservation-return-date" class="input input-bordered" @bind-Value="ActionEditor.ActualReturnDate" />
+                            @foreach (var error in GetFieldErrors(nameof(ActionEditor.ActualReturnDate)))
+                            {
+                                <span class="label-text-alt text-error">@error</span>
+                            }
+                        </label>
+                    }
+                    else if (PendingAction == ReservationAction.Cancellation)
+                    {
+                        <label class="form-control material-reservations__field" for="material-reservation-cancellation-note">
+                            <span class="label"><span class="label-text">@L["material_reservations_administration_note"]</span></span>
+                            <InputTextArea id="material-reservation-cancellation-note" class="textarea textarea-bordered" @bind-Value="ActionEditor.AdministrationNote" />
+                            <span class="label-text-alt">@(SelectedReservation.Status == MaterialReservationStatus.PickedUp ? L["material_reservations_cancellation_note_required"] : L["material_reservations_cancellation_note_optional"])</span>
+                            @foreach (var error in GetFieldErrors(nameof(ActionEditor.AdministrationNote)))
+                            {
+                                <span class="label-text-alt text-error">@error</span>
+                            }
+                        </label>
+                    }
+
+                    <div class="modal-action material-reservations__modal-actions">
+                        <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="DismissAction">@L["material_reservations_back"]</button>
+                        <button type="submit" class="btn @(PendingAction == ReservationAction.Cancellation ? "btn-error" : "btn-primary")" disabled="@IsSubmitting">@GetActionSubmitLabel()</button>
+                    </div>
+                </EditForm>
+            </div>
+            <button type="button" class="modal-backdrop" aria-label="@L["material_reservations_close"]" disabled="@IsSubmitting" @onclick="DismissAction">@L["material_reservations_close"]</button>
+        </div>
+    }
+</section>

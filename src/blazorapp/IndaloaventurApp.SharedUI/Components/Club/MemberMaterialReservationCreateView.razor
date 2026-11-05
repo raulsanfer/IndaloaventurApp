@@ -1,0 +1,88 @@
+@using IndaloaventurApp.SharedUI.Models.Inventory
+@using Microsoft.AspNetCore.Components.Forms
+
+<section class="member-material-reservations" aria-busy="@IsLoading">
+    <header class="member-material-reservations__header">
+        <nav class="breadcrumbs text-sm" aria-label="@L["member_material_reservations_breadcrumb_label"]">
+            <ul>
+                <li><a href="/mi-club">@L["mi_club_back"]</a></li>
+                <li><a href="/mi-club/reservas-material">@L["member_material_reservations_title"]</a></li>
+                <li aria-current="page">@L["member_material_reservations_new"]</li>
+            </ul>
+        </nav>
+        <h1>@L["member_material_reservations_new"]</h1>
+        <p>@L["member_material_reservations_new_intro"]</p>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="alert alert-error member-material-reservations__feedback" role="alert"><span>@ErrorMessage</span></div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="alert alert-info member-material-reservations__feedback"><span class="loading loading-spinner loading-sm" aria-hidden="true"></span><span>@L["member_material_reservations_loading_materials"]</span></div>
+    }
+    else if (IsForbidden)
+    {
+        <div class="alert alert-warning member-material-reservations__feedback" role="alert"><span>@L["member_material_reservations_forbidden"]</span></div>
+    }
+    else
+    {
+        <EditForm EditContext="EditContext" OnValidSubmit="SubmitAsync" class="card border border-base-200 bg-base-100 shadow-sm member-material-reservations__form">
+            <DataAnnotationsValidator />
+            <div class="card-body">
+                <ValidationSummary class="text-error" />
+                <label class="form-control" for="member-reservation-material">
+                    <span class="label"><span class="label-text">@L["member_material_reservations_material"]</span></span>
+                    <InputSelect id="member-reservation-material" class="select select-bordered" @bind-Value="Form.InventoryMaterialId" disabled="@IsSubmitting">
+                        <option value="">@L["member_material_reservations_select_material"]</option>
+                        @foreach (var material in Materials)
+                        {
+                            <option value="@material.Id">@material.Description</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => Form.InventoryMaterialId)" class="label-text-alt text-error" />
+                </label>
+
+                @if (SelectedMaterial is not null)
+                {
+                    <div class="alert alert-info member-material-reservations__availability" role="status">
+                        <span>@string.Format(L["member_material_reservations_available_units"], SelectedMaterial.AvailableQuantity)</span>
+                        <span class="member-material-reservations__availability-note">@L["member_material_reservations_availability_disclaimer"]</span>
+                    </div>
+                }
+
+                <label class="form-control" for="member-reservation-quantity">
+                    <span class="label"><span class="label-text">@L["member_material_reservations_requested_quantity"]</span></span>
+                    <InputNumber id="member-reservation-quantity" class="input input-bordered" @bind-Value="Form.RequestedQuantity" disabled="@IsSubmitting" />
+                    <ValidationMessage For="@(() => Form.RequestedQuantity)" class="label-text-alt text-error" />
+                </label>
+
+                <div class="member-material-reservations__form-dates">
+                    <label class="form-control" for="member-reservation-pickup-date">
+                        <span class="label"><span class="label-text">@L["member_material_reservations_pickup_date"]</span></span>
+                        <InputDate id="member-reservation-pickup-date" class="input input-bordered" @bind-Value="Form.ScheduledPickupDate" disabled="@IsSubmitting" />
+                        <ValidationMessage For="@(() => Form.ScheduledPickupDate)" class="label-text-alt text-error" />
+                    </label>
+                    <label class="form-control" for="member-reservation-return-date">
+                        <span class="label"><span class="label-text">@L["member_material_reservations_return_estimated"]</span></span>
+                        <InputDate id="member-reservation-return-date" class="input input-bordered" @bind-Value="Form.EstimatedReturnDate" disabled="@IsSubmitting" />
+                        <ValidationMessage For="@(() => Form.EstimatedReturnDate)" class="label-text-alt text-error" />
+                    </label>
+                </div>
+
+                <label class="form-control" for="member-reservation-notes">
+                    <span class="label"><span class="label-text">@L["member_material_reservations_notes_optional"]</span></span>
+                    <InputTextArea id="member-reservation-notes" class="textarea textarea-bordered" maxlength="2000" @bind-Value="Form.MemberNotes" disabled="@IsSubmitting" />
+                    <ValidationMessage For="@(() => Form.MemberNotes)" class="label-text-alt text-error" />
+                </label>
+
+                <div class="card-actions member-material-reservations__form-actions">
+                    <a class="btn btn-ghost" href="/mi-club/reservas-material">@L["member_material_reservations_back"]</a>
+                    <button type="submit" class="btn btn-primary" disabled="@IsSubmitDisabled">@L["member_material_reservations_submit"]</button>
+                </div>
+            </div>
+        </EditForm>
+    }
+</section>

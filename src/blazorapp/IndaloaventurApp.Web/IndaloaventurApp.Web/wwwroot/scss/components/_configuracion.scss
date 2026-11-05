@@ -1027,6 +1027,150 @@
   font-size: 0.92rem;
 }
 
+.inventory-management {
+  display: grid;
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: var(--space-lg);
+}
+
+.inventory-management__header {
+  display: grid;
+  gap: 8px;
+}
+
+.inventory-management__hero-topline,
+.inventory-management__section-head,
+.inventory-management__actions,
+.inventory-management__row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.inventory-management__hero-topline,
+.inventory-management__section-head {
+  justify-content: space-between;
+}
+
+.inventory-management__hero .card-body,
+.inventory-management__card .card-body {
+  display: grid;
+  gap: 20px;
+}
+
+.inventory-management__hero h1,
+.inventory-management__section-head h2 {
+  margin: 0;
+}
+
+.inventory-management__hero h1 {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.1;
+}
+
+.inventory-management__eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.inventory-management__tabs {
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.inventory-management__tabs .tab {
+  min-height: 42px;
+}
+
+.inventory-management__panel {
+  display: grid;
+  gap: 20px;
+}
+
+.inventory-management__form,
+.inventory-management__grid {
+  display: grid;
+  gap: 16px;
+}
+
+.inventory-management__field {
+  gap: 4px;
+}
+
+.inventory-management__field .label {
+  padding: 0;
+}
+
+.inventory-management__field .label-text {
+  color: #554233;
+  font-weight: 600;
+}
+
+.inventory-management__field .input,
+.inventory-management__field .select,
+.inventory-management__field .textarea {
+  width: 100%;
+}
+
+.inventory-management__row-actions {
+  justify-content: flex-end;
+}
+
+.inventory-management__list {
+  padding: 0;
+  margin: 0;
+}
+
+.inventory-management__list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.inventory-management__list-row--child {
+  padding-left: 40px;
+}
+
+.inventory-management__list-copy {
+  min-width: 0;
+}
+
+.inventory-management__table th,
+.inventory-management__table td {
+  white-space: nowrap;
+}
+
+.inventory-management__status,
+.inventory-management__feedback {
+  margin: 0;
+}
+
+.inventory-management__feedback {
+  justify-content: flex-start;
+}
+
+.inventory-management__confirm .modal-box {
+  display: grid;
+  gap: 14px;
+}
+
+.inventory-management__confirm .modal-box h2,
+.inventory-management__confirm .modal-box p {
+  margin: 0;
+}
+
+.inventory-management__retry {
+  width: fit-content;
+}
+
 @media (min-width: 768px) {
   .settings-cargos {
     gap: 28px;
@@ -1057,6 +1201,14 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .inventory-management__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .inventory-management__field--wide {
+    grid-column: span 2;
+  }
+
   .settings-admin-member-file__grid-span-2 {
     grid-column: span 2;
   }
@@ -1068,7 +1220,8 @@
   .settings-federative-licenses,
   .settings-signals,
   .settings-signal-categories,
-  .settings-admin-member-file {
+  .settings-admin-member-file,
+  .inventory-management {
     gap: 18px;
   }
 
@@ -1122,7 +1275,10 @@
   .settings-federative-licenses__section-header,
   .settings-federative-licenses__actions,
   .settings-admin-member-file__section-head,
-  .settings-admin-member-file__actions {
+  .settings-admin-member-file__actions,
+  .inventory-management__hero-topline,
+  .inventory-management__section-head,
+  .inventory-management__row-actions {
     width: 100%;
     align-items: start;
     justify-content: flex-start;
@@ -1131,7 +1287,8 @@
   .settings-cargos__list-item,
   .settings-signal-categories__list-item,
   .settings-users__list-item,
-  .settings-federative-licenses__list-item {
+  .settings-federative-licenses__list-item,
+  .inventory-management__list-row {
     flex-direction: column;
     align-items: start;
   }
@@ -1148,5 +1305,259 @@
   .settings-federative-licenses__status-editor {
     width: 100%;
     justify-items: stretch;
+  }
+
+  .inventory-management__tabs {
+    width: 100%;
+  }
+
+  .inventory-management__tabs .tab {
+    flex: 1 0 auto;
+  }
+
+  .inventory-management__actions .btn,
+  .inventory-management__row-actions .btn {
+    flex: 1 1 auto;
+  }
+}
+
+.material-reservations {
+  display: grid;
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: var(--space-lg);
+}
+
+.material-reservations__header,
+.material-reservations__layout,
+.material-reservations__detail,
+.material-reservations__form,
+.material-reservations__notes {
+  display: grid;
+  gap: 20px;
+}
+
+.material-reservations__hero-topline,
+.material-reservations__section-head,
+.material-reservations__actions,
+.material-reservations__modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.material-reservations__hero-topline,
+.material-reservations__section-head {
+  justify-content: space-between;
+}
+
+.material-reservations__hero h1,
+.material-reservations__section-head h2,
+.material-reservations__notes h3,
+.material-reservations__notes p {
+  margin: 0;
+}
+
+.material-reservations__hero h1 {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  line-height: 1.1;
+}
+
+.material-reservations__hero p:last-child,
+.material-reservations__list-main span,
+.material-reservations__list-meta,
+.material-reservations__section-kicker,
+.material-reservations__details-grid dt,
+.material-reservations__notes p {
+  color: #6f6054;
+}
+
+.material-reservations__eyebrow,
+.material-reservations__section-kicker {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.material-reservations__list-card .card-body,
+.material-reservations__detail-card .card-body {
+  display: grid;
+  gap: 20px;
+}
+
+.material-reservations__list {
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+.material-reservations__list-item {
+  padding: 0;
+}
+
+.material-reservations__list-button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  width: 100%;
+  gap: 14px;
+  padding: 16px;
+  border: 0;
+  border-bottom: 1px solid hsl(var(--bc) / 0.12);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
+.material-reservations__list-item:last-child .material-reservations__list-button {
+  border-bottom: 0;
+}
+
+.material-reservations__list-button:hover,
+.material-reservations__list-button:focus-visible,
+.material-reservations__list-button--active {
+  background: hsl(var(--p) / 0.08);
+  outline: none;
+}
+
+.material-reservations__list-main,
+.material-reservations__list-meta {
+  display: grid;
+  gap: 4px;
+}
+
+.material-reservations__list-main {
+  min-width: 0;
+}
+
+.material-reservations__list-main strong {
+  overflow-wrap: anywhere;
+}
+
+.material-reservations__list-meta {
+  justify-items: end;
+  font-size: 0.82rem;
+  text-align: right;
+}
+
+.material-reservations__priority-grid,
+.material-reservations__details-grid {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.material-reservations__priority-item,
+.material-reservations__details-grid > div,
+.material-reservations__notes > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid hsl(var(--bc) / 0.12);
+  border-radius: var(--radius-md);
+  background: hsl(var(--b2) / 0.45);
+}
+
+.material-reservations__priority-item span,
+.material-reservations__details-grid dt {
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.material-reservations__details-grid dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.material-reservations__field {
+  gap: 6px;
+}
+
+.material-reservations__field .label {
+  padding: 0;
+}
+
+.material-reservations__field .input,
+.material-reservations__field .textarea {
+  width: 100%;
+}
+
+.material-reservations__status,
+.material-reservations__feedback {
+  margin: 0;
+}
+
+.material-reservations__feedback {
+  justify-content: flex-start;
+}
+
+.material-reservations__modal .modal-box {
+  display: grid;
+  gap: 18px;
+}
+
+.material-reservations__modal .modal-box > p {
+  margin: 0;
+  color: #6f6054;
+}
+
+@media (min-width: 768px) {
+  .material-reservations__priority-grid,
+  .material-reservations__details-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .material-reservations__layout {
+    grid-template-columns: minmax(300px, 0.8fr) minmax(0, 1.2fr);
+    align-items: start;
+  }
+
+  .material-reservations__list-card {
+    position: sticky;
+    top: 16px;
+  }
+
+  .material-reservations__priority-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .material-reservations {
+    gap: 18px;
+  }
+
+  .material-reservations__hero .card-body,
+  .material-reservations__list-card .card-body,
+  .material-reservations__detail-card .card-body {
+    padding: 18px;
+  }
+
+  .material-reservations__hero-topline,
+  .material-reservations__section-head,
+  .material-reservations__actions,
+  .material-reservations__modal-actions {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .material-reservations__list-button {
+    grid-template-columns: 1fr;
+  }
+
+  .material-reservations__list-meta {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .material-reservations__actions .btn,
+  .material-reservations__modal-actions .btn {
+    flex: 1 1 auto;
   }
 }

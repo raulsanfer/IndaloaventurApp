@@ -13,6 +13,8 @@ using IndaloAventurApi.Infrastructure.Media;
 using IndaloAventurApi.Application.Abstractions.TrailSignals;
 using IndaloAventurApi.Application.Abstractions.WordPress;
 using IndaloAventurApi.Application.Abstractions.Inventario;
+using IndaloAventurApi.Application.Abstractions.Inventario.ReservasMaterial;
+using IndaloAventurApi.Application.Features.Inventario.ReservasMaterial.Notifications;
 using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using IndaloAventurApi.Infrastructure.Persistence.Querying;
 using IndaloAventurApi.Infrastructure.Persistence.ClubPositions;
@@ -42,6 +44,7 @@ public static class DependencyInjection
         services.Configure<PasswordRecoveryOptions>(configuration.GetSection(PasswordRecoveryOptions.SectionName));
         services.Configure<SmtpEmailSenderOptions>(configuration.GetSection(SmtpEmailSenderOptions.SectionName));
         services.Configure<FederativeLicenseRequestNotificationOptions>(configuration.GetSection(FederativeLicenseRequestNotificationOptions.SectionName));
+        services.Configure<ReservaMaterialNotificationOptions>(configuration.GetSection(ReservaMaterialNotificationOptions.SectionName));
         services.Configure<WordPressOptions>(configuration.GetSection(WordPressOptions.SectionName));
         services.Configure<SignalImageStorageOptions>(configuration.GetSection(SignalImageStorageOptions.SectionName));
 
@@ -69,9 +72,13 @@ public static class DependencyInjection
         services.AddScoped<ISignalRepository, SignalRepository>();
         services.AddScoped<IInventarioCategoriaRepository, InventarioCategoriaRepository>();
         services.AddScoped<IInventarioEstadoRepository, InventarioEstadoRepository>();
+        services.AddScoped<IInventarioMaterialRepository, InventarioMaterialRepository>();
+        services.AddScoped<IReservaMaterialRepository, ReservaMaterialRepository>();
+        services.AddScoped<ISocioReservaReader, SocioReservaReader>();
         services.AddSingleton<ISignalImageStorage, FileSystemSignalImageStorage>();
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IEmailSender, SmtpEmailSender>();
+        services.AddScoped<IReservaMaterialNotificationService, ReservaMaterialNotificationService>();
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<ISocialTokenValidator, GoogleSocialTokenValidator>();
         services.AddHttpClient<IWordPressService, WordPressService>(client =>

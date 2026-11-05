@@ -1,0 +1,12 @@
+@page "/mi-club/reservas-material"
+@using IndaloaventurApp.SharedUI.Components.Club
+@using IndaloaventurApp.SharedUI.Components.Shell
+
+<PageTitle>Reservas de material</PageTitle>
+
+@if (CanAccessReservations)
+{
+    <AuthenticatedShell ActiveHref="/mi-club">
+        <MemberMaterialReservationsListView />
+    </AuthenticatedShell>
+}

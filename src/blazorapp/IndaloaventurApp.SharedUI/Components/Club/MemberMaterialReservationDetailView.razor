@@ -1,0 +1,89 @@
+@using IndaloaventurApp.SharedUI.Models.Inventory
+
+<section class="member-material-reservations" aria-live="polite" aria-busy="@IsLoading">
+    <header class="member-material-reservations__header">
+        <nav class="breadcrumbs text-sm" aria-label="@L["member_material_reservations_breadcrumb_label"]">
+            <ul>
+                <li><a href="/mi-club">@L["mi_club_back"]</a></li>
+                <li><a href="/mi-club/reservas-material">@L["member_material_reservations_title"]</a></li>
+                <li aria-current="page">@L["member_material_reservations_detail_title"]</li>
+            </ul>
+        </nav>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+    {
+        <div class="alert alert-error member-material-reservations__feedback" role="alert"><span>@ErrorMessage</span></div>
+    }
+
+    @if (IsLoading)
+    {
+        <div class="alert alert-info member-material-reservations__feedback"><span class="loading loading-spinner loading-sm" aria-hidden="true"></span><span>@L["member_material_reservations_loading_detail"]</span></div>
+    }
+    else if (IsForbidden)
+    {
+        <div class="alert alert-warning member-material-reservations__feedback" role="alert"><span>@L["member_material_reservations_forbidden"]</span></div>
+    }
+    else if (Reservation is not null)
+    {
+        <article class="card border border-base-200 bg-base-100 shadow-sm member-material-reservations__detail-card">
+            <div class="card-body">
+                <div class="member-material-reservations__card-head">
+                    <div>
+                        <p class="member-material-reservations__eyebrow">@L["member_material_reservations_detail_title"]</p>
+                        <h1 class="card-title">@Reservation.MaterialDescription</h1>
+                    </div>
+                    <span class="badge badge-lg @GetStatusBadgeClass(Reservation.Status)">@GetStatusLabel(Reservation.Status)</span>
+                </div>
+
+                <dl class="member-material-reservations__detail-grid">
+                    <div><dt>@L["member_material_reservations_requested_quantity"]</dt><dd>@string.Format(L["member_material_reservations_units"], Reservation.RequestedQuantity)</dd></div>
+                    <div><dt>@L["member_material_reservations_request_date"]</dt><dd>@FormatRequestDate(Reservation.RequestedAtUtc)</dd></div>
+                    <div><dt>@L["member_material_reservations_pickup_date"]</dt><dd>@FormatDate(Reservation.ScheduledPickupDate)</dd></div>
+                    <div><dt>@L["member_material_reservations_return_estimated"]</dt><dd>@FormatDate(Reservation.EstimatedReturnDate)</dd></div>
+                </dl>
+
+                @if (!string.IsNullOrWhiteSpace(Reservation.MemberNotes))
+                {
+                    <div class="member-material-reservations__notes">
+                        <h2>@L["member_material_reservations_notes"]</h2>
+                        <p>@Reservation.MemberNotes</p>
+                    </div>
+                }
+
+                @if (CanCancel)
+                {
+                    <p class="member-material-reservations__hint">@L["member_material_reservations_replace_hint"]</p>
+                    <div class="member-material-reservations__actions">
+                        <button type="button" class="btn btn-error btn-outline" disabled="@IsSubmitting" @onclick="BeginCancellation">@L["member_material_reservations_cancel"]</button>
+                    </div>
+                }
+                else if (CanConfirmReturn)
+                {
+                    <div class="member-material-reservations__actions">
+                        <button type="button" class="btn btn-primary" disabled="@IsSubmitting" @onclick="BeginReturnConfirmation">@L["member_material_reservations_confirm_return"]</button>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info member-material-reservations__feedback"><span>@L["member_material_reservations_read_only"]</span></div>
+                }
+            </div>
+        </article>
+    }
+
+    @if (PendingAction != ReservationAction.None && Reservation is not null)
+    {
+        <div class="modal modal-open member-material-reservations__modal" role="dialog" aria-modal="true" aria-labelledby="member-reservation-action-title">
+            <div class="modal-box">
+                <h2 id="member-reservation-action-title">@GetActionTitle()</h2>
+                <p>@GetActionDescription()</p>
+                <div class="modal-action">
+                    <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="DismissAction">@L["member_material_reservations_back"]</button>
+                    <button type="button" class="btn @(PendingAction == ReservationAction.Cancellation ? "btn-error" : "btn-primary")" disabled="@IsSubmitting" @onclick="SubmitActionAsync">@GetActionSubmitLabel()</button>
+                </div>
+            </div>
+            <button type="button" class="modal-backdrop" aria-label="@L["member_material_reservations_close"]" disabled="@IsSubmitting" @onclick="DismissAction">@L["member_material_reservations_close"]</button>
+        </div>
+    }
+</section>

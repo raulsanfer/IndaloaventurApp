@@ -10,6 +10,41 @@ using Microsoft.Extensions.Localization;
 
 public sealed class ClubIndexViewTests : BunitContext
 {
+    [Fact]
+    public void ClubIndexView_ShowsMaterialReservationsImmediatelyAfterPhonebook_ForRealMember()
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(new AuthSession("token", "Bearer", 3600, true, new[] { "Member" }));
+
+        Services.AddSingleton<ISessionService>(sessionService);
+        Services.AddSingleton<IStringLocalizer<SharedTexts>, TestStringLocalizer<SharedTexts>>();
+
+        var cut = Render<ClubIndexView>();
+        var phonebookPosition = cut.Markup.IndexOf("/mi-club/telefonos-interes", StringComparison.Ordinal);
+        var reservationsPosition = cut.Markup.IndexOf("/mi-club/reservas-material", StringComparison.Ordinal);
+        var licensesPosition = cut.Markup.IndexOf("/mi-club/licencias-federativas", StringComparison.Ordinal);
+
+        Assert.True(phonebookPosition >= 0);
+        Assert.True(reservationsPosition > phonebookPosition);
+        Assert.True(licensesPosition > reservationsPosition);
+    }
+
+    [Theory]
+    [InlineData(false, "Member")]
+    [InlineData(true, "Admin")]
+    public void ClubIndexView_HidesMaterialReservations_WhenRoleOrMembershipIsMissing(bool isMember, string role)
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(new AuthSession("token", "Bearer", 3600, isMember, new[] { role }));
+
+        Services.AddSingleton<ISessionService>(sessionService);
+        Services.AddSingleton<IStringLocalizer<SharedTexts>, TestStringLocalizer<SharedTexts>>();
+
+        var cut = Render<ClubIndexView>();
+
+        Assert.DoesNotContain("/mi-club/reservas-material", cut.Markup);
+    }
+
     /// <summary>
     /// Covers scenario: club index view shows federative licenses option for member role.
     /// </summary>

@@ -25,4 +25,15 @@ public sealed class ArchitectureTests
 
         Assert.True(result.IsSuccessful);
     }
+
+    [Fact]
+    public void ApplicationContracts_Should_Not_Depend_On_Infrastructure()
+    {
+        var result = Types.InAssembly(typeof(IndaloAventurApi.Application.DependencyInjection).Assembly)
+            .ShouldNot()
+            .HaveDependencyOn("IndaloAventurApi.Infrastructure")
+            .GetResult();
+
+        Assert.True(result.IsSuccessful);
+    }
 }

@@ -142,6 +142,52 @@ public sealed class InventarioIntegrationTests : IClassFixture<CustomWebApplicat
         Assert.Equal([$"Alfa {suffix}", $"Zeta {suffix}"], estados!.Where(x => x.Nombre.EndsWith(suffix, StringComparison.Ordinal)).Select(x => x.Nombre));
     }
 
+    [Fact]
+    public async Task InventarioMaterial_ConsultasMaterializanFechaDeAdquisicion()
+    {
+        await _factory.AuthenticateAsAdminAsync(_httpClient);
+        var suffix = Guid.NewGuid().ToString("N");
+        var fechaAdquisicion = new DateOnly(2024, 6, 15);
+
+        var categoriaResponse = await _httpClient.PostAsJsonAsync("/api/inventario-categorias", new
+        {
+            Nombre = $"Material {suffix}",
+            CategoriaPadreId = (int?)null
+        });
+        Assert.Equal(HttpStatusCode.Created, categoriaResponse.StatusCode);
+        var categoriaId = await categoriaResponse.Content.ReadFromJsonAsync<int>();
+
+        var estadoResponse = await _httpClient.PostAsJsonAsync("/api/inventario-estados", new { Nombre = $"Disponible {suffix}" });
+        Assert.Equal(HttpStatusCode.Created, estadoResponse.StatusCode);
+        var estadoId = await estadoResponse.Content.ReadFromJsonAsync<int>();
+
+        var createResponse = await _httpClient.PostAsJsonAsync("/api/inventario-materiales", new
+        {
+            Descripcion = $"Casco {suffix}",
+            MarcaModelo = "Modelo de prueba",
+            Cantidad = 1,
+            CategoriaId = categoriaId,
+            EstadoId = estadoId,
+            FechaAdquisicion = fechaAdquisicion,
+            AdquiridoDonado = "Adquirido",
+            Observaciones = (string?)null,
+            NumeroSerie = (string?)null
+        });
+        Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+        var materialId = await createResponse.Content.ReadFromJsonAsync<int>();
+
+        var listResponse = await _httpClient.GetAsync("/api/inventario-materiales");
+        Assert.True(listResponse.IsSuccessStatusCode, await listResponse.Content.ReadAsStringAsync());
+        var materiales = await listResponse.Content.ReadFromJsonAsync<IReadOnlyCollection<InventarioMaterialPayload>>();
+        Assert.Contains(materiales!, material => material.Id == materialId && material.FechaAdquisicion == fechaAdquisicion);
+
+        var detailResponse = await _httpClient.GetAsync($"/api/inventario-materiales/{materialId}");
+        Assert.True(detailResponse.IsSuccessStatusCode, await detailResponse.Content.ReadAsStringAsync());
+        var materialDetalle = await detailResponse.Content.ReadFromJsonAsync<InventarioMaterialPayload>();
+        Assert.NotNull(materialDetalle);
+        Assert.Equal(fechaAdquisicion, materialDetalle!.FechaAdquisicion);
+    }
+
     private async Task AuthenticateAsMemberAsync()
     {
         var email = $"inventario-member-{Guid.NewGuid():N}@club.test";
@@ -156,4 +202,5 @@ public sealed class InventarioIntegrationTests : IClassFixture<CustomWebApplicat
     private sealed record InventarioCategoriaPayload(int Id, string Nombre, int? CategoriaPadreId, IReadOnlyCollection<InventarioSubcategoriaPayload> Subcategorias);
     private sealed record InventarioSubcategoriaPayload(int Id, string Nombre);
     private sealed record InventarioEstadoPayload(int Id, string Nombre);
+    private sealed record InventarioMaterialPayload(int Id, DateOnly? FechaAdquisicion);
 }

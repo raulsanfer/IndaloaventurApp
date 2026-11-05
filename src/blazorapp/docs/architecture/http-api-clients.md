@@ -21,12 +21,14 @@ Los clientes API viven en `IndaloaventurApp.Web.Client/Infrastructure` y se regi
 - `Infrastructure/Licenses/FederativeLicenseApiClient.cs`: licencias federativas de socio.
 - `Infrastructure/Licenses/AdminFederativeLicenseApiClient.cs`: gestion admin de licencias.
 - `Infrastructure/Cargos/CargoAdminApiClient.cs`: cargos.
+- `Infrastructure/Inventory/InventoryReservationAdminApiClient.cs`: consulta y transiciones administrativas de reservas de material.
+- `Infrastructure/Inventory/MemberMaterialReservationApiClient.cs`: consulta, alta, cancelacion y confirmacion de devolucion de las reservas propias del socio; mapea la disponibilidad informativa del catalogo autenticado sin sustituir la validacion final de la API.
 - `Infrastructure/WordPress/WordPressPostApiClient.cs`: noticias.
 - `Infrastructure/FoodAlerts/FoodAlertAppApiClient.cs`: alertas alimentarias servidas por endpoints locales del host.
 
 ## Manejo de errores
 
-Usa codigos estables en `ServiceError.Code`, por ejemplo `auth.session_invalid`, `signals.timeout` o `licenses.admin_forbidden`. La UI debe decidir que mensaje mostrar a partir de esos resultados, normalmente mediante recursos localizados.
+Usa codigos estables en `ServiceError.Code`, por ejemplo `auth.session_invalid`, `signals.timeout`, `licenses.admin_forbidden` o `reservations.conflict`. La UI debe decidir que mensaje mostrar a partir de esos resultados, normalmente mediante recursos localizados. Las operaciones de reserva propias no envian `userId`; la API resuelve la identidad desde el Bearer y mantiene la autoridad final sobre disponibilidad y transiciones.
 
 ## Testing
 

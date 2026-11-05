@@ -14,6 +14,7 @@ Los tests viven en `IndaloaventurApp.Frontend.Tests/Features`:
 - `FoodAlerts`
 - `Settings`
 - `Admin`
+- `Inventory`
 - `Pwa`
 
 `TestDoubles.cs` contiene dobles compartidos como servicios de grabacion, localizer de test, factorias JWT y `StubHttpMessageHandler`.
@@ -38,6 +39,8 @@ Los tests de clientes HTTP verifican:
 - payload serializado;
 - mapeo de respuestas;
 - errores funcionales como forbidden, unauthorized, timeout o payload invalido.
+
+Las reservas de material incluyen pruebas de cliente para las rutas administrativas y personales, y pruebas bUnit para el orden de tarjetas, guardas `Member` + `IsMember`, formulario de alta, acciones dependientes de estado y recarga remota tras mutaciones.
 
 ## Convenciones
 
