@@ -13,6 +13,8 @@ public partial class SettingsPage
 
     protected bool IsAdmin => SessionService.CurrentSession?.IsInRole("Admin") == true;
 
+    protected bool CanManageInventory => SessionService.CurrentSession?.CanManageInventory() == true;
+
     protected override void OnInitialized()
     {
         if (!SessionService.IsAuthenticated)

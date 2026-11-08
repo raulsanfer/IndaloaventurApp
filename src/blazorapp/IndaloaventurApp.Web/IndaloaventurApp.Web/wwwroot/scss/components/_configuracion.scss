@@ -636,7 +636,8 @@
 .settings-federative-licenses__section-header h2,
 .settings-admin-member-file__hero h1,
 .settings-admin-member-file__section-head h2,
-.settings-admin-member-file__consents h3 {
+.settings-admin-member-file__consents h3,
+.settings-admin-member-file__inventory-permission h3 {
   margin: 0;
   color: #3f403f;
 }
@@ -667,7 +668,8 @@
 .settings-federative-licenses__section-header p,
 .settings-admin-member-file__hero p:last-child,
 .settings-admin-member-file__section-head p,
-.settings-admin-member-file__consents p {
+.settings-admin-member-file__consents p,
+.settings-admin-member-file__inventory-permission p {
   margin: 0;
   color: #6f6054;
 }
@@ -849,6 +851,36 @@
   border: 1px solid #eadccd;
   border-radius: 18px;
   background: #fffdf8;
+}
+
+.settings-admin-member-file__inventory-permission {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid #eadccd;
+  border-radius: 18px;
+  background: #fffdf8;
+}
+
+.settings-admin-member-file__inventory-permission-header,
+.settings-admin-member-file__inventory-permission-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-admin-member-file__inventory-permission-control {
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #f0e2d7;
+  border-bottom: 1px solid #f0e2d7;
+}
+
+.settings-admin-member-file__inventory-permission-actions {
+  justify-content: flex-end;
 }
 
 .settings-admin-member-file__checkbox-row {

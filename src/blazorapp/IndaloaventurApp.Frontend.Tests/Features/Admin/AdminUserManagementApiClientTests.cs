@@ -306,6 +306,101 @@ public sealed class AdminUserManagementApiClientTests
         Assert.True(result.Value);
     }
 
+    [Fact]
+    public async Task UpdateUserAsync_PutsCompleteRolesAndAcceptsNoContentWithoutDeserializing()
+    {
+        var userId = Guid.NewGuid();
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+
+        var handler = new StubHttpMessageHandler(async request =>
+        {
+            Assert.Equal(HttpMethod.Put, request.Method);
+            Assert.Equal($"/api/users/{userId}", request.RequestUri?.AbsolutePath);
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal(TestSessions.AdminSession.AccessToken, request.Headers.Authorization?.Parameter);
+
+            var body = await request.Content!.ReadAsStringAsync();
+            var payload = JsonSerializer.Deserialize<UpdateManagedUserApiPayload>(body, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+            Assert.NotNull(payload);
+            Assert.Equal("ana@club.es", payload.Email);
+            Assert.True(payload.IsMember);
+            Assert.Equal(new[] { "Member", "CustomRole", "InventoryManager" }, payload.Roles);
+
+            return new HttpResponseMessage(HttpStatusCode.NoContent)
+            {
+                Content = new StringContent("this body must not be deserialized", Encoding.UTF8, "application/json")
+            };
+        });
+
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        var result = await sut.UpdateUserAsync(
+            userId,
+            new UpdateManagedUserRequest("ANA@CLUB.ES", true, new[] { "Member", "CustomRole", "InventoryManager" }));
+
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Value);
+    }
+
+    [Theory]
+    [InlineData(400, "users.validation")]
+    [InlineData(401, "auth.session_invalid")]
+    [InlineData(403, "users.forbidden")]
+    [InlineData(404, "users.not_found")]
+    [InlineData(409, "users.conflict")]
+    public async Task UpdateUserAsync_MapsExpectedHttpFailures(int statusCode, string expectedErrorCode)
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        var handler = new StubHttpMessageHandler(_ => Task.FromResult(new HttpResponseMessage((HttpStatusCode)statusCode)));
+
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        var result = await sut.UpdateUserAsync(Guid.NewGuid(), new UpdateManagedUserRequest("ana@club.es", true, new[] { "Member" }));
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(expectedErrorCode, result.Error?.Code);
+    }
+
+    [Fact]
+    public async Task UpdateUserAsync_MapsUnexpectedSuccessAsInvalidPayload()
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        var handler = new StubHttpMessageHandler(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)));
+
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        var result = await sut.UpdateUserAsync(Guid.NewGuid(), new UpdateManagedUserRequest("ana@club.es", true, new[] { "Member" }));
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal("users.invalid_payload", result.Error?.Code);
+    }
+
+    [Theory]
+    [InlineData(false, "users.unavailable")]
+    [InlineData(true, "users.timeout")]
+    public async Task UpdateUserAsync_MapsTransportFailures(bool timeout, string expectedErrorCode)
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        var handler = new StubHttpMessageHandler(_ => timeout
+            ? throw new TaskCanceledException()
+            : throw new HttpRequestException());
+
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        var result = await sut.UpdateUserAsync(Guid.NewGuid(), new UpdateManagedUserRequest("ana@club.es", true, new[] { "Member" }));
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(expectedErrorCode, result.Error?.Code);
+    }
+
     private sealed record UpdateMemberFileApiPayload(
         int? CargoId,
         string? Nombre,
@@ -322,4 +417,6 @@ public sealed class AdminUserManagementApiClientTests
         bool AceptaPoliticaPrivacidad,
         bool AceptaUsoImagenes,
         bool AceptaCobroCuenta);
+
+    private sealed record UpdateManagedUserApiPayload(string Email, bool IsMember, string[] Roles);
 }

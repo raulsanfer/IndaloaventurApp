@@ -1,6 +1,7 @@
 namespace IndaloaventurApp.SharedUI.Components.Settings;
 
 using IndaloaventurApp.SharedUI.Abstractions.Inventory;
+using IndaloaventurApp.SharedUI.Abstractions.Session;
 using IndaloaventurApp.SharedUI.Models.Common;
 using IndaloaventurApp.SharedUI.Models.Inventory;
 using IndaloaventurApp.SharedUI.Resources;
@@ -16,6 +17,12 @@ public partial class InventoryManagementView
     [Inject]
     private IStringLocalizer<SharedTexts> L { get; set; } = default!;
 
+    [Inject]
+    private IServiceProvider ServiceProvider { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
     protected IReadOnlyList<InventoryCategory> Categories { get; private set; } = Array.Empty<InventoryCategory>();
 
     protected IReadOnlyList<InventoryStatus> Statuses { get; private set; } = Array.Empty<InventoryStatus>();
@@ -27,6 +34,8 @@ public partial class InventoryManagementView
     protected bool IsLoading { get; private set; } = true;
 
     protected bool IsSubmitting { get; private set; }
+
+    protected bool IsForbidden { get; private set; }
 
     protected string? ErrorMessage { get; private set; }
 
@@ -88,12 +97,22 @@ public partial class InventoryManagementView
 
     protected async Task ReloadAsync()
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         ClearFeedback();
         await LoadAllAsync();
     }
 
     protected void BeginCreateCategory()
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         EditingCategoryId = null;
         EditingCategory = null;
         CategoryEditor = new CategoryEditorModel();
@@ -103,6 +122,11 @@ public partial class InventoryManagementView
 
     protected void BeginEditCategory(InventoryCategory category)
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         EditingCategoryId = category.Id;
         EditingCategory = category;
         CategoryEditor = new CategoryEditorModel
@@ -116,6 +140,11 @@ public partial class InventoryManagementView
 
     protected void BeginCreateStatus()
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         EditingStatusId = null;
         StatusEditor = new StatusEditorModel();
         StatusErrors.Clear();
@@ -124,6 +153,11 @@ public partial class InventoryManagementView
 
     protected void BeginEditStatus(InventoryStatus status)
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         EditingStatusId = status.Id;
         StatusEditor = new StatusEditorModel { Name = status.Name };
         StatusErrors.Clear();
@@ -132,6 +166,11 @@ public partial class InventoryManagementView
 
     protected void BeginCreateMaterial()
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         EditingMaterialId = null;
         MaterialEditor = new MaterialEditorModel();
         MaterialErrors.Clear();
@@ -140,6 +179,11 @@ public partial class InventoryManagementView
 
     protected void BeginEditMaterial(InventoryMaterial material)
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         EditingMaterialId = material.Id;
         MaterialEditor = new MaterialEditorModel
         {
@@ -159,6 +203,11 @@ public partial class InventoryManagementView
 
     protected async Task SaveCategoryAsync(EditContext _)
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         ClearFeedback();
         CategoryErrors.Clear();
 
@@ -179,6 +228,11 @@ public partial class InventoryManagementView
         IsSubmitting = false;
         if (!result.IsSuccess)
         {
+            if (await HandleAuthenticationOrAuthorizationFailureAsync(result.Error))
+            {
+                return;
+            }
+
             ApplyServiceError(result.Error, CategoryErrors, MapCategoryProperty);
             return;
         }
@@ -194,6 +248,11 @@ public partial class InventoryManagementView
 
     protected async Task SaveStatusAsync(EditContext _)
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         ClearFeedback();
         StatusErrors.Clear();
 
@@ -212,6 +271,11 @@ public partial class InventoryManagementView
         IsSubmitting = false;
         if (!result.IsSuccess)
         {
+            if (await HandleAuthenticationOrAuthorizationFailureAsync(result.Error))
+            {
+                return;
+            }
+
             ApplyServiceError(result.Error, StatusErrors, MapStatusProperty);
             return;
         }
@@ -226,6 +290,11 @@ public partial class InventoryManagementView
 
     protected async Task SaveMaterialAsync(EditContext _)
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         ClearFeedback();
         MaterialErrors.Clear();
 
@@ -254,6 +323,11 @@ public partial class InventoryManagementView
         IsSubmitting = false;
         if (!result.IsSuccess)
         {
+            if (await HandleAuthenticationOrAuthorizationFailureAsync(result.Error))
+            {
+                return;
+            }
+
             ApplyServiceError(result.Error, MaterialErrors, MapMaterialProperty);
             return;
         }
@@ -268,6 +342,11 @@ public partial class InventoryManagementView
 
     protected void RequestDeletion(PendingDeleteKind kind, int id, string name, bool hasKnownDependents)
     {
+        if (IsForbidden)
+        {
+            return;
+        }
+
         ClearFeedback();
         PendingDeletion = new DeletionRequest(kind, id, name, hasKnownDependents);
     }
@@ -279,7 +358,7 @@ public partial class InventoryManagementView
 
     protected async Task ConfirmDeletionAsync()
     {
-        if (PendingDeletion is null)
+        if (PendingDeletion is null || IsForbidden)
         {
             return;
         }
@@ -298,6 +377,11 @@ public partial class InventoryManagementView
         IsSubmitting = false;
         if (!result.IsSuccess)
         {
+            if (await HandleAuthenticationOrAuthorizationFailureAsync(result.Error))
+            {
+                return;
+            }
+
             ApplyServiceError(result.Error, null, static propertyName => propertyName);
             return;
         }
@@ -367,6 +451,12 @@ public partial class InventoryManagementView
             Categories = categoriesResult.IsSuccess ? categoriesResult.Value ?? Array.Empty<InventoryCategory>() : Array.Empty<InventoryCategory>();
             Statuses = statusesResult.IsSuccess ? statusesResult.Value ?? Array.Empty<InventoryStatus>() : Array.Empty<InventoryStatus>();
             Materials = materialsResult.IsSuccess ? materialsResult.Value ?? Array.Empty<InventoryMaterial>() : Array.Empty<InventoryMaterial>();
+            if (await HandleAuthenticationOrAuthorizationFailureAsync(loadError))
+            {
+                IsLoading = false;
+                return;
+            }
+
             LoadErrorMessage = loadError.Message;
             ErrorMessage = loadError.Message;
         }
@@ -386,6 +476,11 @@ public partial class InventoryManagementView
         var result = await InventoryService.GetCategoriesAsync();
         if (!result.IsSuccess)
         {
+            if (await HandleAuthenticationOrAuthorizationFailureAsync(result.Error))
+            {
+                return false;
+            }
+
             ApplyLoadError(result.Error);
             return false;
         }
@@ -399,6 +494,11 @@ public partial class InventoryManagementView
         var result = await InventoryService.GetStatusesAsync();
         if (!result.IsSuccess)
         {
+            if (await HandleAuthenticationOrAuthorizationFailureAsync(result.Error))
+            {
+                return false;
+            }
+
             ApplyLoadError(result.Error);
             return false;
         }
@@ -412,6 +512,11 @@ public partial class InventoryManagementView
         var result = await InventoryService.GetMaterialsAsync();
         if (!result.IsSuccess)
         {
+            if (await HandleAuthenticationOrAuthorizationFailureAsync(result.Error))
+            {
+                return false;
+            }
+
             ApplyLoadError(result.Error);
             return false;
         }
@@ -562,6 +667,36 @@ public partial class InventoryManagementView
     {
         ErrorMessage = error?.Message ?? L["inventory_load_error"].Value;
         LoadErrorMessage = ErrorMessage;
+    }
+
+    private async Task<bool> HandleAuthenticationOrAuthorizationFailureAsync(ServiceError? error)
+    {
+        if (error?.Code == "auth.session_invalid")
+        {
+            Categories = Array.Empty<InventoryCategory>();
+            Statuses = Array.Empty<InventoryStatus>();
+            Materials = Array.Empty<InventoryMaterial>();
+            PendingDeletion = null;
+
+            if (ServiceProvider.GetService(typeof(ISessionService)) is ISessionService sessionService)
+            {
+                await sessionService.SignOutAsync();
+            }
+
+            NavigationManager.NavigateTo("/", true);
+            return true;
+        }
+
+        if (error?.Code == "inventory.forbidden")
+        {
+            PendingDeletion = null;
+            IsForbidden = true;
+            ErrorMessage = L["inventory_forbidden"].Value;
+            LoadErrorMessage = ErrorMessage;
+            return true;
+        }
+
+        return false;
     }
 
     private void ClearFeedback()

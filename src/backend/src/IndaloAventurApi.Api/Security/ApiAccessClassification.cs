@@ -24,5 +24,9 @@ public enum ApiAccessClassification
     /// <summary>
     /// La ruta requiere que el usuario sea socio del club.
     /// </summary>
-    ClubMember
+    ClubMember,
+    /// <summary>
+    /// La ruta permite a administracion o a un socio delegado para gestionar inventario.
+    /// </summary>
+    InventoryManagement
 }

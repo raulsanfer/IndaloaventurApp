@@ -13,6 +13,9 @@ public partial class SettingsView
     public bool IsAdmin { get; set; }
 
     [Parameter]
+    public bool CanManageInventory { get; set; }
+
+    [Parameter]
     public string CargoManagementHref { get; set; } = "/configuracion/cargos";
 
     [Parameter]

@@ -25,6 +25,8 @@ Los elementos comunes estan en `IndaloaventurApp.SharedUI/Components/Shell`:
 
 Las paginas protegidas consultan `ISessionService`. Si no hay sesion utilizable, redirigen al login. `SessionInitializationGate` evita tomar esa decision antes de completar la restauracion de sesion persistida.
 
+Las rutas de inventario y de reservas administrativas usan la capacidad de sesion `CanManageInventory`: permite `Admin` sin requerir condicion de socio, o `InventoryManager` solo cuando `IsMember` es verdadero. Esta comprobacion controla la navegacion y la experiencia; la API mantiene la autorizacion definitiva. Una respuesta `401` limpia la sesion persistida y dirige al acceso, mientras que un `403` conserva la sesion y bloquea la operacion privilegiada afectada.
+
 ## PWA
 
 La instalabilidad PWA se valida con tests en `IndaloaventurApp.Frontend.Tests/Features/Pwa/PwaManifestTests.cs`. Los assets estaticos y el manifiesto pertenecen al host web bajo `IndaloaventurApp.Web/IndaloaventurApp.Web/wwwroot`.

@@ -33,7 +33,7 @@ public sealed class InventarioCategoriasController(IMediator mediator) : Control
         => Ok(await mediator.Send(new GetInventarioCategoriaByIdQuery(id), cancellationToken));
 
     [HttpPost]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -45,7 +45,7 @@ public sealed class InventarioCategoriasController(IMediator mediator) : Control
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -57,7 +57,7 @@ public sealed class InventarioCategoriasController(IMediator mediator) : Control
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]

@@ -3,4 +3,4 @@ using IndaloAventurApi.Application.Abstractions.Inventario.ReservasMaterial;
 
 namespace IndaloAventurApi.Application.Features.Inventario.ReservasMaterial.GetAdminReservasMaterial;
 
-public sealed record GetAdminReservasMaterialQuery(bool IsAdmin) : IQuery<IReadOnlyCollection<ReservaMaterialDto>>;
+public sealed record GetAdminReservasMaterialQuery(bool CanManageInventory) : IQuery<IReadOnlyCollection<ReservaMaterialDto>>;

@@ -34,15 +34,27 @@
                     <span aria-hidden="true">&gt;</span>
                 </a>
 
-                <a class="btn btn-ghost settings-page__admin-option" href="@InventoryManagementHref">
-                    <span class="settings-page__admin-option-label">@L["settings_admin_inventory_title"]</span>
-                    <span aria-hidden="true">&gt;</span>
-                </a>
+                </div>
+            </div>
+        </fieldset>
+    }
 
-                <a class="btn btn-ghost settings-page__admin-option" href="@MaterialReservationsManagementHref">
-                    <span class="settings-page__admin-option-label">@L["settings_admin_material_reservations_title"]</span>
-                    <span aria-hidden="true">&gt;</span>
-                </a>
+    @if (CanManageInventory)
+    {
+        <fieldset class="fieldset card border border-base-200 bg-base-100 shadow-sm settings-page__fieldset" aria-label="@L["settings_inventory_management_title"]">
+            <legend class="fieldset-legend text-base">@L["settings_inventory_management_title"]</legend>
+
+            <div class="card-body">
+                <div class="settings-page__admin-options">
+                    <a class="btn btn-ghost settings-page__admin-option" href="@InventoryManagementHref">
+                        <span class="settings-page__admin-option-label">@L["settings_admin_inventory_title"]</span>
+                        <span aria-hidden="true">&gt;</span>
+                    </a>
+
+                    <a class="btn btn-ghost settings-page__admin-option" href="@MaterialReservationsManagementHref">
+                        <span class="settings-page__admin-option-label">@L["settings_admin_material_reservations_title"]</span>
+                        <span aria-hidden="true">&gt;</span>
+                    </a>
                 </div>
             </div>
         </fieldset>

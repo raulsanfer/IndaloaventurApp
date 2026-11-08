@@ -2,11 +2,14 @@ namespace IndaloaventurApp.SharedUI.Components.Settings;
 
 using IndaloaventurApp.SharedUI.Abstractions.Member;
 using IndaloaventurApp.SharedUI.Abstractions.Cargos;
+using IndaloaventurApp.SharedUI.Abstractions.Session;
 using IndaloaventurApp.SharedUI.Components;
+using IndaloaventurApp.SharedUI.Models.Common;
 using IndaloaventurApp.SharedUI.Models.Member;
 using IndaloaventurApp.SharedUI.Resources;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Localization;
 
 public partial class AdminMemberProfileView
@@ -23,6 +26,12 @@ public partial class AdminMemberProfileView
     [Inject]
     private ICargoAdminService CargoAdminService { get; set; } = default!;
 
+    [Inject]
+    private ISessionService SessionService { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
     protected MemberSelfProfileFormModel? Form { get; private set; }
 
     protected EditContext? EditContext { get; private set; }
@@ -32,6 +41,10 @@ public partial class AdminMemberProfileView
     protected bool IsSubmitting { get; private set; }
 
     protected bool IsStateChanging { get; private set; }
+
+    protected bool IsUpdatingInventoryManager { get; private set; }
+
+    protected bool IsInventoryManagerSelected { get; private set; }
 
     protected string? ErrorMessageKey { get; private set; }
 
@@ -72,6 +85,11 @@ public partial class AdminMemberProfileView
         }
 
         await ApplyProfileAsync(result.Value);
+        if (!await RefreshManagedUserAsync())
+        {
+            ManagedUser = null;
+        }
+
         StatusMessageKey = "settings_admin_member_file_save_success";
     }
 
@@ -100,6 +118,56 @@ public partial class AdminMemberProfileView
         StatusMessageKey = ManagedUser.IsActive
             ? "settings_admin_member_file_reactivate_success"
             : "settings_admin_member_file_deactivate_success";
+    }
+
+    protected void HandleInventoryManagerSelectionChanged(ChangeEventArgs args)
+    {
+        if (ManagedUser?.IsMember != true || IsUpdatingInventoryManager)
+        {
+            return;
+        }
+
+        IsInventoryManagerSelected = args.Value is bool selected && selected;
+    }
+
+    protected async Task HandleSaveInventoryManagerAsync()
+    {
+        if (ManagedUser?.IsMember != true || IsUpdatingInventoryManager)
+        {
+            return;
+        }
+
+        ClearMessages();
+        IsUpdatingInventoryManager = true;
+
+        var updatedRoles = BuildUpdatedRoles(ManagedUser);
+        var rolesChanged = !HaveEquivalentRoles(ManagedUser.Roles, updatedRoles);
+        var result = await AdminUserManagementService.UpdateUserAsync(
+            ManagedUser.UserId,
+            new UpdateManagedUserRequest(ManagedUser.Email, ManagedUser.IsMember, updatedRoles));
+
+        IsUpdatingInventoryManager = false;
+        if (!result.IsSuccess)
+        {
+            RestoreInventoryManagerSelection();
+            await HandleInventoryManagerUpdateFailureAsync(result.Error);
+            return;
+        }
+
+        if (rolesChanged && SessionService.CurrentSession?.UserId == ManagedUser.UserId)
+        {
+            await SessionService.SignOutAsync();
+            NavigationManager.NavigateTo("/", true);
+            return;
+        }
+
+        if (!await RefreshManagedUserAsync())
+        {
+            ErrorMessageKey = "settings_admin_member_file_load_error";
+            return;
+        }
+
+        StatusMessageKey = "settings_users_inventory_manager_save_success";
     }
 
     protected string GetManagedUserStateBadgeClass()
@@ -141,8 +209,68 @@ public partial class AdminMemberProfileView
         }
 
         ManagedUser = userResult.Value;
+        IsInventoryManagerSelected = HasInventoryManagerRole(ManagedUser);
         await ApplyProfileAsync(result.Value);
     }
+
+    private async Task<bool> RefreshManagedUserAsync()
+    {
+        var userResult = await AdminUserManagementService.GetUserAsync(UserId);
+        if (!userResult.IsSuccess || userResult.Value is null)
+        {
+            return false;
+        }
+
+        ManagedUser = userResult.Value;
+        IsInventoryManagerSelected = HasInventoryManagerRole(ManagedUser);
+        return true;
+    }
+
+    private IReadOnlyList<string> BuildUpdatedRoles(ManagedUserItem user)
+    {
+        var roles = user.Roles
+            .Where(role => !string.Equals(role, "InventoryManager", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (IsInventoryManagerSelected)
+        {
+            roles.Add("InventoryManager");
+        }
+
+        return roles;
+    }
+
+    private async Task HandleInventoryManagerUpdateFailureAsync(ServiceError? error)
+    {
+        if (error?.Code == "auth.session_invalid")
+        {
+            await SessionService.SignOutAsync();
+            NavigationManager.NavigateTo("/", true);
+            return;
+        }
+
+        ErrorMessageKey = error?.Code switch
+        {
+            "users.forbidden" => "settings_users_inventory_manager_forbidden",
+            "users.validation" => "settings_users_inventory_manager_validation_error",
+            "users.not_found" => "settings_users_inventory_manager_not_found",
+            "users.conflict" => "settings_users_inventory_manager_conflict",
+            _ => "settings_users_inventory_manager_save_error"
+        };
+    }
+
+    private void RestoreInventoryManagerSelection()
+    {
+        IsInventoryManagerSelected = ManagedUser is not null && HasInventoryManagerRole(ManagedUser);
+    }
+
+    private static bool HasInventoryManagerRole(ManagedUserItem user)
+        => user.Roles.Any(role => string.Equals(role, "InventoryManager", StringComparison.OrdinalIgnoreCase));
+
+    private static bool HaveEquivalentRoles(IReadOnlyList<string> first, IReadOnlyList<string> second)
+        => first.Count == second.Count
+            && first.OrderBy(static role => role, StringComparer.OrdinalIgnoreCase)
+                .SequenceEqual(second.OrderBy(static role => role, StringComparer.OrdinalIgnoreCase), StringComparer.OrdinalIgnoreCase);
 
     private async Task ApplyProfileAsync(MemberSelfProfile profile)
     {

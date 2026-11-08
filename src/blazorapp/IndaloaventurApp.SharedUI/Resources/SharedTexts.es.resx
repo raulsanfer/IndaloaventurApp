@@ -365,6 +365,7 @@
   <data name="settings_title" xml:space="preserve"><value>Configuración</value></data>
   <data name="settings_summary" xml:space="preserve"><value>Gestiona los accesos y herramientas disponibles para tu cuenta.</value></data>
   <data name="settings_admin_title" xml:space="preserve"><value>Administración</value></data>
+  <data name="settings_inventory_management_title" xml:space="preserve"><value>Gestión de inventario</value></data>
   <data name="settings_admin_description" xml:space="preserve"><value>Accede a utilidades reservadas para usuarios administradores.</value></data>
   <data name="settings_admin_cargos_title" xml:space="preserve"><value>Cargos</value></data>
   <data name="settings_admin_cargos_description" xml:space="preserve"><value>Gestiona el catálogo de cargos disponibles para los miembros.</value></data>
@@ -466,6 +467,16 @@
   <data name="settings_users_active_badge" xml:space="preserve"><value>Activo</value></data>
   <data name="settings_users_inactive_badge" xml:space="preserve"><value>Desactivado</value></data>
   <data name="settings_users_roles_label" xml:space="preserve"><value>Roles</value></data>
+  <data name="settings_users_inventory_manager_label" xml:space="preserve"><value>Gestor/a de inventario</value></data>
+  <data name="settings_users_inventory_manager_save" xml:space="preserve"><value>Guardar permiso</value></data>
+  <data name="settings_users_inventory_manager_save_success" xml:space="preserve"><value>El permiso se ha actualizado. La persona debe iniciar sesión de nuevo para recibir sus permisos actuales.</value></data>
+  <data name="settings_users_inventory_manager_forbidden" xml:space="preserve"><value>No tienes permisos para actualizar este permiso.</value></data>
+  <data name="settings_users_inventory_manager_validation_error" xml:space="preserve"><value>No se pudo guardar el permiso porque los datos del usuario no son válidos.</value></data>
+  <data name="settings_users_inventory_manager_not_found" xml:space="preserve"><value>El usuario ya no está disponible.</value></data>
+  <data name="settings_users_inventory_manager_conflict" xml:space="preserve"><value>No se pudo guardar el permiso por un conflicto. Actualiza la lista e inténtalo de nuevo.</value></data>
+  <data name="settings_users_inventory_manager_save_error" xml:space="preserve"><value>No se pudo guardar el permiso de inventario.</value></data>
+  <data name="settings_admin_member_file_inventory_permission_title" xml:space="preserve"><value>Permiso de gestión de inventario</value></data>
+  <data name="settings_admin_member_file_inventory_permission_summary" xml:space="preserve"><value>Concede o retira el acceso a la gestión de inventario. El cambio requerirá un nuevo inicio de sesión.</value></data>
   <data name="settings_admin_member_file_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de ficha administrativa de socio</value></data>
   <data name="settings_admin_member_file_title" xml:space="preserve"><value>Ficha de Socio</value></data>
   <data name="settings_admin_member_file_summary" xml:space="preserve"><value>Actualiza la ficha de un socio desde administración manteniendo las mismas validaciones y seguridad del autoservicio.</value></data>
@@ -538,6 +549,7 @@
   <data name="settings_signal_categories_icon_format" xml:space="preserve"><value>Icono: {0}</value></data>
   <data name="settings_signal_categories_icon_empty" xml:space="preserve"><value>Sin icono</value></data>
   <data name="settings_admin_inventory_title" xml:space="preserve"><value>Inventario</value></data>
+  <data name="inventory_forbidden" xml:space="preserve"><value>No tienes permisos para gestionar el inventario.</value></data>
   <data name="inventory_breadcrumb_label" xml:space="preserve"><value>Ruta de navegación de inventario</value></data>
   <data name="inventory_loading" xml:space="preserve"><value>Cargando inventario...</value></data>
   <data name="inventory_retry" xml:space="preserve"><value>Reintentar</value></data>

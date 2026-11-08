@@ -2,7 +2,7 @@
 
 ## Proposito
 
-Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licencias federativas, categorias de signals y reservas de material.
+Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licencias federativas, categorias de signals, inventario y reservas de material.
 
 ## Componentes y paginas
 
@@ -16,7 +16,9 @@ Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licenci
 - `IndaloaventurApp.SharedUI/Components/Settings/CargoManagementView.razor`: gestion de cargos.
 - `IndaloaventurApp.Web.Client/Pages/SettingsSignalsPage.razor`: ruta `/configuracion/signals`.
 - `IndaloaventurApp.SharedUI/Components/Settings/SignalSettingsHubView.razor`: hub admin de signals.
-- `IndaloaventurApp.Web.Client/Pages/SettingsMaterialReservationsPage.razor`: ruta `/configuracion/reservas-material` protegida para Admin.
+- `IndaloaventurApp.Web.Client/Pages/SettingsInventoryPage.razor`: ruta `/configuracion/inventario` para gestion de inventario.
+- `IndaloaventurApp.SharedUI/Components/Settings/InventoryManagementView.razor`: categorias, estados y materiales de inventario.
+- `IndaloaventurApp.Web.Client/Pages/SettingsMaterialReservationsPage.razor`: ruta `/configuracion/reservas-material` para la gestion administrativa de reservas.
 - `IndaloaventurApp.SharedUI/Components/Settings/MaterialReservationsManagementView.razor`: listado, detalle y decisiones administrativas de reservas de material.
 
 ## Servicios y contratos
@@ -26,16 +28,20 @@ Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licenci
 - `IAdminFederativeLicenseService`
 - `ISignalService`
 - `IInventoryReservationAdminService`
+- `IInventoryService`
 - `AdminUserManagementApiClient`
 - `CargoAdminApiClient`
 - `AdminFederativeLicenseApiClient`
 - `InventoryReservationAdminApiClient`
-- `ManagedUserItem`, `AdminUserPasswordChangeRequest`, `CargoItem`, `CreateCargoRequest`, `UpdateCargoRequest`
+- `ManagedUserItem`, `UpdateManagedUserRequest`, `AdminUserPasswordChangeRequest`, `CargoItem`, `CreateCargoRequest`, `UpdateCargoRequest`
 - `MaterialReservation`, `MaterialReservationStatus`, `RegisterAdminMaterialReservationPickupRequest`, `CancelAdminMaterialReservationRequest`, `ConfirmAdminMaterialReservationReturnRequest`
 
 ## Estados
 
-- acceso permitido solo para sesiones admin;
+- la administracion de usuarios, fichas, cargos, licencias y signals se reserva a `Admin`;
+- la gestion de inventario y las reservas administrativas se permite a `Admin` o a `InventoryManager` cuando la sesion tiene `IsMember = true`; las rutas personales `/me` mantienen su propiedad y condicion de socio;
+- un administrador puede asignar o retirar `InventoryManager` desde la ficha administrativa de un socio mediante `PUT /api/users/{userId}`, preservando los demas roles; el listado queda limitado a localizar usuarios y navegar a sus acciones;
+- despues de cambiar roles o condicion de socio, la persona afectada debe iniciar sesion de nuevo; si la persona administradora se modifica a si misma, la interfaz cierra su sesion;
 - filtros de usuarios;
 - activacion y desactivacion de usuarios;
 - cambio de contraseña mediante `PUT /api/users/{userId}/password`, reservado a Admin y sin exponer secretos en la UI;
@@ -44,7 +50,7 @@ Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licenci
 - consulta de reservas de material con datos de socio solo en la ruta Admin;
 - retirada y cancelacion para reservas solicitadas, y confirmacion administrativa de devolucion o cancelacion para reservas retiradas;
 - recarga de listado y detalle despues de cada respuesta correcta, sin actualizar estados de forma optimista;
-- errores de permisos, validacion o conectividad.
+- errores de permisos, validacion o conectividad; un `401` limpia la sesion local y un `403` conserva la sesion y deshabilita la accion afectada.
 
 ## Tests relacionados
 

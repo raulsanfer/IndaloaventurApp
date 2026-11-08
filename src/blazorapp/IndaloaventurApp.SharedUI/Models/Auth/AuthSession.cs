@@ -62,6 +62,14 @@ public sealed record AuthSession
         return IsInRole("Admin");
     }
 
+    /// <summary>
+    /// Gets whether this session can manage inventory and administrative material reservations.
+    /// </summary>
+    public bool CanManageInventory()
+    {
+        return IsInRole("Admin") || (IsMember && IsInRole("InventoryManager"));
+    }
+
     public bool CanAccessFederativeLicenses()
     {
         return CanAccessOwnFederativeLicenses() || CanAdministerFederativeLicenses();

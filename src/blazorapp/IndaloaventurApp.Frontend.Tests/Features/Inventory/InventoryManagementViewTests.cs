@@ -2,7 +2,9 @@ namespace IndaloaventurApp.Frontend.Tests.Features.Inventory;
 
 using Bunit;
 using IndaloaventurApp.SharedUI.Abstractions.Inventory;
+using IndaloaventurApp.SharedUI.Abstractions.Session;
 using IndaloaventurApp.SharedUI.Components.Settings;
+using IndaloaventurApp.SharedUI.Models.Auth;
 using IndaloaventurApp.SharedUI.Models.Common;
 using IndaloaventurApp.SharedUI.Models.Inventory;
 using IndaloaventurApp.SharedUI.Resources;
@@ -181,6 +183,68 @@ public sealed class InventoryManagementViewTests : BunitContext
         {
             Assert.Contains("La categoría tiene material asignado.", cut.Markup);
             Assert.Contains("Material técnico", cut.Markup);
+        });
+    }
+
+    [Fact]
+    public void InventoryManagementView_DisablesWritesAfterForbiddenResponse()
+    {
+        var catalog = CreateCatalogService();
+        var inventoryService = new RecordingInventoryService
+        {
+            GetCategoriesHandler = catalog.GetCategoriesHandler,
+            GetStatusesHandler = catalog.GetStatusesHandler,
+            GetMaterialsHandler = catalog.GetMaterialsHandler,
+            CreateCategoryHandler = (_, _) => Task.FromResult(ServiceResult<int>.Failure(
+                new ServiceError("inventory.forbidden", "No autorizado.")))
+        };
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        Services.AddSingleton<ISessionService>(sessionService);
+        RegisterInventoryService(inventoryService);
+
+        var cut = Render<InventoryManagementView>();
+        cut.WaitForAssertion(() => Assert.NotEmpty(cut.FindAll("#inventory-categories-tab")));
+        cut.Find("#inventory-categories-tab").Click();
+        cut.Find("#inventory-category-name").Change("Arneses");
+        cut.Find("form").Submit();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains("inventory_forbidden", cut.Markup);
+            Assert.True(cut.Find("button[type='submit']").HasAttribute("disabled"));
+            Assert.Equal(0, sessionService.SignOutCallCount);
+            Assert.True(sessionService.IsAuthenticated);
+        });
+    }
+
+    [Fact]
+    public void InventoryManagementView_ClearsSessionAfterUnauthorizedResponse()
+    {
+        var catalog = CreateCatalogService();
+        var inventoryService = new RecordingInventoryService
+        {
+            GetCategoriesHandler = catalog.GetCategoriesHandler,
+            GetStatusesHandler = catalog.GetStatusesHandler,
+            GetMaterialsHandler = catalog.GetMaterialsHandler,
+            CreateCategoryHandler = (_, _) => Task.FromResult(ServiceResult<int>.Failure(
+                new ServiceError("auth.session_invalid", "La sesión no es válida.")))
+        };
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        Services.AddSingleton<ISessionService>(sessionService);
+        RegisterInventoryService(inventoryService);
+
+        var cut = Render<InventoryManagementView>();
+        cut.WaitForAssertion(() => Assert.NotEmpty(cut.FindAll("#inventory-categories-tab")));
+        cut.Find("#inventory-categories-tab").Click();
+        cut.Find("#inventory-category-name").Change("Arneses");
+        cut.Find("form").Submit();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Equal(1, sessionService.SignOutCallCount);
+            Assert.Equal("http://localhost/", Services.GetRequiredService<Microsoft.AspNetCore.Components.NavigationManager>().Uri);
         });
     }
 

@@ -15,7 +15,7 @@ public sealed class RegistrarRetiradaReservaMaterialCommandHandler(
 {
     public async Task<bool> Handle(RegistrarRetiradaReservaMaterialCommand request, CancellationToken cancellationToken)
     {
-        ReservaMaterialAdminAccess.RequireAdmin(request.IsAdmin);
+        ReservaMaterialInventoryManagementAccess.RequireInventoryManagement(request.CanManageInventory);
 
         var retirada = await reservaRepository.ExecuteSerializableAsync(async transactionCancellationToken =>
         {

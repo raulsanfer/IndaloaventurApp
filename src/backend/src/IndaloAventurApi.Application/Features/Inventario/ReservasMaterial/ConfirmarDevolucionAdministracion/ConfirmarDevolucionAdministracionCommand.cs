@@ -4,7 +4,7 @@ using IndaloAventurApi.Application.Abstractions.Cqrs;
 namespace IndaloAventurApi.Application.Features.Inventario.ReservasMaterial.ConfirmarDevolucionAdministracion;
 
 public sealed record ConfirmarDevolucionAdministracionCommand(
-    bool IsAdmin,
+    bool CanManageInventory,
     Guid ReservaId,
     DateOnly FechaDevolucionEfectiva) : ICommand<bool>;
 

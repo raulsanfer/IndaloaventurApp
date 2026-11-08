@@ -33,7 +33,7 @@ public sealed class InventarioEstadosController(IMediator mediator) : Controller
         => Ok(await mediator.Send(new GetInventarioEstadoByIdQuery(id), cancellationToken));
 
     [HttpPost]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(typeof(int), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -44,7 +44,7 @@ public sealed class InventarioEstadosController(IMediator mediator) : Controller
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -56,7 +56,7 @@ public sealed class InventarioEstadosController(IMediator mediator) : Controller
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)

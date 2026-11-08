@@ -11,7 +11,7 @@ public sealed class GetAdminReservasMaterialQueryHandler(IQueryConnectionFactory
 {
     public async Task<IReadOnlyCollection<ReservaMaterialDto>> Handle(GetAdminReservasMaterialQuery request, CancellationToken cancellationToken)
     {
-        ReservaMaterialAdminAccess.RequireAdmin(request.IsAdmin);
+        ReservaMaterialInventoryManagementAccess.RequireInventoryManagement(request.CanManageInventory);
 
         var sql = $"""
             {ReservaMaterialDapperProjection.SelectSql}

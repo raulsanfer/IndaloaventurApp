@@ -187,8 +187,16 @@ public sealed class IdentityService(
             return (false, ["Usuario no encontrado."]);
         }
 
+        if (user.IsMember == isMember)
+        {
+            return (true, []);
+        }
+
         user.IsMember = isMember;
-        return (true, []);
+        var result = await userManager.UpdateSecurityStampAsync(user);
+        return result.Succeeded
+            ? (true, [])
+            : (false, result.Errors.Select(x => x.Description));
     }
 
     public async Task<(bool Succeeded, IEnumerable<string> Errors)> UpdateUserAsync(Guid userId, string email, bool isMember, IEnumerable<string> roles, CancellationToken cancellationToken)
@@ -199,6 +207,7 @@ public sealed class IdentityService(
             return (false, ["Usuario no encontrado."]);
         }
 
+        var isMemberChanged = user.IsMember != isMember;
         user.Email = email;
         user.UserName = email;
         // IsMember expresa condicion de socio del club; no equivale a pertenecer al rol tecnico Member.
@@ -207,6 +216,15 @@ public sealed class IdentityService(
         if (!updateResult.Succeeded)
         {
             return (false, updateResult.Errors.Select(x => x.Description));
+        }
+
+        if (isMemberChanged)
+        {
+            var securityStampResult = await userManager.UpdateSecurityStampAsync(user);
+            if (!securityStampResult.Succeeded)
+            {
+                return (false, securityStampResult.Errors.Select(x => x.Description));
+            }
         }
 
         var existingRoles = await userManager.GetRolesAsync(user);
@@ -218,6 +236,12 @@ public sealed class IdentityService(
             {
                 return (false, removeResult.Errors.Select(x => x.Description));
             }
+
+            var securityStampResult = await userManager.UpdateSecurityStampAsync(user);
+            if (!securityStampResult.Succeeded)
+            {
+                return (false, securityStampResult.Errors.Select(x => x.Description));
+            }
         }
 
         var rolesToAdd = roles.Except(existingRoles, StringComparer.OrdinalIgnoreCase).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
@@ -227,6 +251,12 @@ public sealed class IdentityService(
             if (!addResult.Succeeded)
             {
                 return (false, addResult.Errors.Select(x => x.Description));
+            }
+
+            var securityStampResult = await userManager.UpdateSecurityStampAsync(user);
+            if (!securityStampResult.Succeeded)
+            {
+                return (false, securityStampResult.Errors.Select(x => x.Description));
             }
         }
 

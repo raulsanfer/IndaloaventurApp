@@ -30,6 +30,7 @@ public static class IdentityBootstrapper
 
         await EnsureRoleExistsAsync(roleManager, IdentityRoles.Admin);
         await EnsureRoleExistsAsync(roleManager, IdentityRoles.Member);
+        await EnsureRoleExistsAsync(roleManager, IdentityRoles.InventoryManager);
 
         if (!adminOptions.Enabled)
         {

@@ -15,7 +15,7 @@ public sealed class CancelAdminReservaMaterialCommandHandler(
 {
     public async Task<bool> Handle(CancelAdminReservaMaterialCommand request, CancellationToken cancellationToken)
     {
-        ReservaMaterialAdminAccess.RequireAdmin(request.IsAdmin);
+        ReservaMaterialInventoryManagementAccess.RequireInventoryManagement(request.CanManageInventory);
 
         var cancelled = await reservaRepository.ExecuteSerializableAsync(async transactionCancellationToken =>
         {

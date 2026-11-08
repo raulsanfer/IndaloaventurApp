@@ -105,20 +105,20 @@ public sealed class InventarioReservasController(IMediator mediator) : Controlle
     }
 
     [HttpGet("admin")]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(typeof(IReadOnlyCollection<ReservaMaterialDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyCollection<ReservaMaterialDto>>> GetAdminReservations(CancellationToken cancellationToken)
-        => Ok(await mediator.Send(new GetAdminReservasMaterialQuery(User.HasAdminRole()), cancellationToken));
+        => Ok(await mediator.Send(new GetAdminReservasMaterialQuery(User.CanManageInventory()), cancellationToken));
 
     [HttpGet("admin/{reservaId:guid}")]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(typeof(ReservaMaterialDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ReservaMaterialDto>> GetAdminReservation(Guid reservaId, CancellationToken cancellationToken)
-        => Ok(await mediator.Send(new GetAdminReservaMaterialQuery(User.HasAdminRole(), reservaId), cancellationToken));
+        => Ok(await mediator.Send(new GetAdminReservaMaterialQuery(User.CanManageInventory(), reservaId), cancellationToken));
 
     [HttpPost("admin/{reservaId:guid}/retirada")]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -128,12 +128,12 @@ public sealed class InventarioReservasController(IMediator mediator) : Controlle
         [FromBody] RegistrarRetiradaRequest request,
         CancellationToken cancellationToken)
     {
-        await mediator.Send(new RegistrarRetiradaReservaMaterialCommand(User.HasAdminRole(), reservaId, request.FechaRetirada), cancellationToken);
+        await mediator.Send(new RegistrarRetiradaReservaMaterialCommand(User.CanManageInventory(), reservaId, request.FechaRetirada), cancellationToken);
         return NoContent();
     }
 
     [HttpPost("admin/{reservaId:guid}/cancelacion")]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -143,12 +143,12 @@ public sealed class InventarioReservasController(IMediator mediator) : Controlle
         [FromBody] CancelarReservaAdministracionRequest request,
         CancellationToken cancellationToken)
     {
-        await mediator.Send(new CancelAdminReservaMaterialCommand(User.HasAdminRole(), reservaId, request.ObservacionAdministracion), cancellationToken);
+        await mediator.Send(new CancelAdminReservaMaterialCommand(User.CanManageInventory(), reservaId, request.ObservacionAdministracion), cancellationToken);
         return NoContent();
     }
 
     [HttpPost("admin/{reservaId:guid}/confirmacion-devolucion")]
-    [Authorize(Policy = AuthorizationPolicies.Admin)]
+    [Authorize(Policy = AuthorizationPolicies.InventoryManagement)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -159,7 +159,7 @@ public sealed class InventarioReservasController(IMediator mediator) : Controlle
         CancellationToken cancellationToken)
     {
         await mediator.Send(new ConfirmarDevolucionAdministracionCommand(
-            User.HasAdminRole(),
+            User.CanManageInventory(),
             reservaId,
             request.FechaDevolucionEfectiva), cancellationToken);
         return NoContent();

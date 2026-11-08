@@ -35,6 +35,13 @@
         </div>
     }
 
+    @if (IsForbidden)
+    {
+        <div class="alert alert-warning inventory-management__status" role="alert">
+            <span>@L["inventory_forbidden"]</span>
+        </div>
+    }
+
     @if (IsLoading)
     {
         <div class="alert alert-info inventory-management__feedback">
@@ -153,10 +160,10 @@
                             </div>
 
                             <div class="inventory-management__actions">
-                                <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">@L["inventory_save"]</button>
+                                <button type="submit" class="btn btn-primary" disabled="@(IsSubmitting || IsForbidden)">@L["inventory_save"]</button>
                                 @if (IsEditingMaterial)
                                 {
-                                    <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="BeginCreateMaterial">@L["inventory_cancel"]</button>
+                                    <button type="button" class="btn btn-ghost" disabled="@(IsSubmitting || IsForbidden)" @onclick="BeginCreateMaterial">@L["inventory_cancel"]</button>
                                 }
                             </div>
                         </EditForm>
@@ -169,7 +176,7 @@
                             <h2 id="inventory-materials-title">@L["inventory_tab_materials"]</h2>
                             @if (IsEditingMaterial)
                             {
-                                <button type="button" class="btn btn-outline" @onclick="BeginCreateMaterial">@L["inventory_new_material"]</button>
+                                <button type="button" class="btn btn-outline" disabled="@IsForbidden" @onclick="BeginCreateMaterial">@L["inventory_new_material"]</button>
                             }
                         </div>
                         @if (Materials.Count == 0)
@@ -190,8 +197,8 @@
                                                 <td>@GetMaterialCategoryLabel(material)</td>
                                                 <td>@material.StatusName</td>
                                                 <td class="inventory-management__row-actions">
-                                                    <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEditMaterial(material)">@L["inventory_edit"]</button>
-                                                    <button type="button" class="btn btn-sm btn-error btn-outline" @onclick="() => RequestDeletion(PendingDeleteKind.Material, material.Id, material.Description, false)">@L["inventory_delete"]</button>
+                                                    <button type="button" class="btn btn-sm btn-outline" disabled="@IsForbidden" @onclick="() => BeginEditMaterial(material)">@L["inventory_edit"]</button>
+                                                    <button type="button" class="btn btn-sm btn-error btn-outline" disabled="@IsForbidden" @onclick="() => RequestDeletion(PendingDeleteKind.Material, material.Id, material.Description, false)">@L["inventory_delete"]</button>
                                                 </td>
                                             </tr>
                                         }
@@ -235,10 +242,10 @@
                                 </label>
                             </div>
                             <div class="inventory-management__actions">
-                                <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">@L["inventory_save"]</button>
+                                <button type="submit" class="btn btn-primary" disabled="@(IsSubmitting || IsForbidden)">@L["inventory_save"]</button>
                                 @if (IsEditingCategory)
                                 {
-                                    <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="BeginCreateCategory">@L["inventory_cancel"]</button>
+                                    <button type="button" class="btn btn-ghost" disabled="@(IsSubmitting || IsForbidden)" @onclick="BeginCreateCategory">@L["inventory_cancel"]</button>
                                 }
                             </div>
                         </EditForm>
@@ -251,7 +258,7 @@
                             <h2 id="inventory-categories-title">@L["inventory_tab_categories"]</h2>
                             @if (IsEditingCategory)
                             {
-                                <button type="button" class="btn btn-outline" @onclick="BeginCreateCategory">@L["inventory_new_category"]</button>
+                                <button type="button" class="btn btn-outline" disabled="@IsForbidden" @onclick="BeginCreateCategory">@L["inventory_new_category"]</button>
                             }
                         </div>
                         @if (Categories.Count == 0)
@@ -266,8 +273,8 @@
                                     <li class="list-row inventory-management__list-row">
                                         <div class="inventory-management__list-copy"><strong>@category.Name</strong></div>
                                         <div class="inventory-management__row-actions">
-                                            <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEditCategory(category)">@L["inventory_edit"]</button>
-                                            <button type="button" class="btn btn-sm btn-error btn-outline" @onclick="() => RequestDeletion(PendingDeleteKind.Category, category.Id, category.Name, category.Subcategories.Count > 0 || IsCategoryUsedByMaterial(category.Id))">@L["inventory_delete"]</button>
+                                            <button type="button" class="btn btn-sm btn-outline" disabled="@IsForbidden" @onclick="() => BeginEditCategory(category)">@L["inventory_edit"]</button>
+                                            <button type="button" class="btn btn-sm btn-error btn-outline" disabled="@IsForbidden" @onclick="() => RequestDeletion(PendingDeleteKind.Category, category.Id, category.Name, category.Subcategories.Count > 0 || IsCategoryUsedByMaterial(category.Id))">@L["inventory_delete"]</button>
                                         </div>
                                     </li>
                                     @foreach (var subcategory in category.Subcategories)
@@ -275,8 +282,8 @@
                                         <li class="list-row inventory-management__list-row inventory-management__list-row--child">
                                             <div class="inventory-management__list-copy"><strong>@subcategory.Name</strong></div>
                                             <div class="inventory-management__row-actions">
-                                                <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEditCategory(subcategory)">@L["inventory_edit"]</button>
-                                                <button type="button" class="btn btn-sm btn-error btn-outline" @onclick="() => RequestDeletion(PendingDeleteKind.Category, subcategory.Id, subcategory.Name, IsCategoryUsedByMaterial(subcategory.Id))">@L["inventory_delete"]</button>
+                                                <button type="button" class="btn btn-sm btn-outline" disabled="@IsForbidden" @onclick="() => BeginEditCategory(subcategory)">@L["inventory_edit"]</button>
+                                                <button type="button" class="btn btn-sm btn-error btn-outline" disabled="@IsForbidden" @onclick="() => RequestDeletion(PendingDeleteKind.Category, subcategory.Id, subcategory.Name, IsCategoryUsedByMaterial(subcategory.Id))">@L["inventory_delete"]</button>
                                             </div>
                                         </li>
                                     }
@@ -303,10 +310,10 @@
                                 }
                             </label>
                             <div class="inventory-management__actions">
-                                <button type="submit" class="btn btn-primary" disabled="@IsSubmitting">@L["inventory_save"]</button>
+                                <button type="submit" class="btn btn-primary" disabled="@(IsSubmitting || IsForbidden)">@L["inventory_save"]</button>
                                 @if (IsEditingStatus)
                                 {
-                                    <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="BeginCreateStatus">@L["inventory_cancel"]</button>
+                                    <button type="button" class="btn btn-ghost" disabled="@(IsSubmitting || IsForbidden)" @onclick="BeginCreateStatus">@L["inventory_cancel"]</button>
                                 }
                             </div>
                         </EditForm>
@@ -319,7 +326,7 @@
                             <h2 id="inventory-statuses-title">@L["inventory_tab_statuses"]</h2>
                             @if (IsEditingStatus)
                             {
-                                <button type="button" class="btn btn-outline" @onclick="BeginCreateStatus">@L["inventory_new_status"]</button>
+                                <button type="button" class="btn btn-outline" disabled="@IsForbidden" @onclick="BeginCreateStatus">@L["inventory_new_status"]</button>
                             }
                         </div>
                         @if (Statuses.Count == 0)
@@ -334,8 +341,8 @@
                                     <li class="list-row inventory-management__list-row">
                                         <div class="inventory-management__list-copy"><strong>@status.Name</strong></div>
                                         <div class="inventory-management__row-actions">
-                                            <button type="button" class="btn btn-sm btn-outline" @onclick="() => BeginEditStatus(status)">@L["inventory_edit"]</button>
-                                            <button type="button" class="btn btn-sm btn-error btn-outline" @onclick="() => RequestDeletion(PendingDeleteKind.Status, status.Id, status.Name, IsStatusUsedByMaterial(status.Id))">@L["inventory_delete"]</button>
+                                            <button type="button" class="btn btn-sm btn-outline" disabled="@IsForbidden" @onclick="() => BeginEditStatus(status)">@L["inventory_edit"]</button>
+                                            <button type="button" class="btn btn-sm btn-error btn-outline" disabled="@IsForbidden" @onclick="() => RequestDeletion(PendingDeleteKind.Status, status.Id, status.Name, IsStatusUsedByMaterial(status.Id))">@L["inventory_delete"]</button>
                                         </div>
                                     </li>
                                 }
@@ -348,7 +355,7 @@
 
         @if (!string.IsNullOrWhiteSpace(LoadErrorMessage))
         {
-            <button type="button" class="btn btn-outline inventory-management__retry" @onclick="ReloadAsync">@L["inventory_retry"]</button>
+            <button type="button" class="btn btn-outline inventory-management__retry" disabled="@IsForbidden" @onclick="ReloadAsync">@L["inventory_retry"]</button>
         }
     }
 
@@ -363,8 +370,8 @@
                     <p class="text-warning">@L["inventory_delete_dependency_warning"]</p>
                 }
                 <div class="modal-action">
-                    <button type="button" class="btn btn-ghost" disabled="@IsSubmitting" @onclick="CancelDeletion">@L["inventory_cancel"]</button>
-                    <button type="button" class="btn btn-error" disabled="@IsSubmitting" @onclick="ConfirmDeletionAsync">@L["inventory_delete"]</button>
+                    <button type="button" class="btn btn-ghost" disabled="@(IsSubmitting || IsForbidden)" @onclick="CancelDeletion">@L["inventory_cancel"]</button>
+                    <button type="button" class="btn btn-error" disabled="@(IsSubmitting || IsForbidden)" @onclick="ConfirmDeletionAsync">@L["inventory_delete"]</button>
                 </div>
             </div>
         </dialog>

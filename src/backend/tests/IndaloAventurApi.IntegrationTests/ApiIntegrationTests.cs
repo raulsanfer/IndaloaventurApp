@@ -1069,6 +1069,12 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             Assert.True(result.Succeeded, string.Join("; ", result.Errors.Select(x => x.Description)));
         }
 
+        if (!await roleManager.RoleExistsAsync(IdentityRoles.InventoryManager))
+        {
+            var result = await roleManager.CreateAsync(new IdentityRole<Guid>(IdentityRoles.InventoryManager));
+            Assert.True(result.Succeeded, string.Join("; ", result.Errors.Select(x => x.Description)));
+        }
+
         var admin = await userManager.FindByEmailAsync(TestAdminEmail);
         if (admin is null)
         {

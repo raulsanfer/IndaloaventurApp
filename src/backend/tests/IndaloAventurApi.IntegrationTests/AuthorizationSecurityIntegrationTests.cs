@@ -38,6 +38,39 @@ public sealed class AuthorizationSecurityIntegrationTests(CustomWebApplicationFa
         Assert.Equal(discoveredEndpoints, documentedEndpoints);
     }
 
+    [Fact]
+    public void AuthorizationMatrix_ShouldClassifyEveryAdministrativeInventoryRouteAsInventoryManagement()
+    {
+        var routes = new[]
+        {
+            "POST /api/inventario-categorias",
+            "PUT /api/inventario-categorias/{id:int}",
+            "DELETE /api/inventario-categorias/{id:int}",
+            "POST /api/inventario-estados",
+            "PUT /api/inventario-estados/{id:int}",
+            "DELETE /api/inventario-estados/{id:int}",
+            "POST /api/inventario-materiales",
+            "PUT /api/inventario-materiales/{id:int}",
+            "DELETE /api/inventario-materiales/{id:int}",
+            "GET /api/inventario-reservas/admin",
+            "GET /api/inventario-reservas/admin/{reservaId:guid}",
+            "POST /api/inventario-reservas/admin/{reservaId:guid}/retirada",
+            "POST /api/inventario-reservas/admin/{reservaId:guid}/cancelacion",
+            "POST /api/inventario-reservas/admin/{reservaId:guid}/confirmacion-devolucion"
+        };
+
+        var inventoryManagementRules = ApiAuthorizationMatrix.Rules
+            .Where(rule => routes.Contains($"{rule.HttpMethod} {rule.Route}", StringComparer.Ordinal))
+            .ToArray();
+
+        Assert.Equal(routes.Length, inventoryManagementRules.Length);
+        Assert.All(inventoryManagementRules, rule =>
+        {
+            Assert.Equal(ApiAccessClassification.InventoryManagement, rule.Classification);
+            Assert.Equal("Policy: InventoryManagement", rule.Enforcement);
+        });
+    }
+
     [Theory]
     [InlineData("/api/agenda-telefonica")]
     [InlineData("/api/cargos")]

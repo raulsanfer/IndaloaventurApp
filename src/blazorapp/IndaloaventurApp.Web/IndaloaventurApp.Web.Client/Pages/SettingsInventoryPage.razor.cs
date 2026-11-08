@@ -21,7 +21,7 @@ public partial class SettingsInventoryPage
             return;
         }
 
-        if (SessionService.CurrentSession?.IsInRole("Admin") != true)
+        if (SessionService.CurrentSession?.CanManageInventory() != true)
         {
             NavigationManager.NavigateTo("/configuracion", true);
             return;

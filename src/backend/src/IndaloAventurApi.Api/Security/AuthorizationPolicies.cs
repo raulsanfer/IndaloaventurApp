@@ -29,6 +29,10 @@ public static class AuthorizationPolicies
     /// Politica para usuarios autenticados marcados como socios.
     /// </summary>
     public const string ClubMember = "ClubMember";
+    /// <summary>
+    /// Politica para administradores y socios delegados para gestionar el inventario.
+    /// </summary>
+    public const string InventoryManagement = "InventoryManagement";
 
     /// <summary>
     /// Construye la configuracion de politicas que se registra en ASP.NET Core.
@@ -61,6 +65,11 @@ public static class AuthorizationPolicies
             {
                 policy.RequireAuthenticatedUser();
                 policy.RequireClaim(AuthClaimNames.IsMember, bool.TrueString.ToLowerInvariant());
+            });
+            options.AddPolicy(InventoryManagement, policy =>
+            {
+                policy.RequireAuthenticatedUser();
+                policy.RequireAssertion(context => context.User.CanManageInventory());
             });
         };
     }

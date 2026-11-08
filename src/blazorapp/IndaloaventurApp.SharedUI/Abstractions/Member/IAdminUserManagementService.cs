@@ -19,6 +19,11 @@ public interface IAdminUserManagementService
     Task<ServiceResult<ManagedUserItem>> GetUserAsync(Guid userId, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Updates the editable identity state and complete roles collection of a managed user.
+    /// </summary>
+    Task<ServiceResult<bool>> UpdateUserAsync(Guid userId, UpdateManagedUserRequest request, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Gets the member file associated with a managed user.
     /// </summary>
     Task<ServiceResult<MemberSelfProfile>> GetMemberFileAsync(Guid userId, CancellationToken cancellationToken = default);

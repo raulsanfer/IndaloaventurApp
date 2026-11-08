@@ -12,7 +12,7 @@ public sealed class GetAdminReservaMaterialQueryHandler(
 {
     public async Task<ReservaMaterialDto> Handle(GetAdminReservaMaterialQuery request, CancellationToken cancellationToken)
     {
-        ReservaMaterialAdminAccess.RequireAdmin(request.IsAdmin);
+        ReservaMaterialInventoryManagementAccess.RequireInventoryManagement(request.CanManageInventory);
 
         var reserva = await reservaRepository.GetByIdAsync(request.ReservaId, cancellationToken)
             ?? throw new KeyNotFoundException("La reserva de material no existe.");

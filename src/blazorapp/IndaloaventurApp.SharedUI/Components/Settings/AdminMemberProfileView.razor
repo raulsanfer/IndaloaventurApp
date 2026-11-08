@@ -211,6 +211,40 @@
                         </button>
                     </div>
                 </EditForm>
+
+                @if (ManagedUser?.IsMember == true)
+                {
+                    <section class="settings-admin-member-file__inventory-permission" aria-labelledby="admin-member-inventory-permission-title">
+                        <div class="settings-admin-member-file__inventory-permission-header">
+                            <div>
+                                <h3 id="admin-member-inventory-permission-title">@L["settings_admin_member_file_inventory_permission_title"]</h3>
+                                <p>@L["settings_admin_member_file_inventory_permission_summary"]</p>
+                            </div>
+                        </div>
+
+                        <label class="label cursor-pointer settings-admin-member-file__inventory-permission-control" for="admin-member-inventory-manager">
+                            <span class="label-text">@L["settings_users_inventory_manager_label"]</span>
+                            <input
+                                id="admin-member-inventory-manager"
+                                class="checkbox checkbox-primary"
+                                type="checkbox"
+                                checked="@IsInventoryManagerSelected"
+                                disabled="@IsUpdatingInventoryManager"
+                                @onchange="HandleInventoryManagerSelectionChanged" />
+                        </label>
+
+                        <div class="settings-admin-member-file__inventory-permission-actions">
+                            <button
+                                id="admin-member-inventory-manager-save"
+                                type="button"
+                                class="btn btn-outline btn-sm"
+                                disabled="@IsUpdatingInventoryManager"
+                                @onclick="HandleSaveInventoryManagerAsync">
+                                @L["settings_users_inventory_manager_save"]
+                            </button>
+                        </div>
+                    </section>
+                }
             </div>
         </fieldset>
     }

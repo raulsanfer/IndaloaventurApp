@@ -25,7 +25,7 @@ public sealed class InventoryApiClientTests
             switch (requestKey)
             {
                 case "GET /api/inventario-categorias":
-                    return JsonResponse("[{\"id\":10,\"nombre\":\"Material técnico\",\"categoriaPadreId\":null,\"subcategorias\":[{\"id\":11,\"nombre\":\"Cascos\",\"categoriaPadreId\":10,\"subcategorias\":[]}]}");
+                    return JsonResponse("[{\"id\":10,\"nombre\":\"Material técnico\",\"categoriaPadreId\":null,\"subcategorias\":[{\"id\":11,\"nombre\":\"Cascos\",\"categoriaPadreId\":10,\"subcategorias\":[]}]}]");
                 case "POST /api/inventario-categorias":
                     await AssertJsonPropertyAsync(request, "nombre", "Cascos");
                     await AssertJsonPropertyAsync(request, "categoriaPadreId", 10);
@@ -63,7 +63,7 @@ public sealed class InventoryApiClientTests
         var updatedStatus = await sut.UpdateStatusAsync(new UpdateInventoryStatusRequest(4, "Revisado"));
         var deletedStatus = await sut.DeleteStatusAsync(4);
 
-        Assert.True(categories.IsSuccess);
+        Assert.True(categories.IsSuccess, categories.Error?.Message);
         Assert.Equal("Material técnico", categories.Value![0].Name);
         Assert.Equal("Cascos", categories.Value[0].Subcategories[0].Name);
         Assert.Equal(12, createdCategory.Value);

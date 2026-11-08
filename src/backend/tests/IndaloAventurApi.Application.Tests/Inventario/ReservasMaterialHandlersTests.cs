@@ -267,8 +267,9 @@ public sealed class ReservasMaterialHandlersTests
             new FakeSocioReservaReader(ownerId),
             NotificationService);
 
-        await Assert.ThrowsAsync<ForbiddenAccessException>(() => retiradaHandler.Handle(
+        var forbiddenException = await Assert.ThrowsAsync<ForbiddenAccessException>(() => retiradaHandler.Handle(
             new RegistrarRetiradaReservaMaterialCommand(false, reserva.Id, new DateOnly(2026, 11, 4)), CancellationToken.None));
+        Assert.Equal("Solo administracion o los gestores de inventario pueden gestionar las reservas de material.", forbiddenException.Message);
 
         await retiradaHandler.Handle(
             new RegistrarRetiradaReservaMaterialCommand(true, reserva.Id, new DateOnly(2026, 11, 4)), CancellationToken.None);

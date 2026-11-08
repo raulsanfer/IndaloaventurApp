@@ -12,9 +12,6 @@ using Microsoft.Extensions.Localization;
 
 public sealed class AdminUsersManagementViewTests : BunitContext
 {
-    /// <summary>
-    /// Covers scenario: admin users management view loads initial users and shows member and non member actions.
-    /// </summary>
     [Fact]
     public void AdminUsersManagementView_LoadsInitialUsersAndShowsMemberAndNonMemberActions()
     {
@@ -44,32 +41,11 @@ public sealed class AdminUsersManagementViewTests : BunitContext
         });
     }
 
-    /// <summary>
-    /// Covers scenario: admin users management view navigates to member file when creating from non member.
-    /// </summary>
     [Fact]
     public void AdminUsersManagementView_NavigatesToMemberFile_WhenCreatingFromNonMember()
     {
         var userId = Guid.NewGuid();
-        var profile = new MemberSelfProfile(
-            userId,
-            null,
-            null,
-            "Ana",
-            "Montes",
-            null,
-            new DateOnly(1990, 4, 18),
-            null,
-            null,
-            null,
-            null,
-            null,
-            "ana@club.es",
-            null,
-            false,
-            false,
-            false);
-
+        var profile = CreateProfile(userId, "ana@club.es");
         var service = new RecordingAdminUserManagementService
         {
             GetUsersHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<ManagedUserItem>>.Success(new[]
@@ -89,7 +65,6 @@ public sealed class AdminUsersManagementViewTests : BunitContext
         var navigationManager = Services.GetRequiredService<NavigationManager>();
 
         cut.WaitForAssertion(() => Assert.Contains("settings_users_create_member_file", cut.Markup));
-
         cut.Find("button[type='button']").Click();
 
         cut.WaitForAssertion(() =>
@@ -98,9 +73,6 @@ public sealed class AdminUsersManagementViewTests : BunitContext
         });
     }
 
-    /// <summary>
-    /// Covers scenario: admin users management view filters users by email.
-    /// </summary>
     [Fact]
     public void AdminUsersManagementView_FiltersUsersByEmail()
     {
@@ -126,4 +98,46 @@ public sealed class AdminUsersManagementViewTests : BunitContext
             Assert.DoesNotContain("otro@club.es", cut.Markup);
         });
     }
+
+    [Fact]
+    public void AdminUsersManagementView_DoesNotRenderInventoryPermissionEditor()
+    {
+        var user = new ManagedUserItem(Guid.NewGuid(), "ana@club.es", true, true, new[] { "Member", "InventoryManager" });
+        var service = new RecordingAdminUserManagementService
+        {
+            GetUsersHandler = (_, _) => Task.FromResult(ServiceResult<IReadOnlyList<ManagedUserItem>>.Success(new[] { user }))
+        };
+
+        Services.AddSingleton<IAdminUserManagementService>(service);
+        Services.AddSingleton<IStringLocalizer<SharedTexts>, TestStringLocalizer<SharedTexts>>();
+
+        var cut = Render<AdminUsersManagementView>();
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.DoesNotContain("settings-users-inventory-manager", cut.Markup);
+            Assert.DoesNotContain("settings_users_inventory_manager_save", cut.Markup);
+            Assert.Empty(cut.FindAll("input[type='checkbox']"));
+        });
+    }
+
+    private static MemberSelfProfile CreateProfile(Guid userId, string email)
+        => new(
+            userId,
+            null,
+            null,
+            "Ana",
+            "Montes",
+            null,
+            new DateOnly(1990, 4, 18),
+            null,
+            null,
+            null,
+            null,
+            null,
+            email,
+            null,
+            false,
+            false,
+            false);
 }

@@ -81,9 +81,13 @@ public partial class AdminUsersManagementView
             ? L["settings_users_active_badge"]
             : L["settings_users_inactive_badge"];
 
-    private async Task LoadUsersAsync(string? email = null)
+    private async Task<bool> LoadUsersAsync(string? email = null, bool preserveFeedback = false)
     {
-        ClearMessages();
+        if (!preserveFeedback)
+        {
+            ClearMessages();
+        }
+
         IsSearching = true;
         IsFilterApplied = !string.IsNullOrWhiteSpace(email);
         Results = Array.Empty<ManagedUserItem>();
@@ -96,10 +100,11 @@ public partial class AdminUsersManagementView
         if (!result.IsSuccess || result.Value is null)
         {
             ErrorMessageKey = "settings_users_search_error";
-            return;
+            return false;
         }
 
         Results = result.Value;
+        return true;
     }
 
     private void ClearMessages()

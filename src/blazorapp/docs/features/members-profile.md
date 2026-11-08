@@ -27,6 +27,7 @@ Gestiona datos de cuenta, ficha de socio propia y ficha de socio administrada de
 - usuario con o sin ficha de socio;
 - edicion de datos propios;
 - edicion admin de ficha;
+- asignacion o retirada administrativa de `InventoryManager` desde una seccion independiente de la ficha, con recarga confirmada y nuevo inicio de sesion requerido tras el cambio;
 - cargo asignado, cargo nulo o seleccion pendiente;
 - errores de validacion o persistencia.
 

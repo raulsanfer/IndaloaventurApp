@@ -44,7 +44,9 @@ public sealed class SettingsViewTests : BunitContext
     {
         Services.AddSingleton<IStringLocalizer<SharedTexts>, TestStringLocalizer<SharedTexts>>();
 
-        var cut = Render<SettingsView>(parameters => parameters.Add(x => x.IsAdmin, true));
+        var cut = Render<SettingsView>(parameters => parameters
+            .Add(x => x.IsAdmin, true)
+            .Add(x => x.CanManageInventory, true));
 
         Assert.Contains("shell_nav_my_account", cut.Markup);
         Assert.Contains("settings_title", cut.Markup);
@@ -59,6 +61,27 @@ public sealed class SettingsViewTests : BunitContext
         Assert.DoesNotContain("settings_summary", cut.Markup);
         Assert.DoesNotContain("settings_admin_description", cut.Markup);
         Assert.DoesNotContain("settings_admin_cargos_description", cut.Markup);
+    }
+
+    /// <summary>
+    /// Covers scenario: an inventory manager sees only the delegated Settings entries.
+    /// </summary>
+    [Fact]
+    public void SettingsView_ShowsOnlyInventoryManagement_ForDelegatedMember()
+    {
+        Services.AddSingleton<IStringLocalizer<SharedTexts>, TestStringLocalizer<SharedTexts>>();
+
+        var cut = Render<SettingsView>(parameters => parameters
+            .Add(x => x.IsAdmin, false)
+            .Add(x => x.CanManageInventory, true));
+
+        Assert.Contains("settings_inventory_management_title", cut.Markup);
+        Assert.Contains("/configuracion/inventario", cut.Markup);
+        Assert.Contains("/configuracion/reservas-material", cut.Markup);
+        Assert.DoesNotContain("/configuracion/cargos", cut.Markup);
+        Assert.DoesNotContain("/configuracion/usuarios", cut.Markup);
+        Assert.DoesNotContain("/configuracion/licencias-federativas", cut.Markup);
+        Assert.DoesNotContain("/configuracion/signals", cut.Markup);
     }
 
     /// <summary>

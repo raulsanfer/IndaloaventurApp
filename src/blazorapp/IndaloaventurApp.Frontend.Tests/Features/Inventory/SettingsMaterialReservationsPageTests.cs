@@ -4,6 +4,7 @@ using Bunit;
 using IndaloaventurApp.SharedUI.Abstractions.Inventory;
 using IndaloaventurApp.SharedUI.Abstractions.Session;
 using IndaloaventurApp.SharedUI.Models.Auth;
+using IndaloaventurApp.SharedUI.Models.Common;
 using IndaloaventurApp.SharedUI.Resources;
 using IndaloaventurApp.Web.Client.Pages;
 using Microsoft.AspNetCore.Components;
@@ -52,6 +53,30 @@ public sealed class SettingsMaterialReservationsPageTests : BunitContext
         Services.AddSingleton<IStringLocalizer<SharedTexts>, TestStringLocalizer<SharedTexts>>();
 
         Render<SettingsMaterialReservationsPage>();
+
+        Assert.Equal("http://localhost/", Services.GetRequiredService<NavigationManager>().Uri);
+    }
+
+    [Fact]
+    public void SettingsMaterialReservationsPage_LoadsReservations_ForDelegatedMember()
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(new AuthSession("manager-token", "Bearer", 3600, true, new[] { "InventoryManager" }));
+        var listCalls = 0;
+        var reservationService = new RecordingInventoryReservationAdminService
+        {
+            GetReservationsHandler = _ =>
+            {
+                listCalls++;
+                return Task.FromResult(ServiceResult<IReadOnlyList<IndaloaventurApp.SharedUI.Models.Inventory.MaterialReservation>>.Success(Array.Empty<IndaloaventurApp.SharedUI.Models.Inventory.MaterialReservation>()));
+            }
+        };
+
+        Services.AddSingleton<ISessionService>(sessionService);
+        Services.AddSingleton<IInventoryReservationAdminService>(reservationService);
+        Services.AddSingleton<IStringLocalizer<SharedTexts>, TestStringLocalizer<SharedTexts>>();
+
+        Render<SettingsMaterialReservationsPage>().WaitForAssertion(() => Assert.Equal(1, listCalls));
 
         Assert.Equal("http://localhost/", Services.GetRequiredService<NavigationManager>().Uri);
     }

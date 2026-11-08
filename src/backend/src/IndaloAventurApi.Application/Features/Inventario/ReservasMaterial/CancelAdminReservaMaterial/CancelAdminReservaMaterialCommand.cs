@@ -4,7 +4,7 @@ using IndaloAventurApi.Application.Abstractions.Cqrs;
 namespace IndaloAventurApi.Application.Features.Inventario.ReservasMaterial.CancelAdminReservaMaterial;
 
 public sealed record CancelAdminReservaMaterialCommand(
-    bool IsAdmin,
+    bool CanManageInventory,
     Guid ReservaId,
     string? ObservacionAdministracion) : ICommand<bool>;
 

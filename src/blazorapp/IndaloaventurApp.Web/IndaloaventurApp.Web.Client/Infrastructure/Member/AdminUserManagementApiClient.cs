@@ -73,6 +73,72 @@ public sealed class AdminUserManagementApiClient(HttpClient httpClient, ISession
         return ServiceResult<ManagedUserItem>.Success(user);
     }
 
+    public async Task<ServiceResult<bool>> UpdateUserAsync(Guid userId, UpdateManagedUserRequest request, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        try
+        {
+            var email = MemberSelfProfileMapper.NormalizeEmail(request.Email);
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("users.validation", "El correo electrónico es obligatorio."));
+            }
+
+            var roles = request.Roles
+                .Where(static role => !string.IsNullOrWhiteSpace(role))
+                .Select(static role => role.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+
+            using var message = CreateAuthorizedRequest(HttpMethod.Put, $"{UsersEndpoint}/{userId}");
+            message.Content = JsonContent.Create(new UpdateManagedUserApiRequest(email, request.IsMember, roles));
+
+            using var response = await httpClient.SendAsync(message, cancellationToken);
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("auth.session_invalid", "Sesión inválida."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("users.forbidden", "Acceso denegado."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("users.validation", "Los datos del usuario no son válidos."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("users.not_found", "No se encontró el usuario solicitado."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.Conflict)
+            {
+                return ServiceResult<bool>.Failure(new ServiceError("users.conflict", "No se pudo actualizar el usuario por un conflicto."));
+            }
+
+            if (response.StatusCode != HttpStatusCode.NoContent)
+            {
+                return response.IsSuccessStatusCode
+                    ? ServiceResult<bool>.Failure(new ServiceError("users.invalid_payload", "La respuesta de actualización de usuario no es válida."))
+                    : ServiceResult<bool>.Failure(new ServiceError("users.unavailable", $"Error HTTP {(int)response.StatusCode}."));
+            }
+
+            return ServiceResult<bool>.Success(true);
+        }
+        catch (HttpRequestException)
+        {
+            return ServiceResult<bool>.Failure(new ServiceError("users.unavailable", "No se pudo conectar con usuarios."));
+        }
+        catch (TaskCanceledException)
+        {
+            return ServiceResult<bool>.Failure(new ServiceError("users.timeout", "Tiempo de espera agotado."));
+        }
+    }
+
     public async Task<ServiceResult<MemberSelfProfile>> GetMemberFileAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         try
@@ -479,4 +545,6 @@ public sealed class AdminUserManagementApiClient(HttpClient httpClient, ISession
         bool AceptaCobroCuenta);
 
     private sealed record ChangeUserPasswordApiRequest(string NewPassword);
+
+    private sealed record UpdateManagedUserApiRequest(string Email, bool IsMember, IReadOnlyList<string> Roles);
 }

@@ -68,4 +68,19 @@ public static class ClaimsPrincipalExtensions
     {
         return user.IsInRole(IdentityRoles.Admin);
     }
+
+    /// <summary>
+    /// Indica si el usuario puede gestionar el inventario por ser administrador o socio delegado.
+    /// </summary>
+    /// <param name="user">Principal autenticado de la solicitud actual.</param>
+    /// <returns><see langword="true"/> cuando puede gestionar inventario; en caso contrario, <see langword="false"/>.</returns>
+    public static bool CanManageInventory(this ClaimsPrincipal user)
+    {
+        return user.IsInRole(IdentityRoles.Admin)
+               || (user.IsInRole(IdentityRoles.InventoryManager)
+                   && string.Equals(
+                       user.FindFirstValue(AuthClaimNames.IsMember),
+                       bool.TrueString,
+                       StringComparison.OrdinalIgnoreCase));
+    }
 }

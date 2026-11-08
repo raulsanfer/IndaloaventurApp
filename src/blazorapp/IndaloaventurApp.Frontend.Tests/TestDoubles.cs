@@ -354,6 +354,8 @@ internal sealed class RecordingAdminUserManagementService : IAdminUserManagement
 
     public Func<Guid, CancellationToken, Task<ServiceResult<ManagedUserItem>>>? GetUserHandler { get; init; }
 
+    public Func<Guid, UpdateManagedUserRequest, CancellationToken, Task<ServiceResult<bool>>>? UpdateUserHandler { get; init; }
+
     public Func<Guid, CancellationToken, Task<ServiceResult<MemberSelfProfile>>>? GetMemberFileHandler { get; init; }
 
     public Func<Guid, string, CancellationToken, Task<ServiceResult<MemberSelfProfile>>>? CreateMemberFileHandler { get; init; }
@@ -376,6 +378,12 @@ internal sealed class RecordingAdminUserManagementService : IAdminUserManagement
     {
         return GetUserHandler?.Invoke(userId, cancellationToken)
             ?? Task.FromResult(ServiceResult<ManagedUserItem>.Failure(new ServiceError("users.not_found", "Missing admin user handler")));
+    }
+
+    public Task<ServiceResult<bool>> UpdateUserAsync(Guid userId, UpdateManagedUserRequest request, CancellationToken cancellationToken = default)
+    {
+        return UpdateUserHandler?.Invoke(userId, request, cancellationToken)
+            ?? Task.FromResult(ServiceResult<bool>.Failure(new ServiceError("users.unavailable", "Missing admin update user handler")));
     }
 
     public Task<ServiceResult<MemberSelfProfile>> GetMemberFileAsync(Guid userId, CancellationToken cancellationToken = default)
