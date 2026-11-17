@@ -76,6 +76,7 @@ public sealed class AuthorizationSecurityIntegrationTests(CustomWebApplicationFa
     [InlineData("/api/cargos")]
     [InlineData("/api/fichas-socio/me")]
     [InlineData("/api/licencias-federativas/tarifas")]
+    [InlineData("/api/licencias-federativas/tipos")]
     [InlineData("/api/signals")]
     [InlineData("/api/signal-types")]
     [InlineData("/api/users")]

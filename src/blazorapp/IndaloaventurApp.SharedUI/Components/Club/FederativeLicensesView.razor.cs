@@ -14,8 +14,8 @@ public partial class FederativeLicensesView
     private const string DefaultRequestErrorKey = "mi_club_federative_licenses_request_error";
     private const string EmptyRatesMessageKey = "mi_club_federative_licenses_request_rates_empty";
     private const string InvalidCatalogMessageKey = "mi_club_federative_licenses_request_catalog_invalid";
-    private const string FullSeasonValue = "false";
-    private const string HalfSeasonValue = "true";
+    private int _catalogVersion;
+    private int _modalVersion;
 
     [Inject]
     private IFederativeLicenseService FederativeLicenseService { get; set; } = default!;
@@ -50,22 +50,36 @@ public partial class FederativeLicensesView
 
     protected bool IsRequestMessageError { get; private set; }
 
-    protected bool SelectedMediaTemporada { get; private set; }
+    protected int? SelectedTypeId { get; private set; }
+
+    protected IReadOnlyList<FederativeLicenseType> LicenseTypes { get; private set; } = [];
+
+    protected bool IsTypesLoading { get; private set; }
+
+    protected bool IsDaily => SelectedTypeId == 3;
+
+    protected DateOnly? FechaInicio { get; private set; }
+
+    protected DateOnly? FechaFin { get; private set; }
+
+    protected string? CoverageErrorKey => IsDaily && !HasValidCoverage ? "licenses_coverage_invalid" : null;
+
+    private bool HasValidCoverage => !IsDaily || (FechaInicio.HasValue && FechaFin.HasValue &&
+        FechaInicio <= FechaFin && FechaInicio.Value.Year == SelectedTemporada && FechaFin.Value.Year == SelectedTemporada);
+
+    protected string DateValue(DateOnly? date) => date?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) ?? string.Empty;
+
+    protected void OnStartChanged(ChangeEventArgs args) => FechaInicio = ParseDate(args.Value);
+
+    protected void OnEndChanged(ChangeEventArgs args) => FechaFin = ParseDate(args.Value);
+
+    private static DateOnly? ParseDate(object? value) => DateOnly.TryParseExact(value?.ToString(), "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date) ? date : null;
 
     protected int? SelectedTemporada { get; private set; }
 
     protected string? SelectedLicencia { get; private set; }
 
     protected string? SelectedCategoria { get; private set; }
-
-    protected string SelectedModalityValue => SelectedMediaTemporada ? HalfSeasonValue : FullSeasonValue;
-
-    protected IReadOnlyList<FederativeLicenseSelectionOption> ModalityOptions =>
-        new[]
-        {
-            new FederativeLicenseSelectionOption(FullSeasonValue, L["mi_club_federative_licenses_request_modality_full"]),
-            new FederativeLicenseSelectionOption(HalfSeasonValue, L["mi_club_federative_licenses_request_modality_half"])
-        };
 
     protected IReadOnlyList<FederativeLicenseSelectionOption> SeasonOptions =>
         new[]
@@ -100,6 +114,10 @@ public partial class FederativeLicensesView
 
     protected bool CanConfirmRequest =>
         !IsNonOperational &&
+        IsRequestModalOpen &&
+        !IsTypesLoading &&
+        LicenseTypes.Any(type => type.Id == SelectedTypeId && type.Id is >= 1 and <= 3) &&
+        HasValidCoverage &&
         !IsRatesLoading &&
         !IsSubmittingRequest &&
         SelectedRate is not null &&
@@ -116,15 +134,35 @@ public partial class FederativeLicensesView
         await LoadMyLicensesAsync();
     }
 
-    protected void OpenRequestModal()
+    protected async Task OpenRequestModal()
     {
-        if (IsNonOperational)
+        if (IsNonOperational || IsRequestModalOpen || IsSubmittingRequest)
         {
             return;
         }
 
         ResetRequestState();
         IsRequestModalOpen = true;
+        var version = _modalVersion;
+        IsTypesLoading = true;
+        var result = await FederativeLicenseService.GetLicenseTypesAsync();
+        if (!IsRequestModalOpen || version != _modalVersion)
+        {
+            return;
+        }
+
+        IsTypesLoading = false;
+        if (!result.IsSuccess || result.Value is null || result.Value.Count == 0)
+        {
+            SetRequestMessage("licenses_types_error", isError: true);
+            return;
+        }
+        LicenseTypes = result.Value;
+        SelectedTypeId = LicenseTypes.Any(type => type.Id == 1) ? 1 : null;
+        if (SelectedTemporada is int season && SelectedTypeId.HasValue)
+        {
+            await LoadRatesForSeasonAsync(season);
+        }
     }
 
     protected void CloseRequestModal()
@@ -141,8 +179,9 @@ public partial class FederativeLicensesView
     protected async Task OnSeasonChangedAsync(ChangeEventArgs args)
     {
         ResetRateSelection();
+        FechaInicio = FechaFin = null;
 
-        if (!TryParseSelectedSeason(args.Value, out var temporada))
+        if (!TryParseSelectedSeason(args.Value, out var temporada) || (temporada != CurrentYear && temporada != CurrentYear + 1))
         {
             SelectedTemporada = null;
             return;
@@ -152,16 +191,16 @@ public partial class FederativeLicensesView
         await LoadRatesForSeasonAsync(temporada);
     }
 
-    protected async Task OnModalityChangedAsync(ChangeEventArgs args)
+    protected async Task OnTypeChangedAsync(ChangeEventArgs args)
     {
-        if (!TryParseSelectedModality(args.Value, out var mediaTemporada))
+        SelectedTypeId = int.TryParse(args.Value?.ToString(), out var id) &&
+            id is >= 1 and <= 3 && LicenseTypes.Any(type => type.Id == id) ? id : null;
+        if (!IsDaily)
         {
-            mediaTemporada = false;
+            FechaInicio = FechaFin = null;
         }
 
-        SelectedMediaTemporada = mediaTemporada;
         ResetRateSelection();
-
         if (SelectedTemporada is int temporada)
         {
             await LoadRatesForSeasonAsync(temporada);
@@ -192,7 +231,7 @@ public partial class FederativeLicensesView
         ClearRequestMessages();
 
         var result = await FederativeLicenseService.CreateFederativeLicenseRequestAsync(
-            new CreateFederativeLicenseRequest(SelectedTemporada.Value, SelectedRate.Id));
+            new CreateFederativeLicenseRequest(SelectedTemporada.Value, SelectedRate.Id, IsDaily ? FechaInicio : null, IsDaily ? FechaFin : null));
 
         IsSubmittingRequest = false;
 
@@ -223,7 +262,7 @@ public partial class FederativeLicensesView
     {
         var localizedTemplate = L["mi_club_federative_licenses_season_with_modality"].Value;
         var seasonLabel = GetSeasonLabel(request.Temporada);
-        var modalityLabel = GetModalityLabel(request.MediaTemporada);
+        var modalityLabel = request.TipoLicenciaNombre;
 
         if (localizedTemplate.Contains("{0}", StringComparison.Ordinal) &&
             localizedTemplate.Contains("{1}", StringComparison.Ordinal))
@@ -255,7 +294,7 @@ public partial class FederativeLicensesView
         AvailableRates
             .Where(rate =>
                 rate.Temporada == SelectedTemporada &&
-                rate.MediaTemporada == SelectedMediaTemporada &&
+                rate.TipoLicenciaId == SelectedTypeId &&
                 string.Equals(rate.Licencia, SelectedLicencia, StringComparison.CurrentCultureIgnoreCase) &&
                 string.Equals(rate.Categoria, SelectedCategoria, StringComparison.CurrentCultureIgnoreCase))
             .ToArray();
@@ -287,16 +326,27 @@ public partial class FederativeLicensesView
                 group.Key,
                 group
                     .OrderBy(request => request.Licencia, StringComparer.CurrentCultureIgnoreCase)
-                    .ThenBy(request => request.MediaTemporada)
+                    .ThenBy(request => request.TipoLicenciaId)
+                    .ThenBy(request => request.Id)
                     .ToArray()))
             .ToArray();
     }
 
     private async Task LoadRatesForSeasonAsync(int temporada)
     {
+        if (SelectedTypeId is not int typeId || IsTypesLoading)
+        {
+            return;
+        }
+
+        var version = ++_catalogVersion;
         IsRatesLoading = true;
 
-        var result = await FederativeLicenseService.GetAvailableRatesAsync(temporada, SelectedMediaTemporada);
+        var result = await FederativeLicenseService.GetAvailableRatesAsync(temporada, typeId);
+        if (!IsRequestModalOpen || version != _catalogVersion)
+        {
+            return;
+        }
 
         IsRatesLoading = false;
 
@@ -307,7 +357,7 @@ public partial class FederativeLicensesView
         }
 
         AvailableRates = (result.Value ?? Array.Empty<FederativeLicenseRate>())
-            .Where(rate => rate.Temporada == temporada && rate.MediaTemporada == SelectedMediaTemporada)
+            .Where(rate => rate.Temporada == temporada && rate.TipoLicenciaId == typeId)
             .ToArray();
         HasRateCatalogEmptyState = AvailableRates.Count == 0;
 
@@ -344,7 +394,11 @@ public partial class FederativeLicensesView
 
     private void ResetRequestState()
     {
-        SelectedMediaTemporada = false;
+        ++_modalVersion;
+        LicenseTypes = [];
+        IsTypesLoading = false;
+        SelectedTypeId = null;
+        FechaInicio = FechaFin = null;
         SelectedTemporada = null;
         ResetRateSelection();
         IsRatesLoading = false;
@@ -353,6 +407,8 @@ public partial class FederativeLicensesView
 
     private void ResetRateSelection()
     {
+        ++_catalogVersion;
+        IsRatesLoading = false;
         ClearRequestMessages();
         SelectedLicencia = null;
         SelectedCategoria = null;
@@ -376,45 +432,23 @@ public partial class FederativeLicensesView
 
     private void SetRequestError(ServiceError? error, string fallbackKey = DefaultRequestErrorKey)
     {
-        if (!string.IsNullOrWhiteSpace(error?.Message))
+        RequestMessageKey = error?.Code switch
         {
-            RequestMessageText = error.Message;
-            RequestMessageKey = null;
-        }
-        else
-        {
-            RequestMessageKey = fallbackKey;
-            RequestMessageText = null;
-        }
+            "licenses.request_conflict" => "licenses_request_non_daily_conflict",
+            "licenses.request_invalid" => "licenses_request_invalid",
+            "licenses.not_member" => "mi_club_federative_licenses_not_available",
+            "auth.session_invalid" or "auth.missing_session" => "licenses_session_invalid",
+            _ => fallbackKey
+        };
+        RequestMessageText = null;
 
         IsRequestMessageError = true;
-    }
-
-    private string GetModalityLabel(bool mediaTemporada)
-    {
-        var key = mediaTemporada
-            ? "mi_club_federative_licenses_request_modality_half"
-            : "mi_club_federative_licenses_request_modality_full";
-
-        var localizedValue = L[key].Value;
-        if (!string.Equals(localizedValue, key, StringComparison.Ordinal))
-        {
-            return localizedValue;
-        }
-
-        return mediaTemporada ? "Media Temporada" : "Temporada Completa";
     }
 
     private static bool TryParseSelectedSeason(object? value, out int temporada)
     {
         var rawValue = GetNormalizedValue(value);
         return int.TryParse(rawValue, NumberStyles.Integer, CultureInfo.InvariantCulture, out temporada);
-    }
-
-    private static bool TryParseSelectedModality(object? value, out bool mediaTemporada)
-    {
-        var rawValue = GetNormalizedValue(value);
-        return bool.TryParse(rawValue, out mediaTemporada);
     }
 
     private static string? GetNormalizedValue(object? value)

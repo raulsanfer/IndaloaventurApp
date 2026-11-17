@@ -1,4 +1,7 @@
 using System.Net;
+using FluentValidation;
+using FluentValidation.Results;
+using IndaloAventurApi.Domain.Abstractions;
 using IndaloAventurApi.Application.Abstractions.Email;
 using IndaloAventurApi.Application.Abstractions.LicenciasFederativas;
 using IndaloAventurApi.Application.Common;
@@ -35,16 +38,25 @@ public sealed class CreateSolicitudLicenciaFederativaCommandHandler(
             throw new InvalidOperationException("La tarifa seleccionada no pertenece a la temporada indicada.");
         }
 
-        var existing = await solicitudRepository.GetByUserIdAndTemporadaAsync(request.AuthenticatedUserId, request.Temporada, cancellationToken);
-        if (existing is not null)
+        SolicitudLicenciaFederativa solicitud;
+        try
         {
-            throw new InvalidOperationException("Ya has realizado una solicitud de licencia federativa para esa temporada.");
+            solicitud = SolicitudLicenciaFederativa.Crear(request.AuthenticatedUserId, request.Temporada, tarifa, request.FechaInicio, request.FechaFin);
+        }
+        catch (DomainException exception)
+        {
+            throw new ValidationException([new ValidationFailure("Cobertura", exception.Message)]);
         }
 
-        var solicitud = SolicitudLicenciaFederativa.Crear(request.AuthenticatedUserId, request.Temporada, tarifa);
-
-        await solicitudRepository.AddAsync(solicitud, cancellationToken);
-        await solicitudRepository.SaveChangesAsync(cancellationToken);
+        await solicitudRepository.ExecuteSerializableAsync(async token =>
+        {
+            var existentes = await solicitudRepository.ListByUserIdAndTemporadaForUpdateAsync(request.AuthenticatedUserId, request.Temporada, token);
+            if (tarifa.TipoLicenciaId != TipoLicencia.DiaId && existentes.Any(x => x.TarifaLicenciaFederativa!.TipoLicenciaId != TipoLicencia.DiaId))
+                throw new InvalidOperationException("Ya has realizado una solicitud de licencia completa o media para esa temporada.");
+            await solicitudRepository.AddAsync(solicitud, token);
+            await solicitudRepository.SaveChangesAsync(token);
+            return solicitud;
+        }, cancellationToken);
 
         await TrySendNotificationAsync(request.AuthenticatedUserEmail, cancellationToken);
 
@@ -57,9 +69,12 @@ public sealed class CreateSolicitudLicenciaFederativaCommandHandler(
             tarifa.Licencia,
             tarifa.Categoria,
             tarifa.Territorio,
-            tarifa.MediaTemporada,
+            tarifa.TipoLicenciaId,
+            tarifa.TipoLicencia.Nombre,
             tarifa.PrecioClub,
-            tarifa.PrecioIndependiente);
+            tarifa.PrecioIndependiente,
+            solicitud.FechaInicio,
+            solicitud.FechaFin);
     }
 
     private async Task TrySendNotificationAsync(string requesterEmail, CancellationToken cancellationToken)

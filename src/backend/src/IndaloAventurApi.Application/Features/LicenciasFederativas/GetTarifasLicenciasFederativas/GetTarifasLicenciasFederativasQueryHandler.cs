@@ -8,7 +8,7 @@ public sealed class GetTarifasLicenciasFederativasQueryHandler(ITarifaLicenciaFe
 {
     public async Task<IReadOnlyCollection<TarifaLicenciaFederativaDto>> Handle(GetTarifasLicenciasFederativasQuery request, CancellationToken cancellationToken)
     {
-        var tarifas = await tarifaRepository.ListAsync(request.Temporada, request.MediaTemporada, cancellationToken);
+        var tarifas = await tarifaRepository.ListAsync(request.Temporada, request.TipoLicenciaId, cancellationToken);
 
         return tarifas
             .Select(tarifa => new TarifaLicenciaFederativaDto(
@@ -17,7 +17,8 @@ public sealed class GetTarifasLicenciasFederativasQueryHandler(ITarifaLicenciaFe
                 tarifa.Licencia,
                 tarifa.Categoria,
                 tarifa.Territorio,
-                tarifa.MediaTemporada,
+                tarifa.TipoLicenciaId,
+                tarifa.TipoLicencia.Nombre,
                 tarifa.PrecioClub,
                 tarifa.PrecioIndependiente))
             .ToArray();

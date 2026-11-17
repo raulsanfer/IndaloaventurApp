@@ -23,9 +23,12 @@ internal static class AdminSolicitudLicenciaFederativaMapping
             solicitud.TarifaLicenciaFederativa.Licencia,
             solicitud.TarifaLicenciaFederativa.Categoria,
             solicitud.TarifaLicenciaFederativa.Territorio,
-            solicitud.TarifaLicenciaFederativa.MediaTemporada,
+            solicitud.TarifaLicenciaFederativa.TipoLicenciaId,
+            solicitud.TarifaLicenciaFederativa.TipoLicencia.Nombre,
             solicitud.TarifaLicenciaFederativa.PrecioClub,
-            solicitud.TarifaLicenciaFederativa.PrecioIndependiente);
+            solicitud.TarifaLicenciaFederativa.PrecioIndependiente,
+            solicitud.FechaInicio,
+            solicitud.FechaFin);
     }
 
     public static AdminSolicitudLicenciaFederativaDto WithUserEmail(

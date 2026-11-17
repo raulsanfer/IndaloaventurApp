@@ -33,6 +33,11 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
                 return ServiceResult<IReadOnlyList<FederativeLicenseRequest>>.Failure(new ServiceError("auth.session_invalid", "Sesion invalida."));
             }
 
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                return ServiceResult<IReadOnlyList<FederativeLicenseRequest>>.Failure(new ServiceError("licenses.not_member", "Acceso denegado a las licencias federativas."));
+            }
+
             if (!response.IsSuccessStatusCode)
             {
                 return ServiceResult<IReadOnlyList<FederativeLicenseRequest>>.Failure(new ServiceError("licenses.unavailable", $"Error HTTP {(int)response.StatusCode}."));
@@ -64,7 +69,63 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
         }
     }
 
-    public async Task<ServiceResult<IReadOnlyList<FederativeLicenseRate>>> GetAvailableRatesAsync(int temporada, bool mediaTemporada = false, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<ServiceResult<IReadOnlyList<FederativeLicenseType>>> GetLicenseTypesAsync(CancellationToken cancellationToken = default)
+    {
+        var sessionError = ValidateMemberSession();
+        if (sessionError is not null)
+        {
+            return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Failure(sessionError);
+        }
+
+        try
+        {
+            using var request = CreateAuthorizedRequest(HttpMethod.Get, "/api/licencias-federativas/tipos");
+            using var response = await httpClient.SendAsync(request, cancellationToken);
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Failure(new ServiceError("auth.session_invalid", "Sesion invalida."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Failure(new ServiceError("licenses.not_member", "Acceso denegado a las licencias federativas."));
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Failure(new ServiceError("licenses.types_unavailable", $"Error HTTP {(int)response.StatusCode}."));
+            }
+
+            var payload = await response.Content.ReadFromJsonAsync<FederativeLicenseType[]>(cancellationToken: cancellationToken);
+            if (payload is null)
+            {
+                return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Failure(new ServiceError("licenses.types_empty", "Respuesta vacia."));
+            }
+
+            return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Success(payload);
+        }
+        catch (HttpRequestException)
+        {
+            return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Failure(new ServiceError("licenses.types_unavailable", "No se pudo cargar el catalogo de licencias federativas."));
+        }
+        catch (TaskCanceledException)
+        {
+            return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Failure(new ServiceError("licenses.types_timeout", "Tiempo de espera agotado."));
+        }
+        catch (JsonException)
+        {
+            return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Failure(new ServiceError("licenses.types_invalid_payload", "La respuesta del catalogo de licencias no tiene un formato valido."));
+        }
+        catch (NotSupportedException)
+        {
+            return ServiceResult<IReadOnlyList<FederativeLicenseType>>.Failure(new ServiceError("licenses.types_invalid_payload", "La respuesta del catalogo de licencias no tiene un formato valido."));
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task<ServiceResult<IReadOnlyList<FederativeLicenseRate>>> GetAvailableRatesAsync(int temporada, int tipoLicenciaId, CancellationToken cancellationToken = default)
     {
         var sessionError = ValidateMemberSession();
         if (sessionError is not null)
@@ -76,7 +137,7 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
         {
             var query = string.Create(
                 CultureInfo.InvariantCulture,
-                $"{RatesEndpoint}?temporada={temporada}&mediaTemporada={mediaTemporada.ToString().ToLowerInvariant()}");
+                $"{RatesEndpoint}?temporada={temporada}&tipoLicenciaId={tipoLicenciaId}");
 
             using var request = CreateAuthorizedRequest(HttpMethod.Get, query);
             using var response = await httpClient.SendAsync(request, cancellationToken);
@@ -84,6 +145,11 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
                 return ServiceResult<IReadOnlyList<FederativeLicenseRate>>.Failure(new ServiceError("auth.session_invalid", "Sesion invalida."));
+            }
+
+            if (response.StatusCode == HttpStatusCode.Forbidden)
+            {
+                return ServiceResult<IReadOnlyList<FederativeLicenseRate>>.Failure(new ServiceError("licenses.not_member", "Acceso denegado a las licencias federativas."));
             }
 
             if (!response.IsSuccessStatusCode)
@@ -130,7 +196,7 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
             using var request = CreateAuthorizedRequest(HttpMethod.Post, RequestsEndpoint);
             request.Content = JsonContent.Create(new CreateSolicitudLicenciaFederativaRequest(
                 requestPayload.Temporada,
-                requestPayload.TarifaLicenciaFederativaId));
+                requestPayload.TarifaLicenciaFederativaId, requestPayload.FechaInicio, requestPayload.FechaFin));
 
             using var response = await httpClient.SendAsync(request, cancellationToken);
 
@@ -142,7 +208,7 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
             if (response.StatusCode == HttpStatusCode.Conflict)
             {
                 var detail = await TryReadProblemDetailsAsync(response, cancellationToken);
-                return ServiceResult<FederativeLicenseRequest>.Failure(new ServiceError("licenses.request_conflict", detail ?? "Ya existe una solicitud para la temporada seleccionada."));
+                return ServiceResult<FederativeLicenseRequest>.Failure(new ServiceError("licenses.request_conflict", detail ?? "Ya existe una solicitud Completa o Media para esta temporada, incluso si está cancelada. Puedes solicitar licencias de Día."));
             }
 
             if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -238,11 +304,13 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
         return new FederativeLicenseRequest(
             dto.Id,
             dto.Temporada,
-            dto.MediaTemporada,
+            dto.TipoLicenciaId,
+            dto.TipoLicenciaNombre ?? string.Empty,
             string.IsNullOrWhiteSpace(dto.Licencia) ? "Licencia federativa" : dto.Licencia.Trim(),
             string.IsNullOrWhiteSpace(dto.Categoria) ? "Sin categoria" : dto.Categoria.Trim(),
             string.IsNullOrWhiteSpace(dto.Territorio) ? "Sin ambito" : dto.Territorio.Trim(),
-            string.IsNullOrWhiteSpace(dto.Estado) ? "Sin estado" : dto.Estado.Trim());
+            string.IsNullOrWhiteSpace(dto.Estado) ? "Sin estado" : dto.Estado.Trim(),
+            dto.FechaInicio, dto.FechaFin);
     }
 
     private static FederativeLicenseRate MapRate(TarifaLicenciaFederativaDto dto)
@@ -250,7 +318,8 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
         return new FederativeLicenseRate(
             dto.Id,
             dto.Temporada,
-            dto.MediaTemporada,
+            dto.TipoLicenciaId,
+            dto.TipoLicenciaNombre ?? string.Empty,
             string.IsNullOrWhiteSpace(dto.Licencia) ? "Licencia federativa" : dto.Licencia.Trim(),
             string.IsNullOrWhiteSpace(dto.Categoria) ? "Sin categoria" : dto.Categoria.Trim(),
             string.IsNullOrWhiteSpace(dto.Territorio) ? "Sin ambito" : dto.Territorio.Trim(),
@@ -267,14 +336,18 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
         string? Licencia,
         string? Categoria,
         string? Territorio,
-        bool MediaTemporada,
+        int TipoLicenciaId,
+        string? TipoLicenciaNombre,
         double PrecioClub,
-        double? PrecioIndependiente);
+        double? PrecioIndependiente,
+        DateOnly? FechaInicio,
+        DateOnly? FechaFin);
 
     private sealed record TarifaLicenciaFederativaDto(
         int Id,
         int Temporada,
-        bool MediaTemporada,
+        int TipoLicenciaId,
+        string? TipoLicenciaNombre,
         string? Licencia,
         string? Categoria,
         string? Territorio,
@@ -283,7 +356,9 @@ public sealed class FederativeLicenseApiClient(HttpClient httpClient, ISessionSe
 
     private sealed record CreateSolicitudLicenciaFederativaRequest(
         int Temporada,
-        int TarifaLicenciaFederativaId);
+        int TarifaLicenciaFederativaId,
+        DateOnly? FechaInicio,
+        DateOnly? FechaFin);
 
     private sealed record ProblemDetailsDto(
         string? Title,

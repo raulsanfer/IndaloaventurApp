@@ -63,6 +63,7 @@ public static class ApiAuthorizationMatrix
         new("PUT", "/api/fichas-socio/me", ApiAccessClassification.Authenticated, "Policy: Authenticated", "Edicion autoservicio del titular."),
         new("PUT", "/api/fichas-socio/{userId:guid}", ApiAccessClassification.OwnerOrAdmin, "Handler: OwnerOrAdmin", "Edicion de ficha propia o por administracion."),
 
+        new("GET", "/api/licencias-federativas/tipos", ApiAccessClassification.Authenticated, "Policy: Authenticated", "Consulta de tipos para cualquier autenticado, sin mantenimiento."),
         new("GET", "/api/licencias-federativas/tarifas", ApiAccessClassification.Authenticated, "Policy: Authenticated", "Consulta de tarifas para cualquier autenticado."),
         new("POST", "/api/licencias-federativas/me/solicitudes", ApiAccessClassification.ClubMember, "Policy: ClubMember", "Solo socios reales con claim IsMember."),
         new("GET", "/api/licencias-federativas/me/solicitudes", ApiAccessClassification.Authenticated, "Policy: Authenticated", "Listado autoservicio del usuario autenticado."),

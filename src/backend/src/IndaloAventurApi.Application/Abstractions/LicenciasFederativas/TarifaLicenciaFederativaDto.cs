@@ -6,6 +6,7 @@ public sealed record TarifaLicenciaFederativaDto(
     string Licencia,
     string Categoria,
     string Territorio,
-    bool MediaTemporada,
+    int TipoLicenciaId,
+    string TipoLicenciaNombre,
     decimal PrecioClub,
     decimal? PrecioIndependiente);

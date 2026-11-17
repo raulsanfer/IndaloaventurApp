@@ -36,7 +36,7 @@ public sealed class FederativeLicenseApiClientTests
                     licencia = "B Plus",
                     categoria = "Adulto",
                     territorio = "Nacional",
-                    mediaTemporada = true,
+                    tipoLicenciaId = 2, tipoLicenciaNombre = "Media 01/07 - 31/12",
                     precioClub = 95.50,
                     precioIndependiente = 120.00
                 }
@@ -60,7 +60,7 @@ public sealed class FederativeLicenseApiClientTests
         Assert.True(result.IsSuccess);
         var item = Assert.Single(result.Value!);
         Assert.Equal(2026, item.Temporada);
-        Assert.True(item.MediaTemporada);
+        Assert.Equal(2, item.TipoLicenciaId);
         Assert.Equal("B Plus", item.Licencia);
         Assert.Equal("Pendiente", item.Estado);
         Assert.Equal("Nacional", item.AmbitoTerritorial);
@@ -79,7 +79,7 @@ public sealed class FederativeLicenseApiClientTests
         {
             Assert.Equal(HttpMethod.Get, request.Method);
             Assert.Equal("/api/licencias-federativas/tarifas", request.RequestUri?.AbsolutePath);
-            Assert.Equal("?temporada=2027&mediaTemporada=true", request.RequestUri?.Query);
+            Assert.Equal("?temporada=2027&tipoLicenciaId=2", request.RequestUri?.Query);
 
             var responseBody = JsonSerializer.Serialize(new[]
             {
@@ -87,7 +87,7 @@ public sealed class FederativeLicenseApiClientTests
                 {
                     id = 14,
                     temporada = 2027,
-                    mediaTemporada = true,
+                    tipoLicenciaId = 2, tipoLicenciaNombre = "Media 01/07 - 31/12",
                     licencia = "A",
                     categoria = "Juvenil",
                     territorio = "Autonomico",
@@ -109,13 +109,13 @@ public sealed class FederativeLicenseApiClientTests
 
         var sut = new FederativeLicenseApiClient(httpClient, sessionService);
 
-        var result = await sut.GetAvailableRatesAsync(2027, true);
+        var result = await sut.GetAvailableRatesAsync(2027, 2);
 
         Assert.True(result.IsSuccess);
         var item = Assert.Single(result.Value!);
         Assert.Equal(14, item.Id);
         Assert.Equal(2027, item.Temporada);
-        Assert.True(item.MediaTemporada);
+        Assert.Equal(2, item.TipoLicenciaId);
         Assert.Equal("A", item.Licencia);
         Assert.Equal(42.15m, item.PrecioClub);
     }
@@ -148,7 +148,7 @@ public sealed class FederativeLicenseApiClientTests
                 licencia = "B Plus",
                 categoria = "Adulto",
                 territorio = "Nacional",
-                mediaTemporada = false,
+                tipoLicenciaId = 1, tipoLicenciaNombre = "Completa",
                 precioClub = 88.50,
                 precioIndependiente = 120.00
             });
@@ -171,7 +171,7 @@ public sealed class FederativeLicenseApiClientTests
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
         Assert.Equal(2026, result.Value.Temporada);
-        Assert.False(result.Value.MediaTemporada);
+        Assert.Equal(1, result.Value.TipoLicenciaId);
         Assert.Equal("B Plus", result.Value.Licencia);
     }
 

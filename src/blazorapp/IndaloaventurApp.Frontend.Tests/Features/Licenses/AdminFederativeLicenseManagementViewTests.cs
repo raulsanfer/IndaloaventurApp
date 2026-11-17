@@ -44,7 +44,7 @@ public sealed class AdminFederativeLicenseManagementViewTests : BunitContext
                         "Adulto",
                         "Autonomico",
                         45m,
-                        null)
+                        null, 1, "Completa")
                 }));
             }
         };
@@ -90,8 +90,11 @@ public sealed class AdminFederativeLicenseManagementViewTests : BunitContext
                 "Adulto",
                 "Autonomico",
                 45m,
-                null)
+                null, 3, "Día", new DateOnly(2026,11,20), new DateOnly(2026,11,21))
         };
+        var original = currentItems[0];
+        var other = original with { Id = Guid.NewGuid(), FechaInicio = null, FechaFin = null };
+        currentItems.Add(other);
 
         var service = new RecordingAdminFederativeLicenseService
         {
@@ -121,6 +124,12 @@ public sealed class AdminFederativeLicenseManagementViewTests : BunitContext
             Assert.Equal(targetUserId, service.LastUpdateRequest!.UserId);
             Assert.Equal(requestId, service.LastUpdateRequest.SolicitudId);
             Assert.Equal("Confirmada", service.LastUpdateRequest.Estado);
+            Assert.Equal(original with { Estado = "Confirmada" }, currentItems[0]);
+            Assert.Equal(other, currentItems[1]);
+            Assert.Equal(2, cut.FindAll(".settings-federative-licenses__list-item").Count);
+            Assert.Contains("20/11/2026", cut.Markup);
+            Assert.Contains("21/11/2026", cut.Markup);
+            Assert.Equal(2, cut.FindAll("select.select-sm").Count);
             Assert.Contains("settings_federative_licenses_update_success", cut.Markup);
             Assert.Contains("Confirmada", cut.Markup);
         });

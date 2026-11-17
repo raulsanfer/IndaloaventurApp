@@ -9,6 +9,9 @@ public sealed record SolicitudLicenciaFederativaDto(
     string Licencia,
     string Categoria,
     string Territorio,
-    bool MediaTemporada,
+    int TipoLicenciaId,
+    string TipoLicenciaNombre,
     decimal PrecioClub,
-    decimal? PrecioIndependiente);
+    decimal? PrecioIndependiente,
+    DateOnly? FechaInicio,
+    DateOnly? FechaFin);

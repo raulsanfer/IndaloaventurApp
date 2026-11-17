@@ -6,7 +6,7 @@
 **/out/
 **/publish/
 **/artifacts/
-
+**/docs/
 # ----------------------------
 # Test, coverage, logs
 # ----------------------------
@@ -80,3 +80,5 @@ appsetting_api.json
 # Local tooling
 # ----------------------------
 .codex/
+
+**/floorplan

@@ -8,7 +8,9 @@ public sealed class SolicitudLicenciaFederativaConfiguration : IEntityTypeConfig
 {
     public void Configure(EntityTypeBuilder<SolicitudLicenciaFederativa> builder)
     {
-        builder.ToTable("SolicitudesLicenciasFederativas");
+        builder.ToTable("SolicitudesLicenciasFederativas", table =>
+            table.HasCheckConstraint("CK_SolicitudesLicenciasFederativas_Cobertura",
+                "([FechaInicio] IS NULL AND [FechaFin] IS NULL) OR ([FechaInicio] IS NOT NULL AND [FechaFin] IS NOT NULL AND [FechaInicio] <= [FechaFin])"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).ValueGeneratedNever();
@@ -19,7 +21,9 @@ public sealed class SolicitudLicenciaFederativaConfiguration : IEntityTypeConfig
         builder.Property(x => x.Estado).HasConversion<int>().IsRequired();
         builder.Property(x => x.FechaCreacionUtc).IsRequired();
 
-        builder.HasIndex(x => new { x.UserId, x.Temporada }).IsUnique();
+        builder.Property(x => x.FechaInicio).HasColumnType("date");
+        builder.Property(x => x.FechaFin).HasColumnType("date");
+        builder.HasIndex(x => new { x.UserId, x.Temporada });
         builder.HasIndex(x => x.TarifaLicenciaFederativaId);
 
         builder.HasOne(x => x.TarifaLicenciaFederativa)

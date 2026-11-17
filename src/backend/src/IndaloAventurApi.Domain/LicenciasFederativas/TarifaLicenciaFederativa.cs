@@ -16,7 +16,7 @@ public sealed class TarifaLicenciaFederativa : Entity, IAggregateRoot
         decimal precioClub,
         decimal? precioIndependiente,
         string territorio,
-        bool mediaTemporada)
+        int tipoLicenciaId)
     {
         Id = id;
         Temporada = temporada;
@@ -25,7 +25,7 @@ public sealed class TarifaLicenciaFederativa : Entity, IAggregateRoot
         PrecioClub = precioClub;
         PrecioIndependiente = precioIndependiente;
         Territorio = territorio;
-        MediaTemporada = mediaTemporada;
+        TipoLicenciaId = tipoLicenciaId;
     }
 
     public int Id { get; private set; }
@@ -35,7 +35,8 @@ public sealed class TarifaLicenciaFederativa : Entity, IAggregateRoot
     public decimal PrecioClub { get; private set; }
     public decimal? PrecioIndependiente { get; private set; }
     public string Territorio { get; private set; } = string.Empty;
-    public bool MediaTemporada { get; private set; }
+    public int TipoLicenciaId { get; private set; }
+    public TipoLicencia TipoLicencia { get; private set; } = null!;
 
     public static TarifaLicenciaFederativa Crear(
         int temporada,
@@ -44,9 +45,13 @@ public sealed class TarifaLicenciaFederativa : Entity, IAggregateRoot
         decimal precioClub,
         decimal? precioIndependiente,
         string territorio,
-        bool mediaTemporada = false)
+        int tipoLicenciaId)
     {
         Validar(temporada, licencia, categoria, precioClub, precioIndependiente, territorio);
+        if (tipoLicenciaId <= 0)
+        {
+            throw new DomainException("El tipo de licencia de la tarifa es obligatorio.");
+        }
 
         return new TarifaLicenciaFederativa(
             0,
@@ -56,7 +61,7 @@ public sealed class TarifaLicenciaFederativa : Entity, IAggregateRoot
             precioClub,
             precioIndependiente,
             territorio.Trim(),
-            mediaTemporada);
+            tipoLicenciaId);
     }
 
     private static void Validar(

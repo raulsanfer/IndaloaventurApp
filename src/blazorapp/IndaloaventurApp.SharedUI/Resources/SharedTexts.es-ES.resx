@@ -290,7 +290,7 @@
   <data name="mi_club_federative_licenses_request_modality_full" xml:space="preserve"><value>Temporada Completa</value></data>
   <data name="mi_club_federative_licenses_request_modality_half" xml:space="preserve"><value>Media Temporada</value></data>
   <data name="mi_club_federative_licenses_request_season" xml:space="preserve"><value>Temporada</value></data>
-  <data name="mi_club_federative_licenses_request_license" xml:space="preserve"><value>Tipología</value></data>
+  <data name="mi_club_federative_licenses_request_license" xml:space="preserve"><value>Nombre de licencia</value></data>
   <data name="mi_club_federative_licenses_request_category" xml:space="preserve"><value>Categoría</value></data>
   <data name="mi_club_federative_licenses_request_select_season" xml:space="preserve"><value>Selecciona una temporada</value></data>
   <data name="mi_club_federative_licenses_request_select_license" xml:space="preserve"><value>Selecciona una tipología</value></data>
@@ -707,4 +707,14 @@
   <data name="member_material_reservations_status_unknown" xml:space="preserve"><value>Estado no reconocido</value></data>
   <data name="member_material_reservations_load_error" xml:space="preserve"><value>No pudimos cargar tus reservas de material.</value></data>
   <data name="member_material_reservations_operation_error" xml:space="preserve"><value>No pudimos completar la operación de reserva.</value></data>
+  <data name="licenses_type" xml:space="preserve"><value>Tipo de licencia</value></data>
+  <data name="licenses_select_type" xml:space="preserve"><value>Selecciona un tipo</value></data>
+  <data name="licenses_start" xml:space="preserve"><value>Fecha de inicio</value></data>
+  <data name="licenses_end" xml:space="preserve"><value>Fecha de fin</value></data>
+  <data name="licenses_coverage" xml:space="preserve"><value>Cobertura</value></data>
+  <data name="licenses_coverage_invalid" xml:space="preserve"><value>Indica ambas fechas dentro del año de la temporada, con inicio anterior o igual al fin.</value></data>
+  <data name="licenses_types_error" xml:space="preserve"><value>No pudimos cargar los tipos de licencia. Cierra y vuelve a abrir la solicitud.</value></data>
+  <data name="licenses_request_non_daily_conflict" xml:space="preserve"><value>Ya existe una solicitud Completa o Media para esta temporada, incluso si está cancelada. Puedes solicitar licencias de Día.</value></data>
+  <data name="licenses_request_invalid" xml:space="preserve"><value>Revisa la tarifa y las fechas de cobertura de la solicitud.</value></data>
+  <data name="licenses_session_invalid" xml:space="preserve"><value>Tu sesión ya no es válida. Vuelve a iniciar sesión.</value></data>
 </root>

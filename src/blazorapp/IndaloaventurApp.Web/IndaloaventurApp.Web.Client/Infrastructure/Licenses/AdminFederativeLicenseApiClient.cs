@@ -218,7 +218,8 @@ public sealed class AdminFederativeLicenseApiClient(HttpClient httpClient, ISess
             string.IsNullOrWhiteSpace(dto.Categoria) ? "Sin categoria" : dto.Categoria.Trim(),
             string.IsNullOrWhiteSpace(dto.Territorio) ? "Sin ambito" : dto.Territorio.Trim(),
             dto.PrecioClub,
-            dto.PrecioIndependiente);
+            dto.PrecioIndependiente,
+            dto.TipoLicenciaId, dto.TipoLicenciaNombre ?? string.Empty, dto.FechaInicio, dto.FechaFin);
     }
 
     private sealed record AdminSolicitudLicenciaFederativaDto(
@@ -233,7 +234,11 @@ public sealed class AdminFederativeLicenseApiClient(HttpClient httpClient, ISess
         string? Categoria,
         string? Territorio,
         decimal PrecioClub,
-        decimal? PrecioIndependiente);
+        decimal? PrecioIndependiente,
+        int TipoLicenciaId,
+        string? TipoLicenciaNombre,
+        DateOnly? FechaInicio,
+        DateOnly? FechaFin);
 
     private sealed record UpdateEstadoRequest(string Estado);
 

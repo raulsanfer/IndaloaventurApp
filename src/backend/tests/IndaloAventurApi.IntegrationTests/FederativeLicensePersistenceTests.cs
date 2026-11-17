@@ -21,8 +21,8 @@ public sealed class FederativeLicensePersistenceTests
             .ToListAsync();
 
         Assert.Equal(50, tarifas.Count);
-        Assert.Contains(tarifas, x => x.Licencia == "A NAC +" && x.Categoria == "Mayores" && !x.MediaTemporada && x.PrecioClub == 69m && x.PrecioIndependiente == 89m);
-        Assert.Contains(tarifas, x => x.Licencia == "A NAC +" && x.Categoria == "Mayores" && x.MediaTemporada && x.PrecioClub == 69m && x.PrecioIndependiente == 89m);
+        Assert.Contains(tarifas, x => x.Licencia == "A NAC +" && x.Categoria == "Mayores" && x.TipoLicenciaId == TipoLicencia.CompletaId && x.PrecioClub == 69m && x.PrecioIndependiente == 89m);
+        Assert.Contains(tarifas, x => x.Licencia == "A NAC +" && x.Categoria == "Mayores" && x.TipoLicenciaId == TipoLicencia.MediaId && x.PrecioClub == 69m && x.PrecioIndependiente == 89m);
     }
 
     [Fact]
@@ -34,13 +34,13 @@ public sealed class FederativeLicensePersistenceTests
         Assert.NotNull(tarifaEntity);
         Assert.Contains(
             tarifaEntity!.GetIndexes(),
-            index => index.IsUnique && index.Properties.Select(x => x.Name).SequenceEqual(["Temporada", "Licencia", "Categoria", "MediaTemporada"]));
+            index => index.IsUnique && index.Properties.Select(x => x.Name).SequenceEqual(["Temporada", "TipoLicenciaId", "Licencia", "Categoria"]));
 
         var solicitudEntity = context.Model.FindEntityType(typeof(SolicitudLicenciaFederativa));
         Assert.NotNull(solicitudEntity);
         Assert.Contains(
             solicitudEntity!.GetIndexes(),
-            index => index.IsUnique && index.Properties.Select(x => x.Name).SequenceEqual(["UserId", "Temporada"]));
+            index => !index.IsUnique && index.Properties.Select(x => x.Name).SequenceEqual(["UserId", "Temporada"]));
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public sealed class FederativeLicensePersistenceTests
         var tarifa2026 = await tarifasRepo.GetByIdAsync(1, CancellationToken.None);
         Assert.NotNull(tarifa2026);
 
-        var tarifa2027 = TarifaLicenciaFederativa.Crear(2027, "A", "Mayores", 50m, 70m, "Andalucia, Ceuta y Melilla");
+        var tarifa2027 = TarifaLicenciaFederativa.Crear(2027, "A", "Mayores", 50m, 70m, "Andalucia, Ceuta y Melilla", TipoLicencia.CompletaId);
         await tarifasRepo.AddAsync(tarifa2027, CancellationToken.None);
         await tarifasRepo.SaveChangesAsync(CancellationToken.None);
 

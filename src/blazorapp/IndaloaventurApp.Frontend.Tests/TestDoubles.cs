@@ -164,9 +164,15 @@ internal sealed class RecordingFederativeLicenseService : IFederativeLicenseServ
 {
     public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<FederativeLicenseRequest>>>>? GetMyFederativeLicensesHandler { get; init; }
 
-    public Func<int, bool, CancellationToken, Task<ServiceResult<IReadOnlyList<FederativeLicenseRate>>>>? GetAvailableRatesHandler { get; init; }
+    public Func<int, int, CancellationToken, Task<ServiceResult<IReadOnlyList<FederativeLicenseRate>>>>? GetAvailableRatesHandler { get; init; }
 
     public Func<CreateFederativeLicenseRequest, CancellationToken, Task<ServiceResult<FederativeLicenseRequest>>>? CreateFederativeLicenseRequestHandler { get; init; }
+
+    public Func<CancellationToken, Task<ServiceResult<IReadOnlyList<FederativeLicenseType>>>>? GetLicenseTypesHandler { get; init; }
+
+    public Task<ServiceResult<IReadOnlyList<FederativeLicenseType>>> GetLicenseTypesAsync(CancellationToken cancellationToken = default)
+        => GetLicenseTypesHandler?.Invoke(cancellationToken) ?? Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseType>>.Success(new[] {
+            new FederativeLicenseType(1, "Completa"), new FederativeLicenseType(2, "Media 01/07 - 31/12"), new FederativeLicenseType(3, "Día") }));
 
     public CreateFederativeLicenseRequest? LastCreateRequest { get; private set; }
 
@@ -176,9 +182,9 @@ internal sealed class RecordingFederativeLicenseService : IFederativeLicenseServ
             ?? Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseRequest>>.Success(Array.Empty<FederativeLicenseRequest>()));
     }
 
-    public Task<ServiceResult<IReadOnlyList<FederativeLicenseRate>>> GetAvailableRatesAsync(int temporada, bool mediaTemporada = false, CancellationToken cancellationToken = default)
+    public Task<ServiceResult<IReadOnlyList<FederativeLicenseRate>>> GetAvailableRatesAsync(int temporada, int tipoLicenciaId, CancellationToken cancellationToken = default)
     {
-        return GetAvailableRatesHandler?.Invoke(temporada, mediaTemporada, cancellationToken)
+        return GetAvailableRatesHandler?.Invoke(temporada, tipoLicenciaId, cancellationToken)
             ?? Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseRate>>.Success(Array.Empty<FederativeLicenseRate>()));
     }
 

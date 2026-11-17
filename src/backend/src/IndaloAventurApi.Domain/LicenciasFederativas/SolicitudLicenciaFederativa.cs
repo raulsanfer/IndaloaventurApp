@@ -30,9 +30,12 @@ public sealed class SolicitudLicenciaFederativa : Entity, IAggregateRoot
     public int TarifaLicenciaFederativaId { get; private set; }
     public EstadoSolicitudLicenciaFederativa Estado { get; private set; }
     public DateTime FechaCreacionUtc { get; private set; }
+    public DateOnly? FechaInicio { get; private set; }
+    public DateOnly? FechaFin { get; private set; }
     public TarifaLicenciaFederativa? TarifaLicenciaFederativa { get; private set; }
 
-    public static SolicitudLicenciaFederativa Crear(Guid userId, int temporada, TarifaLicenciaFederativa tarifa)
+    public static SolicitudLicenciaFederativa Crear(Guid userId, int temporada, TarifaLicenciaFederativa tarifa,
+        DateOnly? fechaInicio = null, DateOnly? fechaFin = null)
     {
         if (userId == Guid.Empty)
         {
@@ -54,13 +57,30 @@ public sealed class SolicitudLicenciaFederativa : Entity, IAggregateRoot
             throw new DomainException("La tarifa seleccionada no pertenece a la misma temporada de la solicitud.");
         }
 
-        return new SolicitudLicenciaFederativa(
+        ValidarCobertura(temporada, tarifa.TipoLicenciaId, fechaInicio, fechaFin);
+
+        var solicitud = new SolicitudLicenciaFederativa(
             Guid.NewGuid(),
             userId,
             temporada,
             tarifa.Id,
             EstadoSolicitudLicenciaFederativa.Pendiente,
             DateTime.UtcNow);
+        solicitud.FechaInicio = fechaInicio;
+        solicitud.FechaFin = fechaFin;
+        return solicitud;
+    }
+
+    public static void ValidarCobertura(int temporada, int tipoLicenciaId, DateOnly? inicio, DateOnly? fin)
+    {
+        if (tipoLicenciaId == TipoLicencia.DiaId && (!inicio.HasValue || !fin.HasValue))
+            throw new DomainException("Las licencias de día requieren fecha de inicio y fecha de fin.");
+        if (inicio.HasValue != fin.HasValue)
+            throw new DomainException("La cobertura debe incluir fecha de inicio y fecha de fin.");
+        if (inicio > fin)
+            throw new DomainException("La fecha de inicio no puede ser posterior a la fecha de fin.");
+        if (inicio.HasValue && (inicio.Value.Year != temporada || fin!.Value.Year != temporada))
+            throw new DomainException("Las fechas de cobertura deben pertenecer a la temporada indicada.");
     }
 
     public void Confirmar()

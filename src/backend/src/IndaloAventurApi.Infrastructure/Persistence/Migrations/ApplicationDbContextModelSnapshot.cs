@@ -332,6 +332,12 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("FechaCreacionUtc")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateOnly?>("FechaFin")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly?>("FechaInicio")
+                        .HasColumnType("date");
+
                     b.Property<int>("TarifaLicenciaFederativaId")
                         .HasColumnType("int");
 
@@ -345,10 +351,14 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("TarifaLicenciaFederativaId");
 
-                    b.HasIndex("UserId", "Temporada")
-                        .IsUnique();
+                    b.HasIndex("UserId", "Temporada");
 
-                    b.ToTable("SolicitudesLicenciasFederativas", (string)null);
+                    b.ToTable("SolicitudesLicenciasFederativas", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_SolicitudesLicenciasFederativas_Cobertura", "([FechaInicio] IS NULL AND [FechaFin] IS NULL) OR ([FechaInicio] IS NOT NULL AND [FechaFin] IS NOT NULL AND [FechaInicio] <= [FechaFin])");
+
+                            t.HasCheckConstraint("CK_SolicitudesLicenciasFederativas_CoberturaTemporada", "[FechaInicio] IS NULL OR (YEAR([FechaInicio]) = [Temporada] AND YEAR([FechaFin]) = [Temporada])");
+                        });
                 });
 
             modelBuilder.Entity("IndaloAventurApi.Domain.LicenciasFederativas.TarifaLicenciaFederativa", b =>
@@ -369,11 +379,6 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("nvarchar(80)");
 
-                    b.Property<bool>("MediaTemporada")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
                     b.Property<decimal>("PrecioClub")
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
@@ -390,9 +395,14 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("TipoLicenciaId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("Temporada", "Licencia", "Categoria", "MediaTemporada")
+                    b.HasIndex("TipoLicenciaId");
+
+                    b.HasIndex("Temporada", "TipoLicenciaId", "Licencia", "Categoria")
                         .IsUnique();
 
                     b.ToTable("TarifasLicenciasFederativas", (string)null);
@@ -403,532 +413,567 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
                             Id = 1,
                             Categoria = "Mayores",
                             Licencia = "A",
-                            MediaTemporada = false,
                             PrecioClub = 45.0m,
                             PrecioIndependiente = 65.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 26,
                             Categoria = "Mayores",
                             Licencia = "A",
-                            MediaTemporada = true,
                             PrecioClub = 45.0m,
                             PrecioIndependiente = 65.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 2,
                             Categoria = "Juveniles",
                             Licencia = "A",
-                            MediaTemporada = false,
                             PrecioClub = 11.0m,
                             PrecioIndependiente = 31.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 27,
                             Categoria = "Juveniles",
                             Licencia = "A",
-                            MediaTemporada = true,
                             PrecioClub = 11.0m,
                             PrecioIndependiente = 31.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 3,
                             Categoria = "Infantiles",
                             Licencia = "A",
-                            MediaTemporada = false,
                             PrecioClub = 11.0m,
                             PrecioIndependiente = 31.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 28,
                             Categoria = "Infantiles",
                             Licencia = "A",
-                            MediaTemporada = true,
                             PrecioClub = 11.0m,
                             PrecioIndependiente = 31.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 4,
                             Categoria = "Mayores",
                             Licencia = "A+",
-                            MediaTemporada = false,
                             PrecioClub = 58.0m,
                             PrecioIndependiente = 78.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 29,
                             Categoria = "Mayores",
                             Licencia = "A+",
-                            MediaTemporada = true,
                             PrecioClub = 58.0m,
                             PrecioIndependiente = 78.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 5,
                             Categoria = "Juveniles",
                             Licencia = "A+",
-                            MediaTemporada = false,
                             PrecioClub = 26.0m,
                             PrecioIndependiente = 46.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 30,
                             Categoria = "Juveniles",
                             Licencia = "A+",
-                            MediaTemporada = true,
                             PrecioClub = 26.0m,
                             PrecioIndependiente = 46.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 6,
                             Categoria = "Infantiles",
                             Licencia = "A+",
-                            MediaTemporada = false,
                             PrecioClub = 26.0m,
                             PrecioIndependiente = 46.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 31,
                             Categoria = "Infantiles",
                             Licencia = "A+",
-                            MediaTemporada = true,
                             PrecioClub = 26.0m,
                             PrecioIndependiente = 46.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 7,
                             Categoria = "Mayores",
                             Licencia = "A Familiar",
-                            MediaTemporada = false,
                             PrecioClub = 43.0m,
                             PrecioIndependiente = 63.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 32,
                             Categoria = "Mayores",
                             Licencia = "A Familiar",
-                            MediaTemporada = true,
                             PrecioClub = 43.0m,
                             PrecioIndependiente = 63.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 8,
                             Categoria = "Juveniles",
                             Licencia = "A Familiar",
-                            MediaTemporada = false,
                             PrecioClub = 9.0m,
                             PrecioIndependiente = 29.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 33,
                             Categoria = "Juveniles",
                             Licencia = "A Familiar",
-                            MediaTemporada = true,
                             PrecioClub = 9.0m,
                             PrecioIndependiente = 29.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 9,
                             Categoria = "Infantiles",
                             Licencia = "A Familiar",
-                            MediaTemporada = false,
                             PrecioClub = 9.0m,
                             PrecioIndependiente = 29.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 34,
                             Categoria = "Infantiles",
                             Licencia = "A Familiar",
-                            MediaTemporada = true,
                             PrecioClub = 9.0m,
                             PrecioIndependiente = 29.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 10,
                             Categoria = "Mayores",
                             Licencia = "A-IS Inclusion Social",
-                            MediaTemporada = false,
                             PrecioClub = 19.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 35,
                             Categoria = "Mayores",
                             Licencia = "A-IS Inclusion Social",
-                            MediaTemporada = true,
                             PrecioClub = 19.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 11,
                             Categoria = "Juveniles",
                             Licencia = "A-IS Inclusion Social",
-                            MediaTemporada = false,
                             PrecioClub = 8.5m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 36,
                             Categoria = "Juveniles",
                             Licencia = "A-IS Inclusion Social",
-                            MediaTemporada = true,
                             PrecioClub = 8.5m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 12,
                             Categoria = "Infantiles",
                             Licencia = "A-IS Inclusion Social",
-                            MediaTemporada = false,
                             PrecioClub = 8.5m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 37,
                             Categoria = "Infantiles",
                             Licencia = "A-IS Inclusion Social",
-                            MediaTemporada = true,
                             PrecioClub = 8.5m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 13,
                             Categoria = "Mayores",
                             Licencia = "A+IS Inclusion Social",
-                            MediaTemporada = false,
                             PrecioClub = 33.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 38,
                             Categoria = "Mayores",
                             Licencia = "A+IS Inclusion Social",
-                            MediaTemporada = true,
                             PrecioClub = 33.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 14,
                             Categoria = "Juveniles",
                             Licencia = "A+IS Inclusion Social",
-                            MediaTemporada = false,
                             PrecioClub = 23.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 39,
                             Categoria = "Juveniles",
                             Licencia = "A+IS Inclusion Social",
-                            MediaTemporada = true,
                             PrecioClub = 23.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 15,
                             Categoria = "Infantiles",
                             Licencia = "A+IS Inclusion Social",
-                            MediaTemporada = false,
                             PrecioClub = 23.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 40,
                             Categoria = "Infantiles",
                             Licencia = "A+IS Inclusion Social",
-                            MediaTemporada = true,
                             PrecioClub = 23.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 16,
                             Categoria = "Mayores",
                             Licencia = "A ESP",
-                            MediaTemporada = false,
                             PrecioClub = 28.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 41,
                             Categoria = "Mayores",
                             Licencia = "A ESP",
-                            MediaTemporada = true,
                             PrecioClub = 28.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 17,
                             Categoria = "Mayores",
                             Licencia = "A65",
-                            MediaTemporada = false,
                             PrecioClub = 32.0m,
                             PrecioIndependiente = 52.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 42,
                             Categoria = "Mayores",
                             Licencia = "A65",
-                            MediaTemporada = true,
                             PrecioClub = 32.0m,
                             PrecioIndependiente = 52.0m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 18,
                             Categoria = "Juveniles",
                             Licencia = "A REF",
-                            MediaTemporada = false,
                             PrecioClub = 8.5m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 43,
                             Categoria = "Juveniles",
                             Licencia = "A REF",
-                            MediaTemporada = true,
                             PrecioClub = 8.5m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 19,
                             Categoria = "Infantiles",
                             Licencia = "A REF",
-                            MediaTemporada = false,
                             PrecioClub = 8.5m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 44,
                             Categoria = "Infantiles",
                             Licencia = "A REF",
-                            MediaTemporada = true,
                             PrecioClub = 8.5m,
                             Temporada = 2026,
-                            Territorio = "Andalucia, Ceuta y Melilla"
+                            Territorio = "Andalucia, Ceuta y Melilla",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 20,
                             Categoria = "Mayores",
                             Licencia = "A NAC",
-                            MediaTemporada = false,
                             PrecioClub = 52.0m,
                             PrecioIndependiente = 72.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 45,
                             Categoria = "Mayores",
                             Licencia = "A NAC",
-                            MediaTemporada = true,
                             PrecioClub = 52.0m,
                             PrecioIndependiente = 72.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 21,
                             Categoria = "Juveniles",
                             Licencia = "A NAC",
-                            MediaTemporada = false,
                             PrecioClub = 22.0m,
                             PrecioIndependiente = 42.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 46,
                             Categoria = "Juveniles",
                             Licencia = "A NAC",
-                            MediaTemporada = true,
                             PrecioClub = 22.0m,
                             PrecioIndependiente = 42.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 22,
                             Categoria = "Infantiles",
                             Licencia = "A NAC",
-                            MediaTemporada = false,
                             PrecioClub = 22.0m,
                             PrecioIndependiente = 42.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 47,
                             Categoria = "Infantiles",
                             Licencia = "A NAC",
-                            MediaTemporada = true,
                             PrecioClub = 22.0m,
                             PrecioIndependiente = 42.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 23,
                             Categoria = "Mayores",
                             Licencia = "A NAC +",
-                            MediaTemporada = false,
                             PrecioClub = 69.0m,
                             PrecioIndependiente = 89.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 48,
                             Categoria = "Mayores",
                             Licencia = "A NAC +",
-                            MediaTemporada = true,
                             PrecioClub = 69.0m,
                             PrecioIndependiente = 89.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 24,
                             Categoria = "Juveniles",
                             Licencia = "A NAC +",
-                            MediaTemporada = false,
                             PrecioClub = 36.0m,
                             PrecioIndependiente = 56.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 49,
                             Categoria = "Juveniles",
                             Licencia = "A NAC +",
-                            MediaTemporada = true,
                             PrecioClub = 36.0m,
                             PrecioIndependiente = 56.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 2
                         },
                         new
                         {
                             Id = 25,
                             Categoria = "Infantiles",
                             Licencia = "A NAC +",
-                            MediaTemporada = false,
                             PrecioClub = 36.0m,
                             PrecioIndependiente = 56.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 1
                         },
                         new
                         {
                             Id = 50,
                             Categoria = "Infantiles",
                             Licencia = "A NAC +",
-                            MediaTemporada = true,
                             PrecioClub = 36.0m,
                             PrecioIndependiente = 56.0m,
                             Temporada = 2026,
-                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos"
+                            Territorio = "Espana, Andorra, Pirineo Frances, Portugal y Marruecos",
+                            TipoLicenciaId = 2
+                        });
+                });
+
+            modelBuilder.Entity("IndaloAventurApi.Domain.LicenciasFederativas.TipoLicencia", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nombre")
+                        .IsUnique();
+
+                    b.ToTable("TiposLicencias", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Nombre = "Completa"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Nombre = "Media 01/07 - 31/12"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Nombre = "Día"
                         });
                 });
 
@@ -1424,6 +1469,17 @@ namespace IndaloAventurApi.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("TarifaLicenciaFederativa");
+                });
+
+            modelBuilder.Entity("IndaloAventurApi.Domain.LicenciasFederativas.TarifaLicenciaFederativa", b =>
+                {
+                    b.HasOne("IndaloAventurApi.Domain.LicenciasFederativas.TipoLicencia", "TipoLicencia")
+                        .WithMany()
+                        .HasForeignKey("TipoLicenciaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("TipoLicencia");
                 });
 
             modelBuilder.Entity("IndaloAventurApi.Domain.TrailSignals.Signal", b =>

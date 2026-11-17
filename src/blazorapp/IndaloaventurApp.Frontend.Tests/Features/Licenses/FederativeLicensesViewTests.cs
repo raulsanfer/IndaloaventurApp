@@ -65,9 +65,9 @@ public sealed class FederativeLicensesViewTests : BunitContext
         {
             GetMyFederativeLicensesHandler = _ => Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseRequest>>.Success(new[]
             {
-                new FederativeLicenseRequest(Guid.NewGuid(), 2025, false, "Basica", "Adulto", "Andalucia", "Aprobada"),
-                new FederativeLicenseRequest(Guid.NewGuid(), 2026, true, "B Plus", "Infantil", "Nacional", "Pendiente"),
-                new FederativeLicenseRequest(Guid.NewGuid(), 2026, false, "A", "Adulto", "Autonomico", "En revision")
+                new FederativeLicenseRequest(Guid.NewGuid(), 2025, 1, "Completa", "Basica", "Adulto", "Andalucia", "Aprobada"),
+                new FederativeLicenseRequest(Guid.NewGuid(), 2026, 2, "Media 01/07 - 31/12", "B Plus", "Infantil", "Nacional", "Pendiente"),
+                new FederativeLicenseRequest(Guid.NewGuid(), 2026, 1, "Completa", "A", "Adulto", "Autonomico", "En revision")
             }))
         };
 
@@ -81,8 +81,8 @@ public sealed class FederativeLicensesViewTests : BunitContext
         {
             Assert.Contains("Temporada 2026", cut.Markup);
             Assert.Contains("Temporada 2025", cut.Markup);
-            Assert.Contains("Temporada 2026 · Media Temporada", cut.Markup);
-            Assert.Contains("Temporada 2026 · Temporada Completa", cut.Markup);
+            Assert.Contains("Temporada 2026 · Media 01/07 - 31/12", cut.Markup);
+            Assert.Contains("Temporada 2026 · Completa", cut.Markup);
             Assert.Contains("Pendiente", cut.Markup);
             Assert.Contains("En revision", cut.Markup);
             Assert.Contains("Andalucia", cut.Markup);
@@ -102,14 +102,14 @@ public sealed class FederativeLicensesViewTests : BunitContext
         var service = new RecordingFederativeLicenseService
         {
             GetMyFederativeLicensesHandler = _ => Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseRequest>>.Success(Array.Empty<FederativeLicenseRequest>())),
-            GetAvailableRatesHandler = (temporada, mediaTemporada, _) =>
+            GetAvailableRatesHandler = (temporada, tipoLicenciaId, _) =>
             {
                 Assert.Equal(2026, temporada);
-                Assert.False(mediaTemporada);
+                Assert.Equal(1, tipoLicenciaId);
 
                 return Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseRate>>.Success(new[]
                 {
-                    new FederativeLicenseRate(18, 2026, false, "B Plus", "Adulto", "Nacional", 85.5m, null)
+                    new FederativeLicenseRate(18, 2026, 1, "Completa", "B Plus", "Adulto", "Nacional", 85.5m, null)
                 }));
             }
         };
@@ -121,7 +121,7 @@ public sealed class FederativeLicensesViewTests : BunitContext
         var cut = Render<FederativeLicensesView>();
 
         cut.Find("button.btn.btn-primary.mi-club-licenses__request-btn").Click();
-        cut.FindAll("select")[1].Change("2026");
+        cut.FindAll("select")[0].Change("2026");
 
         cut.WaitForAssertion(() =>
         {
@@ -152,7 +152,7 @@ public sealed class FederativeLicensesViewTests : BunitContext
         var cut = Render<FederativeLicensesView>();
 
         cut.Find("button.btn.btn-primary.mi-club-licenses__request-btn").Click();
-        cut.FindAll("select")[1].Change("2027");
+        cut.FindAll("select")[0].Change("2027");
 
         cut.WaitForAssertion(() =>
         {
@@ -169,24 +169,24 @@ public sealed class FederativeLicensesViewTests : BunitContext
         var sessionService = new RecordingSessionService();
         sessionService.SetSession(new AuthSession("token", "Bearer", 3600, true, new[] { "Member" }));
 
-        var requestedModalities = new List<bool>();
+        var requestedModalities = new List<int>();
 
         var service = new RecordingFederativeLicenseService
         {
             GetMyFederativeLicensesHandler = _ => Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseRequest>>.Success(Array.Empty<FederativeLicenseRequest>())),
-            GetAvailableRatesHandler = (temporada, mediaTemporada, _) =>
+            GetAvailableRatesHandler = (temporada, tipoLicenciaId, _) =>
             {
                 Assert.Equal(2026, temporada);
-                requestedModalities.Add(mediaTemporada);
+                requestedModalities.Add(tipoLicenciaId);
 
-                var rates = mediaTemporada
+                var rates = tipoLicenciaId == 2
                     ? new[]
                     {
-                        new FederativeLicenseRate(28, 2026, true, "A", "Cadete", "Autonomico", 32m, null)
+                        new FederativeLicenseRate(28, 2026, 2, "Media 01/07 - 31/12", "A", "Cadete", "Autonomico", 32m, null)
                     }
                     : new[]
                     {
-                        new FederativeLicenseRate(18, 2026, false, "B Plus", "Adulto", "Nacional", 85.5m, null)
+                        new FederativeLicenseRate(18, 2026, 1, "Completa", "B Plus", "Adulto", "Nacional", 85.5m, null)
                     };
 
                 return Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseRate>>.Success(rates));
@@ -202,16 +202,16 @@ public sealed class FederativeLicensesViewTests : BunitContext
         cut.Find("button.btn.btn-primary.mi-club-licenses__request-btn").Click();
 
         var selects = cut.FindAll("select");
-        selects[1].Change("2026");
+        selects[0].Change("2026");
 
         cut.WaitForAssertion(() => Assert.Contains("B Plus", cut.Markup));
 
         selects = cut.FindAll("select");
-        selects[0].Change("true");
+        selects[1].Change("2");
 
         cut.WaitForAssertion(() =>
         {
-            Assert.Equal(new[] { false, true }, requestedModalities);
+            Assert.Equal(new[] { 1, 2 }, requestedModalities);
             Assert.Contains(">A</option>", cut.FindAll("select")[2].InnerHtml);
             Assert.DoesNotContain(">B Plus</option>", cut.FindAll("select")[2].InnerHtml);
         });
@@ -231,20 +231,20 @@ public sealed class FederativeLicensesViewTests : BunitContext
         var service = new RecordingFederativeLicenseService
         {
             GetMyFederativeLicensesHandler = _ => Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseRequest>>.Success(currentRequests)),
-            GetAvailableRatesHandler = (_, mediaTemporada, _) =>
+            GetAvailableRatesHandler = (_, tipoLicenciaId, _) =>
             {
-                Assert.False(mediaTemporada);
+                Assert.Equal(1, tipoLicenciaId);
 
                 return Task.FromResult(ServiceResult<IReadOnlyList<FederativeLicenseRate>>.Success(new[]
                 {
-                    new FederativeLicenseRate(30, 2026, false, "A", "Adulto", "Autonomico", 40m, null)
+                    new FederativeLicenseRate(30, 2026, 1, "Completa", "A", "Adulto", "Autonomico", 40m, null)
                 }));
             },
             CreateFederativeLicenseRequestHandler = (request, _) =>
             {
                 currentRequests = new[]
                 {
-                    new FederativeLicenseRequest(Guid.NewGuid(), request.Temporada, false, "A", "Adulto", "Autonomico", "Pendiente")
+                    new FederativeLicenseRequest(Guid.NewGuid(), request.Temporada, 1, "Completa", "A", "Adulto", "Autonomico", "Pendiente")
                 };
 
                 return Task.FromResult(ServiceResult<FederativeLicenseRequest>.Success(currentRequests[0]));
@@ -260,7 +260,7 @@ public sealed class FederativeLicensesViewTests : BunitContext
         cut.Find("button.btn.btn-primary.mi-club-licenses__request-btn").Click();
 
         var selects = cut.FindAll("select");
-        selects[1].Change("2026");
+        selects[0].Change("2026");
 
         cut.WaitForAssertion(() => Assert.Contains("A", cut.Markup));
 
@@ -279,7 +279,7 @@ public sealed class FederativeLicensesViewTests : BunitContext
             Assert.Equal(2026, service.LastCreateRequest!.Temporada);
             Assert.Contains("Pendiente", cut.Markup);
             Assert.Contains("Autonomico", cut.Markup);
-            Assert.Contains("Temporada 2026 · Temporada Completa", cut.Markup);
+            Assert.Contains("Temporada 2026 · Completa", cut.Markup);
         });
     }
 }

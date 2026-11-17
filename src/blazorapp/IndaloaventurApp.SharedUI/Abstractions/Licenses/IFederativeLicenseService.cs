@@ -14,9 +14,14 @@ public interface IFederativeLicenseService
     Task<ServiceResult<IReadOnlyList<FederativeLicenseRequest>>> GetMyFederativeLicensesAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Gets available license rates for a season and optional half-season mode.
+    /// Gets the authenticated read-only type catalog in API order.
     /// </summary>
-    Task<ServiceResult<IReadOnlyList<FederativeLicenseRate>>> GetAvailableRatesAsync(int temporada, bool mediaTemporada = false, CancellationToken cancellationToken = default);
+    Task<ServiceResult<IReadOnlyList<FederativeLicenseType>>> GetLicenseTypesAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets available license rates for the selected season and catalog type.
+    /// </summary>
+    Task<ServiceResult<IReadOnlyList<FederativeLicenseRate>>> GetAvailableRatesAsync(int temporada, int tipoLicenciaId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates a federative license request for the current member.

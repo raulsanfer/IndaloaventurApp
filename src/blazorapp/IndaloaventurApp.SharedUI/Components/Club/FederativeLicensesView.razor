@@ -67,12 +67,16 @@
                         <ul class="mi-club-licenses__season-list">
                             @foreach (var request in seasonGroup.Solicitudes)
                             {
-                                <li class="mi-club-licenses__item">
+                                <li @key="request.Id" class="mi-club-licenses__item">
                                     <div class="mi-club-licenses__item-header">
                                         <div class="mi-club-licenses__item-license">
                                             <span class="mi-club-licenses__item-license-label">@L["mi_club_federative_licenses_header_license"]</span>
                                             <p class="mi-club-licenses__item-title">@request.Licencia</p>
                                             <small class="mi-club-licenses__item-season">@GetRequestSeasonLabel(request)</small>
+                                            @if (request.FechaInicio.HasValue && request.FechaFin.HasValue)
+                                            {
+                                                <small class="mi-club-licenses__item-coverage">@L["licenses_coverage"]: @request.FechaInicio.Value.ToString("dd/MM/yyyy") – @request.FechaFin.Value.ToString("dd/MM/yyyy")</small>
+                                            }
                                         </div>
 
                                         <span class="badge badge-outline mi-club-licenses__item-status">
@@ -125,21 +129,6 @@
             <div class="mi-club-licenses__modal-body">
                 <label class="form-control mi-club-licenses__field">
                     <span class="label">
-                        <span class="label-text">@L["mi_club_federative_licenses_request_modality"]</span>
-                    </span>
-                    <select class="select select-bordered w-full"
-                            value="@SelectedModalityValue"
-                            disabled="@IsSubmittingRequest"
-                            @onchange="OnModalityChangedAsync">
-                        @foreach (var option in ModalityOptions)
-                        {
-                            <option value="@option.Value">@option.Label</option>
-                        }
-                    </select>
-                </label>
-
-                <label class="form-control mi-club-licenses__field">
-                    <span class="label">
                         <span class="label-text">@L["mi_club_federative_licenses_request_season"]</span>
                     </span>
                     <select class="select select-bordered w-full"
@@ -150,6 +139,18 @@
                         @foreach (var option in SeasonOptions)
                         {
                             <option value="@option.Value">@option.Label</option>
+                        }
+                    </select>
+                </label>
+
+                <label class="form-control mi-club-licenses__field">
+                    <span class="label"><span class="label-text">@L["licenses_type"]</span></span>
+                    <select class="select select-bordered w-full" value="@SelectedTypeId"
+                            disabled="@(IsSubmittingRequest || IsTypesLoading || LicenseTypes.Count == 0)" @onchange="OnTypeChangedAsync">
+                        @if (SelectedTypeId is null) { <option value="">@L["licenses_select_type"]</option> }
+                        @foreach (var type in LicenseTypes)
+                        {
+                            <option value="@type.Id" disabled="@(type.Id is < 1 or > 3)">@type.Nombre</option>
                         }
                     </select>
                 </label>
@@ -186,7 +187,7 @@
                     </select>
                 </label>
 
-                @if (IsRatesLoading)
+                @if (IsRatesLoading || IsTypesLoading)
                 {
                     <div class="alert mi-club-licenses__modal-status">
                         <span class="loading loading-spinner loading-sm" aria-hidden="true"></span>
@@ -206,6 +207,23 @@
                         <span class="mi-club-licenses__price-label">@L["mi_club_federative_licenses_request_price"]</span>
                         <strong class="mi-club-licenses__price-value">@FormatPrice(SelectedRate.PrecioClub)</strong>
                     </div>
+                }
+                @if (IsDaily)
+                {
+                    <label class="form-control mi-club-licenses__field">
+                        <span class="label"><span class="label-text">@L["licenses_start"]</span></span>
+                        <input class="input input-bordered" type="date" required value="@DateValue(FechaInicio)"
+                               disabled="@IsSubmittingRequest" @onchange="OnStartChanged" />
+                    </label>
+                    <label class="form-control mi-club-licenses__field">
+                        <span class="label"><span class="label-text">@L["licenses_end"]</span></span>
+                        <input class="input input-bordered" type="date" required value="@DateValue(FechaFin)"
+                               disabled="@IsSubmittingRequest" @onchange="OnEndChanged" />
+                    </label>
+                    @if (CoverageErrorKey is not null)
+                    {
+                        <p class="text-error" role="alert">@L[CoverageErrorKey]</p>
+                    }
                 }
             </div>
 

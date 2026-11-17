@@ -132,7 +132,7 @@
                 <ul class="list settings-federative-licenses__list" aria-live="polite">
                     @foreach (var request in Requests)
                     {
-                        <li class="list-row settings-federative-licenses__list-item">
+                        <li @key="request.Id" class="list-row settings-federative-licenses__list-item">
                             <div class="settings-federative-licenses__list-copy">
                                 <div class="settings-federative-licenses__headline">
                                     <strong>@request.UserEmail</strong>
@@ -145,6 +145,11 @@
 
                                 <div class="settings-federative-licenses__license-line">
                                     <strong>@request.Licencia</strong>
+                                    <span>@request.TipoLicenciaNombre</span>
+                                    @if (request.FechaInicio.HasValue && request.FechaFin.HasValue)
+                                    {
+                                        <span>@L["licenses_coverage"]: @request.FechaInicio.Value.ToString("dd/MM/yyyy") – @request.FechaFin.Value.ToString("dd/MM/yyyy")</span>
+                                    }
                                     <span>@request.Categoria</span>
                                     <span>@request.AmbitoTerritorial</span>
                                 </div>

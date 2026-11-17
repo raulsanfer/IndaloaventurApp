@@ -1,4 +1,5 @@
 using Dapper;
+using IndaloAventurApi.Application.Features.LicenciasFederativas.Common;
 using IndaloAventurApi.Application.Abstractions.LicenciasFederativas;
 using IndaloAventurApi.Application.Abstractions.Persistence;
 using IndaloAventurApi.Domain.LicenciasFederativas;
@@ -21,13 +22,17 @@ public sealed class GetMisSolicitudesLicenciaFederativaQueryHandler(IQueryConnec
                 t.Licencia,
                 t.Categoria,
                 t.Territorio,
-                t.MediaTemporada,
+                t.TipoLicenciaId,
+                tipo.Nombre AS TipoLicenciaNombre,
+                s.FechaInicio,
+                s.FechaFin,
                 t.PrecioClub,
                 t.PrecioIndependiente
             FROM SolicitudesLicenciasFederativas s
             INNER JOIN TarifasLicenciasFederativas t ON t.Id = s.TarifaLicenciaFederativaId
+            INNER JOIN TiposLicencias tipo ON tipo.Id = t.TipoLicenciaId
             WHERE s.UserId = @UserId
-            ORDER BY s.FechaCreacionUtc DESC, s.Temporada DESC
+            ORDER BY s.FechaCreacionUtc DESC, s.Id DESC
             """;
 
         using var connection = await queryConnectionFactory.CreateOpenConnectionAsync(cancellationToken);
@@ -56,9 +61,12 @@ public sealed class GetMisSolicitudesLicenciaFederativaQueryHandler(IQueryConnec
             row.Licencia,
             row.Categoria,
             row.Territorio,
-            row.MediaTemporada,
+            row.TipoLicenciaId,
+            row.TipoLicenciaNombre,
             row.PrecioClub,
-            row.PrecioIndependiente);
+            row.PrecioIndependiente,
+            LicenseDateMapping.ToDateOnly(row.FechaInicio),
+            LicenseDateMapping.ToDateOnly(row.FechaFin));
     }
 
     private static Guid ParseGuid(object value) => value switch
@@ -79,7 +87,10 @@ public sealed class GetMisSolicitudesLicenciaFederativaQueryHandler(IQueryConnec
         public string Licencia { get; set; } = string.Empty;
         public string Categoria { get; set; } = string.Empty;
         public string Territorio { get; set; } = string.Empty;
-        public bool MediaTemporada { get; set; }
+        public int TipoLicenciaId { get; set; }
+        public string TipoLicenciaNombre { get; set; } = string.Empty;
+        public object? FechaInicio { get; set; }
+        public object? FechaFin { get; set; }
         public decimal PrecioClub { get; set; }
         public decimal? PrecioIndependiente { get; set; }
     }

@@ -20,6 +20,7 @@ public sealed class ApplicationDbContext : IdentityDbContext<Usuario, IdentityRo
     public DbSet<Cargo> Cargos => Set<Cargo>();
     public DbSet<FichaContacto> FichasContacto => Set<FichaContacto>();
     public DbSet<FichaSocio> FichasSocio => Set<FichaSocio>();
+    public DbSet<TipoLicencia> TiposLicencias => Set<TipoLicencia>();
     public DbSet<TarifaLicenciaFederativa> TarifasLicenciasFederativas => Set<TarifaLicenciaFederativa>();
     public DbSet<SolicitudLicenciaFederativa> SolicitudesLicenciasFederativas => Set<SolicitudLicenciaFederativa>();
     public DbSet<SignalType> SignalTypes => Set<SignalType>();
@@ -34,5 +35,11 @@ public sealed class ApplicationDbContext : IdentityDbContext<Usuario, IdentityRo
     {
         base.OnModelCreating(builder);
         builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        if (Database.IsSqlServer())
+        {
+            builder.Entity<SolicitudLicenciaFederativa>().ToTable("SolicitudesLicenciasFederativas", table =>
+                table.HasCheckConstraint("CK_SolicitudesLicenciasFederativas_CoberturaTemporada",
+                    "[FechaInicio] IS NULL OR (YEAR([FechaInicio]) = [Temporada] AND YEAR([FechaFin]) = [Temporada])"));
+        }
     }
 }

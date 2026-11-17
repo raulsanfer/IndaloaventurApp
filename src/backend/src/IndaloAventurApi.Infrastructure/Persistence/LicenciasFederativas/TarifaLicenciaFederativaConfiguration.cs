@@ -16,12 +16,13 @@ public sealed class TarifaLicenciaFederativaConfiguration : IEntityTypeConfigura
         builder.Property(x => x.Temporada).IsRequired();
         builder.Property(x => x.Licencia).HasMaxLength(80).IsRequired();
         builder.Property(x => x.Categoria).HasMaxLength(40).IsRequired();
-        builder.Property(x => x.MediaTemporada).HasDefaultValue(false).IsRequired();
+        builder.Property(x => x.TipoLicenciaId).IsRequired();
+        builder.HasOne(x => x.TipoLicencia).WithMany().HasForeignKey(x => x.TipoLicenciaId).OnDelete(DeleteBehavior.Restrict);
         builder.Property(x => x.PrecioClub).HasPrecision(10, 2).IsRequired();
         builder.Property(x => x.PrecioIndependiente).HasPrecision(10, 2).IsRequired(false);
         builder.Property(x => x.Territorio).HasMaxLength(200).IsRequired();
 
-        builder.HasIndex(x => new { x.Temporada, x.Licencia, x.Categoria, x.MediaTemporada }).IsUnique();
+        builder.HasIndex(x => new { x.Temporada, x.TipoLicenciaId, x.Licencia, x.Categoria }).IsUnique();
 
         builder.HasData(CreateSeedData());
     }
@@ -66,7 +67,7 @@ public sealed class TarifaLicenciaFederativaConfiguration : IEntityTypeConfigura
                     tarifa.Temporada,
                     tarifa.Licencia,
                     tarifa.Categoria,
-                    MediaTemporada = false,
+                    TipoLicenciaId = TipoLicencia.CompletaId,
                     tarifa.PrecioClub,
                     tarifa.PrecioIndependiente,
                     tarifa.Territorio
@@ -77,7 +78,7 @@ public sealed class TarifaLicenciaFederativaConfiguration : IEntityTypeConfigura
                     tarifa.Temporada,
                     tarifa.Licencia,
                     tarifa.Categoria,
-                    MediaTemporada = true,
+                    TipoLicenciaId = TipoLicencia.MediaId,
                     tarifa.PrecioClub,
                     tarifa.PrecioIndependiente,
                     tarifa.Territorio

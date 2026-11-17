@@ -9,28 +9,28 @@ public sealed class TarifaLicenciaFederativaRepository(ApplicationDbContext dbCo
 {
     public Task<TarifaLicenciaFederativa?> GetByIdAsync(int id, CancellationToken cancellationToken)
     {
-        return dbContext.TarifasLicenciasFederativas.SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+        return dbContext.TarifasLicenciasFederativas.Include(x => x.TipoLicencia).SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<IReadOnlyCollection<TarifaLicenciaFederativa>> ListAsync(int? temporada, bool? mediaTemporada, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<TarifaLicenciaFederativa>> ListAsync(int? temporada, int? tipoLicenciaId, CancellationToken cancellationToken)
     {
-        var query = dbContext.TarifasLicenciasFederativas.AsQueryable();
+        var query = dbContext.TarifasLicenciasFederativas.Include(x => x.TipoLicencia).AsQueryable();
 
         if (temporada.HasValue)
         {
             query = query.Where(x => x.Temporada == temporada.Value);
         }
 
-        if (mediaTemporada.HasValue)
+        if (tipoLicenciaId.HasValue)
         {
-            query = query.Where(x => x.MediaTemporada == mediaTemporada.Value);
+            query = query.Where(x => x.TipoLicenciaId == tipoLicenciaId.Value);
         }
 
         return await query
             .OrderByDescending(x => x.Temporada)
+            .ThenBy(x => x.TipoLicenciaId)
             .ThenBy(x => x.Licencia)
             .ThenBy(x => x.Categoria)
-            .ThenBy(x => x.MediaTemporada)
             .ThenBy(x => x.Territorio)
             .ThenBy(x => x.Id)
             .ToListAsync(cancellationToken);

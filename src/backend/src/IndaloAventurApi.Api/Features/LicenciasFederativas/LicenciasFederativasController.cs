@@ -1,4 +1,7 @@
 using System.Text.Json.Serialization;
+using FluentValidation;
+using FluentValidation.Results;
+using IndaloAventurApi.Application.Features.LicenciasFederativas.GetTiposLicencia;
 using IndaloAventurApi.Api.Security;
 using IndaloAventurApi.Application.Abstractions.LicenciasFederativas;
 using IndaloAventurApi.Application.Features.LicenciasFederativas.CreateSolicitudLicenciaFederativa;
@@ -22,11 +25,17 @@ namespace IndaloAventurApi.Api.Features.LicenciasFederativas;
 [Authorize(Policy = AuthorizationPolicies.Authenticated)]
 public sealed class LicenciasFederativasController(IMediator mediator) : ControllerBase
 {
+    /// <summary>Devuelve los tipos de licencia disponibles, sin operaciones de mantenimiento.</summary>
+    [HttpGet("tipos")]
+    [ProducesResponseType(typeof(IReadOnlyCollection<TipoLicenciaDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyCollection<TipoLicenciaDto>>> GetTypes(CancellationToken cancellationToken)
+        => Ok(await mediator.Send(new GetTiposLicenciaQuery(), cancellationToken));
+
     /// <summary>
     /// Devuelve las tarifas disponibles de licencias federativas.
     /// </summary>
     /// <param name="temporada">Temporada a consultar; si se omite se aplica el criterio por defecto del sistema.</param>
-    /// <param name="mediaTemporada">Filtra tarifas de media temporada cuando se indica.</param>
+    /// <param name="tipoLicenciaId">Filtra tarifas por el tipo de licencia.</param>
     /// <param name="cancellationToken">Token para cancelar la consulta.</param>
     /// <returns>Coleccion de tarifas que cumplen los filtros indicados.</returns>
     [HttpGet("tarifas")]
@@ -34,10 +43,12 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<IReadOnlyCollection<TarifaLicenciaFederativaDto>>> GetRates(
         [FromQuery] int? temporada,
-        [FromQuery] bool? mediaTemporada,
+        [FromQuery] int? tipoLicenciaId,
         CancellationToken cancellationToken = default)
     {
-        var result = await mediator.Send(new GetTarifasLicenciasFederativasQuery(temporada, mediaTemporada), cancellationToken);
+        if (Request.Query.Keys.Any(key => string.Equals(key, "mediaTemporada", StringComparison.OrdinalIgnoreCase)))
+            throw new ValidationException([new ValidationFailure("mediaTemporada", "El filtro mediaTemporada ya no está disponible. Usa tipoLicenciaId.")]);
+        var result = await mediator.Send(new GetTarifasLicenciasFederativasQuery(temporada, tipoLicenciaId), cancellationToken);
         return Ok(result);
     }
 
@@ -63,7 +74,9 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
             User.GetRequiredEmail(),
             User.GetRequiredIsMember(),
             request.Temporada,
-            request.TarifaLicenciaFederativaId), cancellationToken);
+            request.TarifaLicenciaFederativaId,
+            request.FechaInicio,
+            request.FechaFin), cancellationToken);
 
         return CreatedAtAction(nameof(GetMyRequestById), new { solicitudId = result.Id }, result);
     }
@@ -145,7 +158,10 @@ public sealed class LicenciasFederativasController(IMediator mediator) : Control
     /// </summary>
     /// <param name="Temporada">Temporada federativa solicitada.</param>
     /// <param name="TarifaLicenciaFederativaId">Identificador de la tarifa seleccionada.</param>
-    public sealed record CreateSolicitudLicenciaFederativaRequest(int Temporada, int TarifaLicenciaFederativaId);
+    /// <param name="FechaInicio">Inicio de cobertura, obligatorio para licencias de día.</param>
+    /// <param name="FechaFin">Fin de cobertura, obligatorio para licencias de día.</param>
+    public sealed record CreateSolicitudLicenciaFederativaRequest(int Temporada, int TarifaLicenciaFederativaId,
+        DateOnly? FechaInicio = null, DateOnly? FechaFin = null);
 
     /// <summary>
     /// Datos necesarios para cambiar el estado de una solicitud desde administracion.
