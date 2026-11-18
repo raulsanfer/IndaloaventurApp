@@ -24,16 +24,17 @@ namespace IndaloAventurApi.Api.Features.Users;
 public sealed class UsersController(IMediator mediator, ILogger<UsersController> logger) : ControllerBase
 {
     /// <summary>
-    /// Lista usuarios, opcionalmente filtrados por correo electronico.
+    /// Lista usuarios con filtros opcionales por contenido de correo, nombre o apellidos.
     /// </summary>
     /// <param name="email">Filtro opcional por direccion de correo.</param>
+    /// <param name="nombre">Texto parcial del nombre o apellidos de la ficha, sin distinguir mayusculas. Si se informa email, se aplican ambos filtros.</param>
     /// <param name="cancellationToken">Token para cancelar la consulta.</param>
     /// <returns>Coleccion de usuarios que cumplen el filtro indicado.</returns>
     [HttpGet]
     [ProducesResponseType(typeof(IReadOnlyCollection<ManagedUserDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyCollection<ManagedUserDto>>> List([FromQuery] string? email, CancellationToken cancellationToken)
+    public async Task<ActionResult<IReadOnlyCollection<ManagedUserDto>>> List([FromQuery] string? email, [FromQuery] string? nombre, CancellationToken cancellationToken)
     {
-        var users = await mediator.Send(new ListManagedUsersQuery(email), cancellationToken);
+        var users = await mediator.Send(new ListManagedUsersQuery(email, nombre), cancellationToken);
         return Ok(users);
     }
 

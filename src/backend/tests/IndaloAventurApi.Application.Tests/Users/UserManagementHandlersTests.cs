@@ -27,6 +27,7 @@ public sealed class UserManagementHandlersTests
 
         Assert.Same(expected, result);
         Assert.Null(identityService.LastListUsersEmail);
+        Assert.Null(identityService.LastListUsersNombre);
     }
 
     [Fact]
@@ -49,6 +50,29 @@ public sealed class UserManagementHandlersTests
         await handler.Handle(new ListManagedUsersQuery("   "), CancellationToken.None);
 
         Assert.Null(identityService.LastListUsersEmail);
+    }
+
+    [Theory]
+    [InlineData(null, null, null, null)]
+    [InlineData("", "", null, null)]
+    [InlineData(" \t ", " \t ", null, null)]
+    [InlineData(null, "  Ana Marina  ", null, "Ana Marina")]
+    [InlineData("  CLUB.TEST  ", null, "CLUB.TEST", null)]
+    [InlineData("  CLUB.TEST  ", "  aRI  ", "CLUB.TEST", "aRI")]
+    public async Task ListManagedUsers_ShouldNormalizeAndForwardIndependentFilters(
+        string? email, string? nombre, string? expectedEmail, string? expectedNombre)
+    {
+        var expected = new[] { new ManagedUserDto(Guid.NewGuid(), "user@club.test", false, []) };
+        var identityService = new FakeIdentityService { ListUsersResult = expected };
+        var handler = new ListManagedUsersQueryHandler(identityService);
+        using var cancellation = new CancellationTokenSource();
+
+        var result = await handler.Handle(new ListManagedUsersQuery(email, nombre), cancellation.Token);
+
+        Assert.Equal(expectedEmail, identityService.LastListUsersEmail);
+        Assert.Equal(expectedNombre, identityService.LastListUsersNombre);
+        Assert.Equal(cancellation.Token, identityService.LastListUsersCancellationToken);
+        Assert.Same(expected, result);
     }
 
     [Fact]
@@ -195,6 +219,8 @@ public sealed class UserManagementHandlersTests
         public (bool Succeeded, Guid UserId, IEnumerable<string> Errors) CreateUserResult { get; init; } = (true, Guid.NewGuid(), Array.Empty<string>());
         public IReadOnlyCollection<ManagedUserDto> ListUsersResult { get; init; } = Array.Empty<ManagedUserDto>();
         public string? LastListUsersEmail { get; private set; }
+        public string? LastListUsersNombre { get; private set; }
+        public CancellationToken LastListUsersCancellationToken { get; private set; }
         public (bool Succeeded, IEnumerable<string> Errors) UpdateUserResult { get; init; } = (true, Array.Empty<string>());
         public (bool Succeeded, IEnumerable<string> Errors) DeactivateUserResult { get; init; } = (true, Array.Empty<string>());
         public (bool Succeeded, IEnumerable<string> Errors) ReactivateUserResult { get; init; } = (true, Array.Empty<string>());
@@ -219,9 +245,11 @@ public sealed class UserManagementHandlersTests
         public Task<(bool Succeeded, Guid UserId, IEnumerable<string> Errors)> CreateUserAsync(string email, string password, IEnumerable<string> roles, CancellationToken cancellationToken)
             => Task.FromResult(CreateUserResult);
 
-        public Task<IReadOnlyCollection<ManagedUserDto>> ListUsersAsync(string? email, CancellationToken cancellationToken)
+        public Task<IReadOnlyCollection<ManagedUserDto>> ListUsersAsync(string? email, string? nombre, CancellationToken cancellationToken)
         {
             LastListUsersEmail = email;
+            LastListUsersNombre = nombre;
+            LastListUsersCancellationToken = cancellationToken;
             return Task.FromResult(ListUsersResult);
         }
 

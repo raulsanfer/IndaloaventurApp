@@ -445,19 +445,22 @@
   <data name="settings_users_title" xml:space="preserve"><value>Usuarios</value></data>
   <data name="settings_users_summary" xml:space="preserve"><value>Localiza un usuario por email y decide si debes editar su ficha de socio o crearla automáticamente.</value></data>
   <data name="settings_users_search_title" xml:space="preserve"><value>Buscar usuario</value></data>
-  <data name="settings_users_search_summary" xml:space="preserve"><value>Introduce el email exacto para revisar si el usuario ya dispone de ficha de socio.</value></data>
+  <data name="settings_users_search_summary" xml:space="preserve"><value>Busca por parte del email, nombre o apellidos. Si completas ambos filtros, se aplicarán a la vez.</value></data>
   <data name="settings_users_search_label" xml:space="preserve"><value>Email del usuario</value></data>
   <data name="settings_users_search_placeholder" xml:space="preserve"><value>usuario@dominio.com</value></data>
   <data name="settings_users_search" xml:space="preserve"><value>Buscar</value></data>
+  <data name="settings_users_search_nombre_label" xml:space="preserve"><value>Nombre o apellidos</value></data>
+  <data name="settings_users_search_nombre_placeholder" xml:space="preserve"><value>Parte del nombre o de los apellidos</value></data>
+  <data name="settings_users_clear_filters" xml:space="preserve"><value>Limpiar filtros</value></data>
   <data name="settings_users_results_title" xml:space="preserve"><value>Resultado</value></data>
   <data name="settings_users_results_summary" xml:space="preserve"><value>Accede a la ficha existente o inicia su creación en un solo paso.</value></data>
   <data name="settings_users_loading" xml:space="preserve"><value>Buscando usuarios...</value></data>
   <data name="settings_users_loading_all" xml:space="preserve"><value>Cargando usuarios...</value></data>
   <data name="settings_users_loading_filtered" xml:space="preserve"><value>Buscando usuarios...</value></data>
-  <data name="settings_users_idle" xml:space="preserve"><value>Empieza con una búsqueda por email para ver usuarios aquí.</value></data>
+  <data name="settings_users_idle" xml:space="preserve"><value>Busca usuarios por email, nombre o apellidos.</value></data>
   <data name="settings_users_empty" xml:space="preserve"><value>No encontramos usuarios con ese email.</value></data>
   <data name="settings_users_empty_all" xml:space="preserve"><value>No hay usuarios disponibles para mostrar.</value></data>
-  <data name="settings_users_empty_filtered" xml:space="preserve"><value>No encontramos usuarios con ese email.</value></data>
+  <data name="settings_users_empty_filtered" xml:space="preserve"><value>No encontramos usuarios con los filtros indicados.</value></data>
   <data name="settings_users_search_error" xml:space="preserve"><value>No pudimos completar la búsqueda de usuarios.</value></data>
   <data name="settings_users_create_error" xml:space="preserve"><value>No pudimos crear la ficha del usuario seleccionado.</value></data>
   <data name="settings_users_edit_member_file" xml:space="preserve"><value>Editar</value></data>

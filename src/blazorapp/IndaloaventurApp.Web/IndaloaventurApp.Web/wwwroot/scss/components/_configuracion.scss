@@ -731,13 +731,14 @@
   color: #554233;
 }
 
-.settings-users__join {
+.settings-users__filter-actions {
   display: flex;
-  width: 100%;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .settings-users__input {
-  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
 }
 
@@ -1286,12 +1287,12 @@
   }
 
   .settings-cargos__editor-join,
-  .settings-users__join {
+  .settings-users__filter-actions {
     flex-direction: column;
   }
 
   .settings-cargos__editor-join .join-item,
-  .settings-users__join .join-item {
+  .settings-users__filter-actions .btn {
     width: 100%;
     border-radius: 1rem;
   }

@@ -42,7 +42,7 @@ Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licenci
 - la gestion de inventario y las reservas administrativas se permite a `Admin` o a `InventoryManager` cuando la sesion tiene `IsMember = true`; las rutas personales `/me` mantienen su propiedad y condicion de socio;
 - un administrador puede asignar o retirar `InventoryManager` desde la ficha administrativa de un socio mediante `PUT /api/users/{userId}`, preservando los demas roles; el listado queda limitado a localizar usuarios y navegar a sus acciones;
 - despues de cambiar roles o condicion de socio, la persona afectada debe iniciar sesion de nuevo; si la persona administradora se modifica a si misma, la interfaz cierra su sesion;
-- filtros de usuarios;
+- filtros parciales de usuarios por email y por nombre o apellidos, combinables y con limpieza explícita;
 - activacion y desactivacion de usuarios;
 - cambio de contraseña mediante `PUT /api/users/{userId}/password`, reservado a Admin y sin exponer secretos en la UI;
 - creacion, edicion y borrado de cargos;
@@ -51,6 +51,18 @@ Agrupa pantallas administrativas para usuarios, fichas de socio, cargos, licenci
 - retirada y cancelacion para reservas solicitadas, y confirmacion administrativa de devolucion o cancelacion para reservas retiradas;
 - recarga de listado y detalle despues de cada respuesta correcta, sin actualizar estados de forma optimista;
 - errores de permisos, validacion o conectividad; un `401` limpia la sesion local y un `403` conserva la sesion y deshabilita la accion afectada.
+
+## Búsqueda administrativa de usuarios
+
+`/configuracion/usuarios` carga inicialmente todos los usuarios mediante `GET /api/users` sin filtros. El formulario permite introducir parte del email, nombre o apellidos y enviar con `Buscar` o Enter. No es necesario conocer una dirección de correo completa.
+
+El campo `Nombre o apellidos` se envía como `nombre`: el API busca texto literal contenido en `FichaSocio.Nombre` O `FichaSocio.Apellidos`, sin distinguir mayúsculas. No concatena ambos campos ni garantiza equivalencia entre caracteres con y sin acentos. Un usuario sin ficha vinculada no coincide por nombre, aunque su email contenga ese texto; sigue apareciendo en el listado completo y en búsquedas solo por email. Una ficha coincidente puede encontrarse aunque `IsMember` sea falso.
+
+Si se completan email y nombre, se envían ambos en una sola petición y el API exige que se cumplan los dos criterios (AND). Por ejemplo, `email=club.es&nombre=ont` localiza correos que contienen `club.es` cuya ficha contiene `ont` en nombre o apellidos. Los valores se recortan por los extremos, se codifican como valores independientes y se omiten si quedan vacíos. El cliente conserva el resultado del servidor sin filtrar ni consultar cada ficha.
+
+`Limpiar filtros` vacía ambos campos y vuelve a consultar el listado completo. Funciona también después de cero coincidencias o un error. Durante la petición, buscar y limpiar están deshabilitados; cambiar un campo todavía no enviado no altera el estado de los resultados de la petición en curso. Los errores muestran feedback localizado, sin mensajes internos, y permiten reintentar. Los filtros no se persisten en la URL ni en almacenamiento local y no se añaden registros con esos datos personales.
+
+El API desplegado debe admitir el parámetro `nombre`; una versión anterior podría ignorarlo. La autorización administrativa continúa aplicándose en el servidor. Las pruebas frontend verifican el envío, la presentación y la recuperación; la coincidencia real y AND se comprueban en las pruebas HTTP de integración del backend y en el entorno objetivo antes del despliegue.
 
 ## Tests relacionados
 

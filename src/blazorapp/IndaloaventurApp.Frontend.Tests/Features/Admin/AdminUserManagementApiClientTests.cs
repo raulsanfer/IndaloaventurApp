@@ -6,9 +6,152 @@ using System.Text;
 using System.Text.Json;
 using IndaloaventurApp.SharedUI.Models.Member;
 using IndaloaventurApp.Web.Client.Infrastructure.Member;
+using Microsoft.AspNetCore.WebUtilities;
 
 public sealed class AdminUserManagementApiClientTests
 {
+    [Theory]
+    [InlineData(null, "ari", "?nombre=ari")]
+    [InlineData(null, "  aRI  ", "?nombre=aRI")]
+    [InlineData("  CLUB.ES  ", "  Montes  ", "?email=club.es&nombre=Montes")]
+    [InlineData("  CLUB.ES  ", "  ", "?email=club.es")]
+    [InlineData("  ", "Montes", "?nombre=Montes")]
+    [InlineData(null, null, "")]
+    [InlineData("", "", "")]
+    [InlineData("  ", "  ", "")]
+    public async Task GetUsersAsync_SendsOnlyEffectiveFiltersWithAuthorization(string? email, string? nombre, string expectedQuery)
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        var calls = 0;
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            calls++;
+            Assert.Equal(HttpMethod.Get, request.Method);
+            Assert.Equal("/api/users", request.RequestUri?.AbsolutePath);
+            Assert.Equal(expectedQuery, request.RequestUri?.Query);
+            Assert.Equal("Bearer", request.Headers.Authorization?.Scheme);
+            Assert.Equal(TestSessions.AdminSession.AccessToken, request.Headers.Authorization?.Parameter);
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("[]", Encoding.UTF8, "application/json")
+            });
+        });
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        var result = await sut.GetUsersAsync(email, nombre);
+
+        Assert.True(result.IsSuccess);
+        Assert.Empty(result.Value!);
+        Assert.Equal(1, calls);
+    }
+
+    [Theory]
+    [InlineData("  Muñoz & Ana+?#%_[  ", "Muñoz & Ana+?#%_[")]
+    [InlineData("Ana&email=otro@club.es", "Ana&email=otro@club.es")]
+    [InlineData("%26email%3Dotro", "%26email%3Dotro")]
+    [InlineData("<script>alert('x')</script>", "<script>alert('x')</script>")]
+    public async Task GetUsersAsync_EncodesNameAsOneLiteralQueryValue(string input, string expectedValue)
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        var handler = new StubHttpMessageHandler(request =>
+        {
+            var query = QueryHelpers.ParseQuery(request.RequestUri!.Query);
+            Assert.Single(query);
+            Assert.Equal(expectedValue, Assert.Single(query["nombre"]));
+            Assert.Empty(request.RequestUri.Fragment);
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("[]", Encoding.UTF8, "application/json")
+            });
+        });
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        Assert.True((await sut.GetUsersAsync(nombre: input)).IsSuccess);
+    }
+
+    [Theory]
+    [InlineData(401, "auth.session_invalid")]
+    [InlineData(403, "users.forbidden")]
+    [InlineData(500, "users.unavailable")]
+    public async Task GetUsersAsync_WithNameMapsHttpFailuresWithoutExposingResponse(int status, string expectedCode)
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        var handler = new StubHttpMessageHandler(_ => Task.FromResult(new HttpResponseMessage((HttpStatusCode)status)
+        {
+            Content = new StringContent("Private server diagnostic")
+        }));
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        var result = await sut.GetUsersAsync("club.es", "Ana");
+
+        Assert.False(result.IsSuccess);
+        Assert.Null(result.Value);
+        Assert.Equal(expectedCode, result.Error?.Code);
+        Assert.DoesNotContain("Private server diagnostic", result.Error?.Message ?? "");
+    }
+
+    [Theory]
+    [InlineData(false, "users.unavailable")]
+    [InlineData(true, "users.timeout")]
+    public async Task GetUsersAsync_WithNameMapsTransportFailures(bool timeout, string expectedCode)
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        var handler = new StubHttpMessageHandler(_ => timeout
+            ? throw new TaskCanceledException()
+            : throw new HttpRequestException("Private server diagnostic"));
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        var result = await sut.GetUsersAsync(nombre: "Ana");
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal(expectedCode, result.Error?.Code);
+        Assert.DoesNotContain("Private server diagnostic", result.Error?.Message ?? "");
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WithNameRejectsInvalidPayload()
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        var handler = new StubHttpMessageHandler(_ => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent("Private invalid JSON", Encoding.UTF8, "application/json")
+        }));
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+
+        var result = await sut.GetUsersAsync(nombre: "Ana");
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal("users.invalid_payload", result.Error?.Code);
+        Assert.DoesNotContain("Private invalid JSON", result.Error?.Message ?? "");
+    }
+
+    [Fact]
+    public async Task GetUsersAsync_WithNameHonorsCancellation()
+    {
+        var sessionService = new RecordingSessionService();
+        sessionService.SetSession(TestSessions.AdminSession);
+        var handler = new CancellationCheckingHandler();
+        using var httpClient = new HttpClient(handler) { BaseAddress = new Uri("https://localhost") };
+        var sut = new AdminUserManagementApiClient(httpClient, sessionService);
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+
+        var result = await sut.GetUsersAsync(nombre: "Ana", cancellationToken: cancellation.Token);
+
+        Assert.False(result.IsSuccess);
+        Assert.Equal("users.timeout", result.Error?.Code);
+    }
+
     /// <summary>
     /// Covers scenario: get users uses users endpoint and returns matching users.
     /// </summary>
@@ -399,6 +542,16 @@ public sealed class AdminUserManagementApiClientTests
 
         Assert.False(result.IsSuccess);
         Assert.Equal(expectedErrorCode, result.Error?.Code);
+    }
+
+    private sealed class CancellationCheckingHandler : HttpMessageHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Assert.True(cancellationToken.IsCancellationRequested);
+            cancellationToken.ThrowIfCancellationRequested();
+            throw new InvalidOperationException("Expected a cancelled request.");
+        }
     }
 
     private sealed record UpdateMemberFileApiPayload(

@@ -2585,6 +2585,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "nombre",
+            "in": "query",
+            "description": "Texto parcial literal del nombre o apellidos de la ficha vinculada, sin distinguir mayúsculas. Se combina mediante AND con email; vacío o solo espacios no filtra.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {

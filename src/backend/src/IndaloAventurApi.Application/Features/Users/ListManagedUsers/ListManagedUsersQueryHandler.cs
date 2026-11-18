@@ -12,6 +12,10 @@ public sealed class ListManagedUsersQueryHandler(IIdentityService identityServic
             ? null
             : request.Email.Trim();
 
-        return identityService.ListUsersAsync(normalizedEmail, cancellationToken);
+        var normalizedNombre = string.IsNullOrWhiteSpace(request.Nombre)
+            ? null
+            : request.Nombre.Trim();
+
+        return identityService.ListUsersAsync(normalizedEmail, normalizedNombre, cancellationToken);
     }
 }

@@ -52,19 +52,35 @@
                     <span class="label">
                         <span class="label-text settings-users__label-text">@L["settings_users_search_label"]</span>
                     </span>
-                    <div class="join settings-users__join">
-                        <input
-                            id="settings-users-email"
-                            class="input input-bordered join-item settings-users__input"
-                            type="email"
-                            value="@SearchEmail"
-                            placeholder="@L["settings_users_search_placeholder"]"
-                            @oninput="HandleSearchEmailInput" />
-                        <button type="submit" class="btn btn-primary join-item settings-users__primary-button" disabled="@IsSearching">
-                            @L["settings_users_search"]
-                        </button>
-                    </div>
+                    <input
+                        id="settings-users-email"
+                        class="input input-bordered settings-users__input"
+                        type="text"
+                        inputmode="email"
+                        value="@SearchEmail"
+                        placeholder="@L["settings_users_search_placeholder"]"
+                        @oninput="HandleSearchEmailInput" />
                 </label>
+                <label class="form-control settings-users__field" for="settings-users-nombre">
+                    <span class="label">
+                        <span class="label-text settings-users__label-text">@L["settings_users_search_nombre_label"]</span>
+                    </span>
+                    <input
+                        id="settings-users-nombre"
+                        class="input input-bordered settings-users__input"
+                        type="text"
+                        value="@SearchNombre"
+                        placeholder="@L["settings_users_search_nombre_placeholder"]"
+                        @oninput="HandleSearchNombreInput" />
+                </label>
+                <div class="settings-users__filter-actions">
+                    <button type="submit" class="btn btn-primary settings-users__primary-button" disabled="@IsSearching">
+                        @L["settings_users_search"]
+                    </button>
+                    <button id="settings-users-clear" type="button" class="btn btn-outline" disabled="@IsSearching" @onclick="HandleClearFiltersAsync">
+                        @L["settings_users_clear_filters"]
+                    </button>
+                </div>
             </form>
         </div>
     </fieldset>
@@ -92,7 +108,7 @@
                     <span>@L["settings_users_idle"]</span>
                 </div>
             }
-            else if (Results.Count == 0)
+            else if (Results.Count == 0 && string.IsNullOrWhiteSpace(ErrorMessageKey))
             {
                 <div class="alert settings-users__feedback settings-users__feedback--empty">
                     <span>@(IsFilterApplied ? L["settings_users_empty_filtered"] : L["settings_users_empty_all"])</span>

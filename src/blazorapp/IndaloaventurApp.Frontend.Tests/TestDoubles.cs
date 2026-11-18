@@ -356,7 +356,7 @@ internal sealed class RecordingWordPressPostService : IWordPressPostService
 
 internal sealed class RecordingAdminUserManagementService : IAdminUserManagementService
 {
-    public Func<string?, CancellationToken, Task<ServiceResult<IReadOnlyList<ManagedUserItem>>>>? GetUsersHandler { get; init; }
+    public Func<string?, string?, CancellationToken, Task<ServiceResult<IReadOnlyList<ManagedUserItem>>>>? GetUsersHandler { get; init; }
 
     public Func<Guid, CancellationToken, Task<ServiceResult<ManagedUserItem>>>? GetUserHandler { get; init; }
 
@@ -374,9 +374,9 @@ internal sealed class RecordingAdminUserManagementService : IAdminUserManagement
 
     public Func<Guid, CancellationToken, Task<ServiceResult<bool>>>? ReactivateUserHandler { get; init; }
 
-    public Task<ServiceResult<IReadOnlyList<ManagedUserItem>>> GetUsersAsync(string? email = null, CancellationToken cancellationToken = default)
+    public Task<ServiceResult<IReadOnlyList<ManagedUserItem>>> GetUsersAsync(string? email = null, string? nombre = null, CancellationToken cancellationToken = default)
     {
-        return GetUsersHandler?.Invoke(email, cancellationToken)
+        return GetUsersHandler?.Invoke(email, nombre, cancellationToken)
             ?? Task.FromResult(ServiceResult<IReadOnlyList<ManagedUserItem>>.Success(Array.Empty<ManagedUserItem>()));
     }
 

@@ -14,14 +14,24 @@ public sealed class AdminUserManagementApiClient(HttpClient httpClient, ISession
     private const string UsersEndpoint = "/api/users";
     private const string MemberFileEndpointBase = "/api/fichas-socio";
 
-    public async Task<ServiceResult<IReadOnlyList<ManagedUserItem>>> GetUsersAsync(string? email = null, CancellationToken cancellationToken = default)
+    /// <inheritdoc />
+    public async Task<ServiceResult<IReadOnlyList<ManagedUserItem>>> GetUsersAsync(string? email = null, string? nombre = null, CancellationToken cancellationToken = default)
     {
         try
         {
             var requestedEmail = MemberSelfProfileMapper.NormalizeEmail(email);
-            var endpoint = string.IsNullOrWhiteSpace(requestedEmail)
-                ? UsersEndpoint
-                : $"{UsersEndpoint}?email={Uri.EscapeDataString(requestedEmail)}";
+            var query = new List<string>();
+            if (!string.IsNullOrWhiteSpace(requestedEmail))
+            {
+                query.Add($"email={Uri.EscapeDataString(requestedEmail)}");
+            }
+
+            if (!string.IsNullOrWhiteSpace(nombre))
+            {
+                query.Add($"nombre={Uri.EscapeDataString(nombre.Trim())}");
+            }
+
+            var endpoint = query.Count == 0 ? UsersEndpoint : $"{UsersEndpoint}?{string.Join("&", query)}";
 
             using var request = CreateAuthorizedRequest(HttpMethod.Get, endpoint);
             using var response = await httpClient.SendAsync(request, cancellationToken);

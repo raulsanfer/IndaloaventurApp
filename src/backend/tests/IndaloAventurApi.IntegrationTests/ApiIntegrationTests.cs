@@ -1007,7 +1007,12 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             }
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(ConnectionString));
+            {
+                var connection = new SqliteConnection(ConnectionString);
+                // SQLite solo convierte ASCII por defecto; SQL Server tambien convierte letras acentuadas.
+                connection.CreateFunction("upper", (string? value) => value?.ToUpperInvariant(), isDeterministic: true);
+                options.UseSqlite(connection, contextOwnsConnection: true);
+            });
 
             services.AddScoped<IQueryConnectionFactory>(_ => new SqliteQueryConnectionFactory(ConnectionString));
 

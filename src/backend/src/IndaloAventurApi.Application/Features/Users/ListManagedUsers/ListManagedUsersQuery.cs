@@ -3,4 +3,4 @@ using IndaloAventurApi.Application.Abstractions.Identity;
 
 namespace IndaloAventurApi.Application.Features.Users.ListManagedUsers;
 
-public sealed record ListManagedUsersQuery(string? Email = null) : IQuery<IReadOnlyCollection<ManagedUserDto>>;
+public sealed record ListManagedUsersQuery(string? Email = null, string? Nombre = null) : IQuery<IReadOnlyCollection<ManagedUserDto>>;

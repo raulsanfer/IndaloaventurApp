@@ -80,7 +80,7 @@ public sealed class AuthHandlersTests
         public Task<(bool Succeeded, Guid UserId, IEnumerable<string> Errors)> CreateUserAsync(string email, string password, IEnumerable<string> roles, CancellationToken cancellationToken)
             => Task.FromResult((true, Guid.NewGuid(), Array.Empty<string>() as IEnumerable<string>));
 
-        public Task<IReadOnlyCollection<ManagedUserDto>> ListUsersAsync(string? email, CancellationToken cancellationToken)
+        public Task<IReadOnlyCollection<ManagedUserDto>> ListUsersAsync(string? email, string? nombre, CancellationToken cancellationToken)
             => Task.FromResult((IReadOnlyCollection<ManagedUserDto>)Array.Empty<ManagedUserDto>());
 
         public Task<(bool Succeeded, IEnumerable<string> Errors)> SetIsMemberAsync(Guid userId, bool isMember, CancellationToken cancellationToken)

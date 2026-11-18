@@ -4,7 +4,6 @@ using IndaloaventurApp.SharedUI.Abstractions.Member;
 using IndaloaventurApp.SharedUI.Models.Member;
 using IndaloaventurApp.SharedUI.Resources;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.Localization;
 
 public partial class AdminUsersManagementView
@@ -19,6 +18,8 @@ public partial class AdminUsersManagementView
     private IStringLocalizer<SharedTexts> L { get; set; } = default!;
 
     protected string SearchEmail { get; private set; } = string.Empty;
+
+    protected string SearchNombre { get; private set; } = string.Empty;
 
     protected IReadOnlyList<ManagedUserItem> Results { get; private set; } = Array.Empty<ManagedUserItem>();
 
@@ -47,7 +48,25 @@ public partial class AdminUsersManagementView
     protected async Task HandleSearchSubmitAsync()
     {
         var requestedEmail = MemberSelfProfileMapper.NormalizeEmail(SearchEmail);
-        await LoadUsersAsync(requestedEmail);
+        var requestedNombre = string.IsNullOrWhiteSpace(SearchNombre) ? null : SearchNombre.Trim();
+        await LoadUsersAsync(requestedEmail, requestedNombre);
+    }
+
+    protected void HandleSearchNombreInput(ChangeEventArgs args)
+    {
+        SearchNombre = args.Value?.ToString() ?? string.Empty;
+    }
+
+    protected async Task HandleClearFiltersAsync()
+    {
+        if (IsSearching)
+        {
+            return;
+        }
+
+        SearchEmail = string.Empty;
+        SearchNombre = string.Empty;
+        await LoadUsersAsync();
     }
 
     protected async Task HandleCreateMemberFileAsync(ManagedUserItem user)
@@ -81,18 +100,19 @@ public partial class AdminUsersManagementView
             ? L["settings_users_active_badge"]
             : L["settings_users_inactive_badge"];
 
-    private async Task<bool> LoadUsersAsync(string? email = null, bool preserveFeedback = false)
+    private async Task LoadUsersAsync(string? email = null, string? nombre = null)
     {
-        if (!preserveFeedback)
+        if (IsSearching)
         {
-            ClearMessages();
+            return;
         }
 
+        ClearMessages();
         IsSearching = true;
-        IsFilterApplied = !string.IsNullOrWhiteSpace(email);
+        IsFilterApplied = !string.IsNullOrWhiteSpace(email) || !string.IsNullOrWhiteSpace(nombre);
         Results = Array.Empty<ManagedUserItem>();
 
-        var result = await AdminUserManagementService.GetUsersAsync(email);
+        var result = await AdminUserManagementService.GetUsersAsync(email, nombre);
 
         IsSearching = false;
         HasLoaded = true;
@@ -100,11 +120,10 @@ public partial class AdminUsersManagementView
         if (!result.IsSuccess || result.Value is null)
         {
             ErrorMessageKey = "settings_users_search_error";
-            return false;
+            return;
         }
 
         Results = result.Value;
-        return true;
     }
 
     private void ClearMessages()

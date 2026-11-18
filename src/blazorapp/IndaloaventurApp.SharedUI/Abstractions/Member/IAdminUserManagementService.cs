@@ -9,9 +9,13 @@ using IndaloaventurApp.SharedUI.Models.Member;
 public interface IAdminUserManagementService
 {
     /// <summary>
-    /// Gets managed users, optionally filtered by email.
+    /// Gets managed users with optional partial email and linked-profile name or surname filters.
     /// </summary>
-    Task<ServiceResult<IReadOnlyList<ManagedUserItem>>> GetUsersAsync(string? email = null, CancellationToken cancellationToken = default);
+    /// <param name="email">Optional email fragment; blank values do not filter the collection.</param>
+    /// <param name="nombre">Optional literal fragment of the linked profile's name or surnames, ignoring case.</param>
+    /// <param name="cancellationToken">Token used to cancel the request.</param>
+    /// <returns>The server results satisfying all effective filters (email AND name or surnames).</returns>
+    Task<ServiceResult<IReadOnlyList<ManagedUserItem>>> GetUsersAsync(string? email = null, string? nombre = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets a single managed user by identifier.

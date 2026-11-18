@@ -23,7 +23,7 @@ public sealed class UpdateAdminSolicitudLicenciaFederativaEstadoCommandHandler(
         await solicitudRepository.SaveChangesAsync(cancellationToken);
 
         var adminDto = AdminSolicitudLicenciaFederativaMapping.ToAdminDto(solicitud);
-        var user = await identityService.ListUsersAsync(null, cancellationToken);
+        var user = await identityService.ListUsersAsync(null, null, cancellationToken);
         var userEmail = user.FirstOrDefault(x => x.UserId == solicitud.UserId)?.Email ?? string.Empty;
         return AdminSolicitudLicenciaFederativaMapping.WithUserEmail(adminDto, userEmail);
     }

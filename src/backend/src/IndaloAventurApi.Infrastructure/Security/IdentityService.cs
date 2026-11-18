@@ -1,4 +1,5 @@
 using IndaloAventurApi.Application.Abstractions.Identity;
+using IndaloAventurApi.Infrastructure.Persistence.DbContext;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +8,8 @@ namespace IndaloAventurApi.Infrastructure.Security;
 public sealed class IdentityService(
     UserManager<Usuario> userManager,
     RoleManager<IdentityRole<Guid>> roleManager,
-    ISocialTokenValidator socialTokenValidator)
+    ISocialTokenValidator socialTokenValidator,
+    ApplicationDbContext dbContext)
     : IIdentityService
 {
     public async Task<(bool Succeeded, IEnumerable<string> Errors)> RegisterAsync(string email, string password, CancellationToken cancellationToken)
@@ -158,13 +160,22 @@ public sealed class IdentityService(
         return (true, user.Id, []);
     }
 
-    public async Task<IReadOnlyCollection<ManagedUserDto>> ListUsersAsync(string? email, CancellationToken cancellationToken)
+    public async Task<IReadOnlyCollection<ManagedUserDto>> ListUsersAsync(string? email, string? nombre, CancellationToken cancellationToken)
     {
         var query = userManager.Users.AsQueryable();
         if (!string.IsNullOrWhiteSpace(email))
         {
             var normalizedEmail = email.Trim().ToUpperInvariant();
             query = query.Where(x => x.NormalizedEmail != null && x.NormalizedEmail.Contains(normalizedEmail));
+        }
+
+        if (!string.IsNullOrWhiteSpace(nombre))
+        {
+            var normalizedNombre = nombre.Trim().ToUpperInvariant();
+            query = query.Where(user => dbContext.FichasSocio.Any(ficha =>
+                ficha.UserId == user.Id &&
+                (ficha.Nombre.ToUpper().Contains(normalizedNombre) ||
+                 ficha.Apellidos.ToUpper().Contains(normalizedNombre))));
         }
 
         var users = await query.OrderBy(x => x.Email).ToListAsync(cancellationToken);
